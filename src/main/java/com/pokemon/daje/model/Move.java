@@ -1,4 +1,4 @@
-package model;
+package com.pokemon.daje.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
