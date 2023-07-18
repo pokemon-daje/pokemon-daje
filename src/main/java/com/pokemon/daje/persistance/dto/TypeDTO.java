@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "type")
-public class Type {
+public class TypeDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int dbId;
