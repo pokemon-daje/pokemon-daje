@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "move")
-public class Move {
+public class MoveDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -19,7 +19,7 @@ public class Move {
     private String name;
     @OneToOne
     @JoinColumn(name = "type_id", referencedColumnName = "dbId")
-    private Type type;
+    private TypeDTO type;
     @Column(name = "power")
     private int power;
 }

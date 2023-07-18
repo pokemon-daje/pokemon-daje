@@ -9,7 +9,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "pokemons")
-public class Pokemon {
+public class PokemonDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -31,7 +31,7 @@ public class Pokemon {
             inverseJoinColumns=
             @JoinColumn(name="move_db_id", referencedColumnName="id")
     )
-    private Set<Move> moveSet;
+    private Set<MoveDTO> moveDTOSet;
     @Column(name = "trainer_name")
     private String trainerName;
 }
