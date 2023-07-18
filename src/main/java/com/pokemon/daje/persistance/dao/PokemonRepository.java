@@ -1,4 +1,4 @@
-package com.pokemon.daje.persistance.dto.dao;
+package com.pokemon.daje.persistance.dao;
 
 import com.pokemon.daje.persistance.dto.PokemonDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
