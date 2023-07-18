@@ -15,7 +15,7 @@ public class Pokemon {
 
     private Integer id;
     private String name;
-    private Image sprite;
+    private String spriteUrl;
     private Integer currentHP;
     private Integer maxHP;
     private Type type;
