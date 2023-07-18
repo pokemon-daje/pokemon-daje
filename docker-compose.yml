@@ -1,0 +1,16 @@
+version: '3.1'
+services:
+  mysql:
+    image: mysql:8.0.33
+    container_name: daje_db
+    environment:
+      MYSQL_ROOT_PASSWORD: daje
+      MYSQL_DATABASE: daje
+      MYSQL_USER: daje
+      MYSQL_PASSWORD: daje
+    ports:
+      - 3306:3306
+    volumes:
+      - ./scripts/schema.sql:/docker-entrypoint-initdb.d/1.sql
+    command: mysqld --sql_mode="" --character-set-server=utf8 --collation-server=utf8_slovenian_ci --init-connect='SET NAMES UTF8;' --innodb-flush-log-at-trx-commit=0
+
