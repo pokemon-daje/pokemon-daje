@@ -6,7 +6,6 @@ import com.pokemon.daje.persistance.dto.MoveDTO;
 import com.pokemon.daje.persistance.dto.PokemonDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,12 +27,12 @@ public class PokemonMarshaller implements
         Pokemon pokemon = null;
         if (dto != null){
             pokemon = new Pokemon();
-            pokemon.setId(dto.getId());
+            pokemon.setId(dto.getPokemonSpeciesDTO().getPokedexId());
             pokemon.setName(dto.getName());
-            pokemon.setSpriteUrl(dto.getSpriteUrl());
+            pokemon.setSpriteUrl(dto.getPokemonSpeciesDTO().getSpriteUrl());
             pokemon.setCurrentHP(dto.getCurrentHealthPoints());
             pokemon.setMaxHP(dto.getMaxHealthPoints());
-            pokemon.setType(typeMarshaller.fromDTO(dto.getType()));
+            pokemon.setType(typeMarshaller.fromDTO(dto.getPokemonSpeciesDTO().getType()));
             Set<Move> moveSet = new HashSet<>();
             dto.getMoveSet().forEach(move -> moveSet.add(moveMarshaller.fromDTO(move)));
             pokemon.setMoves(moveSet);
@@ -47,12 +46,13 @@ public class PokemonMarshaller implements
         PokemonDTO pokemonDTO = null;
         if (business != null){
             pokemonDTO = new PokemonDTO();
-            pokemonDTO.setId(business.getId());
+            pokemonDTO.getPokemonSpeciesDTO().setPokedexId(business.getId());
             pokemonDTO.setName(business.getName());
-            pokemonDTO.setSpriteUrl(business.getSpriteUrl());
+            pokemonDTO.getPokemonSpeciesDTO().setName(business.getName());
+            pokemonDTO.getPokemonSpeciesDTO().setSpriteUrl(business.getSpriteUrl());
             pokemonDTO.setCurrentHealthPoints(business.getCurrentHP());
             pokemonDTO.setMaxHealthPoints(business.getMaxHP());
-            pokemonDTO.setType(typeMarshaller.toDTO(business.getType()));
+            pokemonDTO.getPokemonSpeciesDTO().setType(typeMarshaller.toDTO(business.getType()));
             Set<MoveDTO> moveSet = new HashSet<>();
             business.getMoves().forEach(move -> moveSet.add(moveMarshaller.toDTO(move)));
             pokemonDTO.setMoveSet(moveSet);
