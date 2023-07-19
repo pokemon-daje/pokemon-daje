@@ -3,9 +3,11 @@ package com.pokemon.daje.service;
 import com.pokemon.daje.model.Pokemon;
 import com.pokemon.daje.model.Types;
 import com.pokemon.daje.persistance.dao.PokemonRepository;
+import com.pokemon.daje.persistance.dao.PokemonSpeciesRepository;
 import com.pokemon.daje.persistance.dao.TypeRepository;
 import com.pokemon.daje.persistance.dto.MoveDTO;
 import com.pokemon.daje.persistance.dto.PokemonDTO;
+import com.pokemon.daje.persistance.dto.PokemonSpeciesDTO;
 import com.pokemon.daje.persistance.dto.TypeDTO;
 import com.pokemon.daje.persistance.marshaller.PokemonMarshaller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +22,14 @@ public class PokemonService {
     private final PokemonRepository pokemonRepository;
     private final PokemonMarshaller pokemonMarshaller;
     private final TypeRepository typeRepository;
+    private final PokemonSpeciesRepository pokemonSpeciesRepository;
 
     @Autowired
-    public PokemonService(PokemonRepository pokemonRepository, PokemonMarshaller pokemonMarshaller, TypeRepository typeRepository) {
+    public PokemonService(PokemonRepository pokemonRepository, PokemonMarshaller pokemonMarshaller, TypeRepository typeRepository, PokemonSpeciesRepository pokemonSpeciesRepository) {
         this.pokemonRepository = pokemonRepository;
         this.pokemonMarshaller = pokemonMarshaller;
         this.typeRepository = typeRepository;
+        this.pokemonSpeciesRepository = pokemonSpeciesRepository;
     }
 
     public List<PokemonDTO> getAll(){
@@ -39,7 +43,9 @@ public class PokemonService {
     public void insert(Pokemon pokemon){
         if(pokemon.getType() != null && !Types.fromString(pokemon.getType().getName()).equals(Types.UNKNOWN)) {
             PokemonDTO pokemonDTO = pokemonMarshaller.toDTO(pokemon);
-            Optional<TypeDTO> pokemonType = typeRepository.findByPokedexId(pokemonDTO.getType().getPokedexId());
+            Optional<PokemonSpeciesDTO> optionalPokemonSpeciesDTO = pokemonSpeciesRepository.findById(pokemon.getId());
+            optionalPokemonSpeciesDTO.ifPresent(pokemonDTO::setPokemonSpeciesDTO);
+            Optional<TypeDTO> pokemonType = typeRepository.findByPokedexId(pokemonDTO.getPokemonSpeciesDTO().getType().getPokedexId());
             Set<MoveDTO> alteredMoves = new HashSet<>();
             pokemonDTO.getMoveSet().forEach(moveDTO -> {
                 Optional<TypeDTO> optionalMoveType = typeRepository.findByPokedexId(moveDTO.getType().getPokedexId());
@@ -48,8 +54,8 @@ public class PokemonService {
                     alteredMoves.add(moveDTO);
                 });
             });
-            pokemonType.ifPresent(pokemonDTO::setType);
             if(pokemonType.isPresent() && alteredMoves.size() == pokemonDTO.getMoveSet().size()) {
+                pokemonDTO.getPokemonSpeciesDTO().setType(pokemonType.get());
                 pokemonRepository.save(pokemonDTO);
             }
         }
