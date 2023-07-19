@@ -64,4 +64,9 @@ public class PokemonService {
     public void deleteById(int id){
         pokemonRepository.deleteById(id);
     }
+
+    public List<Pokemon> getSixRandomPokemon() {
+        List<PokemonDTO> pokemonDTOList = pokemonRepository.getSixRandomPokemon();
+        return pokemonDTOList.stream().map(pokemonMarshaller::fromDTO).toList();
+    }
 }
