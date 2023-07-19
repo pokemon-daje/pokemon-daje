@@ -3,6 +3,7 @@ create table pokemons
     current_health_points int          null,
     id                    int auto_increment primary key,
     max_health_points     int          null,
+    type_id               int          references type (id),
     pokedex_id            int          null,
     name                  varchar(255) null,
     sprite_url            varchar(255) null,
