@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class MoveMarshaller implements
         BaseMarshaller<Move, MoveDTO>{
 
-    private TypeMarshaller typeMarshaller;
+    private final TypeMarshaller typeMarshaller;
 
     @Autowired
     private MoveMarshaller(TypeMarshaller typeMarshaller){
