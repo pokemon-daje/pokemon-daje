@@ -18,7 +18,7 @@ public class MoveDTO implements DTOInterface {
     @Column(name = "name")
     private String name;
     @OneToOne
-    @JoinColumn(name = "type_id", referencedColumnName = "dbId")
+    @JoinColumn(name = "type_id", referencedColumnName = "id")
     private TypeDTO type;
     @Column(name = "power")
     private int power;
