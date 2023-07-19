@@ -36,8 +36,8 @@ public class PokemonService {
         return pokemonRepository.findAll();
     }
 
-    public PokemonDTO getById(int pokemonId){
-        return pokemonRepository.findById(pokemonId).orElse(null);
+    public Pokemon getById(int pokemonId){
+        return pokemonMarshaller.fromDTO(pokemonRepository.findById(pokemonId).orElse(null));
     }
 
     public void insert(Pokemon pokemon){

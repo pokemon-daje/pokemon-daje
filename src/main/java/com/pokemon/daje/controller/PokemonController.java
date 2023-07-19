@@ -1,12 +1,10 @@
 package com.pokemon.daje.controller;
 
 import com.pokemon.daje.model.Pokemon;
-import com.pokemon.daje.persistance.dto.PokemonDTO;
 import com.pokemon.daje.service.PokemonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -19,11 +17,11 @@ public class PokemonController {
         this.pokemonService = pokemonService;
     }
     @GetMapping("/pokemons/")
-    public ResponseEntity<List<PokemonDTO>> getAll(){
-        return ResponseEntity.ok(pokemonService.getAll());
+    public ResponseEntity<List<Pokemon>> getSixRandom(){
+        return ResponseEntity.ok(pokemonService.getSixRandomPokemon());
     }
     @GetMapping("pokemons/{id}")
-    public ResponseEntity<PokemonDTO> getById(@PathVariable int id){
+    public ResponseEntity<Pokemon> getById(@PathVariable int id){
         return ResponseEntity.ok(pokemonService.getById(id));
     }
     @PostMapping("/pokemons/add/")
