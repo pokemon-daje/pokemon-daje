@@ -26,11 +26,11 @@ public class PokemonController {
     public ResponseEntity<PokemonDTO> getById(@PathVariable int id){
         return ResponseEntity.ok(pokemonService.getById(id));
     }
-    @PostMapping("/pokemons/")
+    @PostMapping("/pokemons/add/")
     public void insert(@RequestBody Pokemon pokemon){
         pokemonService.insert(pokemon);
     }
-    @DeleteMapping("/pokemons/{id}")
+    @DeleteMapping("/pokemons/delete/{id}")
     public void delete(@PathVariable int id){
         pokemonService.deleteById(id);
     }
