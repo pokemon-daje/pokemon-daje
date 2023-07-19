@@ -19,6 +19,7 @@ gradlew
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+target
 
 ### IntelliJ IDEA ###
 .idea
