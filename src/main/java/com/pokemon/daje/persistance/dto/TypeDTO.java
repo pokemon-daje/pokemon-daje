@@ -11,9 +11,10 @@ import lombok.Setter;
 public class TypeDTO implements DTOInterface {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private int dbId;
     @Column(name = "pokedex_type_id")
-    private int id;
+    private int pokedexId;
     @Column(name = "name")
     private String name;
     @Column(name = "image_url")
