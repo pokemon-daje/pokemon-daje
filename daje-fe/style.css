@@ -29,6 +29,7 @@ body {
   font-size: 1.80rem;
   margin: 30px 0 5px;
   color: #ffcc00;
+  text-shadow: 3px 3px #004c8c;
 }
 #logo img{
   text-align: center;
