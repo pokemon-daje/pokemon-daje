@@ -1,21 +1,29 @@
-create table pokemons
-(
-    current_health_points int          null,
-    id                    int auto_increment primary key,
-    max_health_points     int          null,
-    type_id               int          references type (id),
-    pokedex_id            int          null,
-    name                  varchar(255) null,
-    sprite_url            varchar(255) null,
-    trainer_name          varchar(255) null
-);
-
 create table type
 (
     id           int auto_increment primary key,
     pokedex_type_id int          null unique ,
     image_url       varchar(255) null,
     name            varchar(255) null
+);
+
+create table pokemon_species
+(
+    id         int auto_increment primary key,
+    pokedex_id int          null unique,
+    type_id    int          null,
+    name       varchar(255) null,
+    sprite_url varchar(255) null,
+    foreign key (type_id) references type (pokedex_type_id)
+);
+
+create table pokemons
+(
+    current_health_points int          null,
+    id                    int auto_increment primary key,
+    max_health_points     int          null,
+    pokedex_id            int          null references pokemon_species(pokedex_id),
+    name                  varchar(255) null,
+    trainer_name          varchar(255) null
 );
 
 create table move
