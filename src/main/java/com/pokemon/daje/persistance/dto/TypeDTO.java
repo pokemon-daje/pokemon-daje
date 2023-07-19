@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "type")
-public class TypeDTO {
+public class TypeDTO implements DTOInterface {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int dbId;

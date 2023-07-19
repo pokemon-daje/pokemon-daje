@@ -9,7 +9,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "pokemons")
-public class PokemonDTO {
+public class PokemonDTO implements DTOInterface {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
