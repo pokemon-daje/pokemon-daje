@@ -12,8 +12,8 @@ create table pokemons
 
 create table type
 (
-    db_id           int auto_increment primary key,
-    pokedex_type_id int          null,
+    id           int auto_increment primary key,
+    pokedex_type_id int          null unique ,
     image_url       varchar(255) null,
     name            varchar(255) null
 );
@@ -25,7 +25,7 @@ create table move
     power           int          null,
     type_id         int          null,
     name            varchar(255) null,
-    foreign key (type_id) references type (db_id)
+    foreign key (type_id) references type (id)
 );
 
 create table pokemons_move_set
