@@ -24,14 +24,17 @@ public class PokemonDTO implements DTOInterface {
     private int currentHealthPoints;
     @Column(name = "max_health_points")
     private int maxHealthPoints;
-    @ManyToMany
+    @OneToOne
+    @JoinColumn(name = "type_id", referencedColumnName = "id")
+    private TypeDTO type;
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name="pokemons_move_set",
             joinColumns=
             @JoinColumn(name="pokemon_db_id", referencedColumnName="id"),
             inverseJoinColumns=
             @JoinColumn(name="move_db_id", referencedColumnName="id")
     )
-    private Set<MoveDTO> moveDTOSet;
+    private Set<MoveDTO> moveSet;
     @Column(name = "trainer_name")
     private String trainerName;
 }
