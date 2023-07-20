@@ -40,8 +40,8 @@ public class PokemonService {
         return pokemonMarshaller.fromDTO(pokemonRepository.findById(pokemonId).orElse(null));
     }
 
-    public void insert(Pokemon pokemon){
-        if(pokemon.getType() != null && !Types.fromString(pokemon.getType().getName()).equals(Types.UNKNOWN)) {
+    public PokemonDTO insert(Pokemon pokemon) {
+        if (pokemon.getType() != null && !Types.fromString(pokemon.getType().getName()).equals(Types.UNKNOWN)) {
             PokemonDTO pokemonDTO = pokemonMarshaller.toDTO(pokemon);
             Optional<PokemonSpeciesDTO> optionalPokemonSpeciesDTO = pokemonSpeciesRepository.findById(pokemon.getId());
             optionalPokemonSpeciesDTO.ifPresent(pokemonDTO::setPokemonSpeciesDTO);
@@ -54,11 +54,12 @@ public class PokemonService {
                     alteredMoves.add(moveDTO);
                 });
             });
-            if(pokemonType.isPresent() && alteredMoves.size() == pokemonDTO.getMoveSet().size()) {
+            if (pokemonType.isPresent() && alteredMoves.size() == pokemonDTO.getMoveSet().size()) {
                 pokemonDTO.getPokemonSpeciesDTO().setType(pokemonType.get());
-                pokemonRepository.save(pokemonDTO);
+                return pokemonRepository.save(pokemonDTO);
             }
         }
+        return null;
     }
 
     public void deleteById(int id){
