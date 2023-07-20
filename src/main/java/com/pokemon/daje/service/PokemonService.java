@@ -10,8 +10,10 @@ import com.pokemon.daje.persistance.dto.PokemonDTO;
 import com.pokemon.daje.persistance.dto.PokemonSpeciesDTO;
 import com.pokemon.daje.persistance.dto.TypeDTO;
 import com.pokemon.daje.persistance.marshaller.PokemonMarshaller;
+import com.pokemon.daje.util.RandomPokemonStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -23,20 +25,22 @@ public class PokemonService {
     private final PokemonMarshaller pokemonMarshaller;
     private final TypeRepository typeRepository;
     private final PokemonSpeciesRepository pokemonSpeciesRepository;
+    private final RandomPokemonStorage randomPokemonStorage;
 
     @Autowired
-    public PokemonService(PokemonRepository pokemonRepository, PokemonMarshaller pokemonMarshaller, TypeRepository typeRepository, PokemonSpeciesRepository pokemonSpeciesRepository) {
+    public PokemonService(PokemonRepository pokemonRepository, PokemonMarshaller pokemonMarshaller, TypeRepository typeRepository, PokemonSpeciesRepository pokemonSpeciesRepository, RandomPokemonStorage randomPokemonStorage) {
         this.pokemonRepository = pokemonRepository;
         this.pokemonMarshaller = pokemonMarshaller;
         this.typeRepository = typeRepository;
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
+        this.randomPokemonStorage = randomPokemonStorage;
     }
 
-    public List<PokemonDTO> getAll(){
+    public List<PokemonDTO> getAll() {
         return pokemonRepository.findAll();
     }
 
-    public Pokemon getById(int pokemonId){
+    public Pokemon getById(int pokemonId) {
         return pokemonMarshaller.fromDTO(pokemonRepository.findById(pokemonId).orElse(null));
     }
 
@@ -62,7 +66,7 @@ public class PokemonService {
         return null;
     }
 
-    public void deleteById(int id){
+    public void deleteById(int id) {
         pokemonRepository.deleteById(id);
     }
 
@@ -70,4 +74,20 @@ public class PokemonService {
         List<PokemonDTO> pokemonDTOList = pokemonRepository.getSixRandomPokemon();
         return pokemonDTOList.stream().map(pokemonMarshaller::fromDTO).toList();
     }
+
+    public Pokemon swap(Pokemon pokemon) {
+        PokemonDTO toReturn = null;
+        if (pokemon != null) {
+            PokemonDTO pokemonDTOToSave = pokemonMarshaller.toDTO(pokemon);
+            Optional<PokemonSpeciesDTO> pokemonSpeciesDTO = pokemonSpeciesRepository.findByPokedexId(pokemon.getId());
+            pokemonSpeciesDTO.ifPresent(specie -> pokemonDTOToSave.setPokemonSpeciesDTO(specie));
+            PokemonDTO pokemonSaved = pokemonRepository.save(pokemonDTOToSave);
+            if (pokemonSaved != null) {
+                toReturn = randomPokemonStorage.swapPokemon(pokemonDTOToSave);
+                pokemonRepository.deleteById(toReturn.getDbId());
+            }
+        }
+        return pokemonMarshaller.fromDTO(toReturn);
+    }
+
 }
