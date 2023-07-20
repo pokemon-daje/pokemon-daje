@@ -1,6 +1,7 @@
 package com.pokemon.daje.persistance.dto;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,10 +26,10 @@ public class PokemonDTO implements DTOInterface {
     private int currentHealthPoints;
     @Column(name = "max_health_points")
     private int maxHealthPoints;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name="pokedex_id", referencedColumnName = "id")
     private PokemonSpeciesDTO pokemonSpeciesDTO;
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name="pokemons_move_set",
             joinColumns=
             @JoinColumn(name="pokemon_db_id", referencedColumnName="id"),
