@@ -60,6 +60,7 @@ body {
 }
 .wrapper i:first-child{
   left: -22px;
+  z-index: 1;
 }
 .wrapper i:last-child{
   right: -22px;
@@ -67,7 +68,7 @@ body {
 .wrapper .carousel{
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: calc((100% / 3) - 12px);
+  grid-auto-columns: calc((100% / 3) - 1px);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   gap: 16px;
@@ -129,6 +130,13 @@ body {
   font-size: 1.31rem;
 }
 
+.card #btn_modal{
+  background-color: #004c8c;
+  font-family: 'Permanent Marker', cursive;
+  color: #ffcc00;
+}
+
+
 @media screen and (max-width: 900px) {
   .wrapper .carousel {
     grid-auto-columns: calc((100% / 2) - 9px);
@@ -140,3 +148,5 @@ body {
     grid-auto-columns: 100%;
   }
 }
+
+

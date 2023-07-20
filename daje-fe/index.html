@@ -12,29 +12,57 @@
     <script src="fetch.js" defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
   </head>
-  <body class="d-flex flex-column row flex-wrap">
+  <body>
 
-    <div id="logo"  class="col-12">
+    <div id="logo">
     <img src="images/logo_pokemon.png" alt="">
     </div>
      
-    <div class="col-12">
-    <div class="wrapper col-8">
+    <div>
+    <div class="wrapper">
       <i id="left" class="fa-solid fa-angle-left"></i>
       <ul class="carousel">
-       <!-- <li class="card">
+        <li class="card">
           <div class="img"><img src="images/pokemon-1513925_1280.jpg" alt="img" draggable="false"></div>
           <h2>Blanche Pearson</h2>
           <span>Sales Manager</span>
-        </li>-->
-       <!-- <li class="card">
+        </li>
+       <li class="card">
           <div class="img"><img src="images/img-2.jpg" alt="img" draggable="false"></div>
           <h2>Joenas Brauers</h2>
           <span>Web Developer</span>
-        </li>-->
-       <!-- <li class="card">
+          <button type="button" class="btn" id="btn_modal" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            me voi vedè bene?
+          </button>
+
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  ...
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+
+
+        </li>
+       <li class="card">
           <div class="img"><img src="images/img-3.jpg" alt="img" draggable="false"></div>
           <h2>Lariach French</h2>
           <span>Online Teacher</span>
@@ -53,13 +81,13 @@
           <div class="img"><img src="images/img-6.jpg" alt="img" draggable="false"></div>
           <h2>Donald Horton</h2>
           <span>App Designer</span>
-        </li>-->
+        </li>
       </ul>
       <i id="right" class="fa-solid fa-angle-right"></i>
     </div>
   </div>
 
-  <div class="alert alert-success" class="message" role="alert" id="message">
+  <div class="message" role="alert" id="message">
   -- Movete a scambià sti cazzo de pokémon.... daje n' pò. --
   </div>
 
