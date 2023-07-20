@@ -16,10 +16,7 @@ import com.pokemon.daje.util.RandomPokemonStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class PokemonService {
@@ -29,6 +26,7 @@ public class PokemonService {
     private final MoveRepository moveRepository;
     private final PokemonSpeciesRepository pokemonSpeciesRepository;
     private final RandomPokemonStorage randomPokemonStorage;
+    private List<Pokemon> listOfChagedPokemon;
 
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository, PokemonMarshaller pokemonMarshaller, TypeRepository typeRepository, MoveRepository moveRepository, PokemonSpeciesRepository pokemonSpeciesRepository, RandomPokemonStorage randomPokemonStorage) {
@@ -38,6 +36,7 @@ public class PokemonService {
         this.moveRepository = moveRepository;
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
         this.randomPokemonStorage = randomPokemonStorage;
+        this.listOfChagedPokemon = new ArrayList<>();
     }
 
     public List<PokemonDTO> getAll() {
@@ -88,15 +87,22 @@ public class PokemonService {
     }
 
     public Pokemon swap(Pokemon pokemon) {
-        PokemonDTO toReturn = null;
+        Pokemon pokemonToReturn = null;
         if (pokemon != null) {
             PokemonDTO pokemonSaved = insert(pokemon);
-            if (pokemonSaved != null) {
-                toReturn = randomPokemonStorage.swapPokemon(pokemonSaved);
-                pokemonRepository.deleteById(toReturn.getDbId());
-            }
+            PokemonDTO dtoSwap = randomPokemonStorage.swapPokemon(pokemonSaved);
+            Optional<PokemonDTO> optPokeToDelete = pokemonRepository.findById(dtoSwap.getDbId());
+            pokemonToReturn = pokemonMarshaller.fromDTO(optPokeToDelete.get());
+            pokemonRepository.delete(optPokeToDelete.get());
+            listOfChagedPokemon.add(pokemonToReturn);
         }
-        return pokemonMarshaller.fromDTO(toReturn);
+        return pokemonToReturn;
+    }
+
+    public List<Pokemon> getListOfChagedPokemon(){
+        List<Pokemon> changedPokemon = new ArrayList<>(listOfChagedPokemon);
+        listOfChagedPokemon = new ArrayList<>();
+        return changedPokemon;
     }
 
     private Optional<MoveDTO> getMoveDTO(int pokedexId){
