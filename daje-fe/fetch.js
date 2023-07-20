@@ -4,15 +4,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
        const text = encodeURIComponent(document.getElementById('text').value);*/
 
-       fetch("http://localhost:8080/api/pokemons")
+       fetch("http://localhost:8080/api/pokemons", { mode: 'no-cors' })
            .then((res) => {
+            console.log(res);
                if(res.ok) {
                    return res.json()
                }
-           }).then((pokemons) => {
-               console.log(pokemons)
+           }).then((response) => {
+                const { results, resultCount } = response; //destructuring
+                console.log(resultCount)
                let ul = '';
-               for (let pokemon_spacies of pokemons) {
+               for (let pokemon_spacies of results) {
                    ul += `
                    <li class="card">
                        <div class="img"><img src="${pokemon_spacies.sprite_url}" draggable="false"></div>
