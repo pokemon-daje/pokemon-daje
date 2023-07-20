@@ -12,24 +12,35 @@ import java.util.List;
 public class PokemonController {
 
     final PokemonService pokemonService;
+
     @Autowired
     public PokemonController(PokemonService pokemonService) {
         this.pokemonService = pokemonService;
     }
+
     @GetMapping("/pokemons")
-    public ResponseEntity<List<Pokemon>> getSixRandom(){
+    public ResponseEntity<List<Pokemon>> getSixRandom() {
         return ResponseEntity.ok(pokemonService.getSixRandomPokemon());
     }
+
     @GetMapping("/pokemons/{id}")
-    public ResponseEntity<Pokemon> getById(@PathVariable int id){
+    public ResponseEntity<Pokemon> getById(@PathVariable int id) {
         return ResponseEntity.ok(pokemonService.getById(id));
     }
+
     @PostMapping("/pokemons")
-    public void insert(@RequestBody Pokemon pokemon){
+    public void insert(@RequestBody Pokemon pokemon) {
         pokemonService.insert(pokemon);
     }
+
+    @PostMapping("/pokemons/swap")
+    public Pokemon swap(@RequestBody Pokemon pokemon) {
+        return pokemonService.swap(pokemon);
+    }
+
     @DeleteMapping("/pokemons/{id}")
-    public void delete(@PathVariable int id){
+    public void delete(@PathVariable int id) {
         pokemonService.deleteById(id);
     }
+
 }
