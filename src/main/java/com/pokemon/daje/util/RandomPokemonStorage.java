@@ -10,12 +10,10 @@ import java.util.Random;
 
 @Component
 public class RandomPokemonStorage {
-    private final PokemonRepository pokemonRepository;
     private final List<PokemonDTO> pokemonDTOList;
 
     @Autowired
     public RandomPokemonStorage(PokemonRepository pokemonRepository) {
-        this.pokemonRepository = pokemonRepository;
         this.pokemonDTOList = pokemonRepository.getSixRandomPokemon();
     }
 
