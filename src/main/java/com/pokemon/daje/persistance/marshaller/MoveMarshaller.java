@@ -20,7 +20,7 @@ public class MoveMarshaller implements
         Move move = null;
         if (dto != null){
             move = new Move();
-            move.setId(dto.getId());
+            move.setId(dto.getPokedexId());
             move.setName(dto.getName());
             move.setPower(dto.getPower());
             move.setType(typeMarshaller.fromDTO(dto.getType()));
@@ -33,7 +33,7 @@ public class MoveMarshaller implements
         MoveDTO moveDTO = null;
         if (business != null){
             moveDTO = new MoveDTO();
-            moveDTO.setId(business.getId());
+            moveDTO.setPokedexId(business.getId());
             moveDTO.setName(business.getName());
             moveDTO.setPower(business.getPower());
             moveDTO.setType(typeMarshaller.toDTO(business.getType()));
