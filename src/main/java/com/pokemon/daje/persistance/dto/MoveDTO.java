@@ -14,7 +14,7 @@ public class MoveDTO implements DTOInterface {
     @Column(name = "id")
     private int dbId;
     @Column(name = "pokedex_move_id")
-    private int id;
+    private int pokedexId;
     @Column(name = "name")
     private String name;
     @OneToOne
