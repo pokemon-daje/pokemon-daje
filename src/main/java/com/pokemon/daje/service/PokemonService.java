@@ -1,6 +1,5 @@
 package com.pokemon.daje.service;
 
-import com.pokemon.daje.model.Move;
 import com.pokemon.daje.model.Pokemon;
 import com.pokemon.daje.model.Types;
 import com.pokemon.daje.persistance.dao.MoveRepository;
