@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 @Entity
@@ -22,4 +24,17 @@ public class MoveDTO implements DTOInterface {
     private TypeDTO type;
     @Column(name = "power")
     private int power;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MoveDTO moveDTO = (MoveDTO) o;
+        return pokedexId == moveDTO.pokedexId && power == moveDTO.power && Objects.equals(name, moveDTO.name) && Objects.equals(type, moveDTO.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pokedexId, name, type, power);
+    }
 }
