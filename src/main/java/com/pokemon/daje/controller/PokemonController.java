@@ -16,19 +16,19 @@ public class PokemonController {
     public PokemonController(PokemonService pokemonService) {
         this.pokemonService = pokemonService;
     }
-    @GetMapping("/pokemons/")
+    @GetMapping("/pokemons")
     public ResponseEntity<List<Pokemon>> getSixRandom(){
         return ResponseEntity.ok(pokemonService.getSixRandomPokemon());
     }
-    @GetMapping("pokemons/{id}")
+    @GetMapping("/pokemons/{id}")
     public ResponseEntity<Pokemon> getById(@PathVariable int id){
         return ResponseEntity.ok(pokemonService.getById(id));
     }
-    @PostMapping("/pokemons/add/")
+    @PostMapping("/pokemons")
     public void insert(@RequestBody Pokemon pokemon){
         pokemonService.insert(pokemon);
     }
-    @DeleteMapping("/pokemons/delete/{id}")
+    @DeleteMapping("/pokemons/{id}")
     public void delete(@PathVariable int id){
         pokemonService.deleteById(id);
     }
