@@ -66,7 +66,11 @@ public class PokemonService {
                 }
             });
             if (pokemonType.isPresent() && alteredMoves.size() == pokemonDTO.getMoveSet().size()) {
-                getSpecieDTO(pokemon.getId()).ifPresent(pokemonDTO::setPokemonSpeciesDTO);
+                Optional<PokemonSpeciesDTO> specie = getSpecieDTO(pokemon.getId());
+                if(specie.isEmpty()){
+                    pokemonDTO.getPokemonSpeciesDTO().setType(pokemonType.get());
+                }
+                specie.ifPresent(pokemonDTO::setPokemonSpeciesDTO);
                 pokemonDTO.setMoveSet(alteredMoves);
                 return pokemonRepository.save(pokemonDTO);
             }
