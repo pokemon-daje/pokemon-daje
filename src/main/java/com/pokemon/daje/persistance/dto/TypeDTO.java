@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 @Entity
@@ -19,4 +21,17 @@ public class TypeDTO implements DTOInterface {
     private String name;
     @Column(name = "image_url")
     private String imageUrl;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TypeDTO typeDTO = (TypeDTO) o;
+        return pokedexId == typeDTO.pokedexId && Objects.equals(name, typeDTO.name) && Objects.equals(imageUrl, typeDTO.imageUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pokedexId, name, imageUrl);
+    }
 }
