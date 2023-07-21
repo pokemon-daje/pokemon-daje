@@ -14,6 +14,7 @@ ByTeam-Daje
     - css
     - bootstrap
     - js
+    - Node
 - [Encountered issues](#Encountered-issues)
 - [Online References](#Online-references)
 
@@ -31,9 +32,14 @@ ByTeam-Daje
 ##<a name="Backend">Backend</a>
 
 - ### Spring Boot Framework:
+
 - ### Docker:
+
 - ### Mysql database:
+
 - ### Swagger:
+[for see all Api](http://localhost:8080/swagger-ui/index.html)
+
 
 
 ##<a name="FrontEnd">Frontend</a>
@@ -68,8 +74,13 @@ ByTeam-Daje
 - ###front-end:
 - [ ] [for bootstrap](https://getbootstrap.com/docs/5.3/getting-started/introduction/)
 - [ ] [for fetch](https://www.html.it/pag/66525/fetch-api/)
+- [ ] Gimp Application - for text color of words of frontend 
+- [ ] [for html and css functionalities](https://www.w3schools.com/)
 
 - ###backend:
+
+  - baeldung
+  
 
 - ### for documentation:
 - [ ] [for Db schemas](https://app.diagrams.net/)
