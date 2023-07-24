@@ -149,7 +149,7 @@ which pokemon to exchange.
   - [for fetch](https://www.html.it/pag/66525/fetch-api/)
   - Gimp Application - for text color of frontend's words
   - [for html and css functionalities](https://www.w3schools.com/)
-
+  - [for images](https://www.pinterest.it/) 
 - ### backend:
   - Baeldung
   - [for MySql](https://medium.com/@tushar0618/how-to-create-er-diagram-of-a-database-in-mysql-workbench-209fbf63fd03)
