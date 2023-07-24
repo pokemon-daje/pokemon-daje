@@ -79,17 +79,27 @@ public class PokemonService {
         }).toList();
     }
 
-    public Pokemon swap(Pokemon pokemon) {
-        Pokemon pokemonToReturn = null;
+    public PackageExchange inizializePokemonsSwap(PokemonExchangeDTO pokemon) {
+        PackageExchange exchangeSwapDTO = null;
         if (pokemon != null) {
-            PokemonDTO pokemonSaved = insert(pokemon);
-            PokemonDTO dtoSwap = randomPokemonStorage.swapPokemon(pokemonSaved);
-            Optional<PokemonDTO> optPokeToDelete = pokemonRepository.findById(dtoSwap.getDbId());
-            pokemonToReturn = pokemonMarshaller.fromDTO(optPokeToDelete.get());
-            pokemonRepository.delete(optPokeToDelete.get());
-            listOfChagedPokemon.add(pokemonToReturn);
+            PokemonDTO pokemonToPersistDTO = validateAndGivePokemonToSave(pokemon);
+            int pokemonToGiveId = choosePokemonToSwap();
+            Optional<PokemonDTO> pokemonDTOToGive= pokemonRepository.findById(pokemonToGiveId);
+            if(pokemonDTOToGive.isPresent()){
+                normalizeDTO(pokemonDTOToGive.get());
+                String idSwap = UUID.randomUUID().toString();
+                exchangeSwapDTO = new PackageExchange(idSwap, mapPokemonToGiveForExchange(pokemonDTOToGive.get()));
+                swapBank.put(idSwap,
+                        new PokemonSwapDeposit(
+                                Map.of(
+                                        SwapBankAction.TOSAVE, pokemonToPersistDTO,
+                                        SwapBankAction.TODELETE, pokemonDTOToGive.get()
+                                )
+                        )
+                );
+            }
         }
-        return pokemonToReturn;
+        return exchangeSwapDTO;
     }
 
     public List<Pokemon> getListOfChagedPokemon(){
