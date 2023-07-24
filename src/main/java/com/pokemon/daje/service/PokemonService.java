@@ -102,10 +102,42 @@ public class PokemonService {
         return exchangeSwapDTO;
     }
 
-    public List<Pokemon> getListOfChagedPokemon(){
-        List<Pokemon> changedPokemon = new ArrayList<>(listOfChagedPokemon);
-        listOfChagedPokemon = new ArrayList<>();
-        return changedPokemon;
+    public int nextStepSwap(String exchangeid, PackageExchangeStatus packageExchangeStatus) {
+        int code = 0;
+        if (packageExchangeStatus.getStatus() == ResponseCode.SUCCESS.getCode()) {
+            PokemonSwapDeposit exchange = swapBank.get(exchangeid);
+            PokemonDTO pokemonToSave = exchange != null ? exchange.getPokemonToSave() : null;
+            PokemonDTO pokemonToDelete = exchange != null ? exchange.getPokemonToDelete() : null;
+
+            if (pokemonToSave != null && pokemonToDelete != null) {
+                try {
+                    pokemonToSave = pokemonRepository.save(pokemonToSave);
+                } catch (Exception ex) {
+                    return ResponseCode.SERVER_ERROR.getCode();
+                }
+                try {
+                    pokemonRepository.delete(pokemonToDelete);
+                } catch (Exception ex) {
+                    pokemonRepository.delete(pokemonToSave);
+                    return ResponseCode.SERVER_ERROR.getCode();
+                }
+                code = ResponseCode.SUCCESS.getCode();
+            } else {
+                code = ResponseCode.BAD_REQUEST.getCode();
+            }
+            swapBank.remove(exchangeid);
+        }
+        return code;
+    }
+
+    public int choosePokemonToSwap() {
+        Random random = new Random();
+        PokemonDTO pokemonSwap = null;
+        if (!randomPokemonStorage.isEmpty()) {
+            int randomPos = random.nextInt(0, randomPokemonStorage.size());
+            pokemonSwap = randomPokemonStorage.remove(randomPos);
+        }
+        return pokemonSwap.getDbId();
     }
 
     private void normalizeDTO(PokemonDTO pokemonToNormalize) {
