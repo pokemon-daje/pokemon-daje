@@ -114,9 +114,4 @@ public class PokemonController {
         return emitter;
     }
 
-    @DeleteMapping("/pokemons/{id}")
-    public void delete(@PathVariable int id) {
-        pokemonService.deleteById(id);
-    }
-
 }
