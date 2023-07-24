@@ -56,31 +56,10 @@ public class PokemonService {
     }
 
     public PokemonDTO insert(Pokemon pokemon) {
-        if (pokemon.getType() != null && !Types.fromString(pokemon.getType().getName()).equals(Types.UNKNOWN)) {
+        if (pokemon.getType() != null) {
             PokemonDTO pokemonDTO = pokemonMarshaller.toDTO(pokemon);
-            Optional<TypeDTO> pokemonType = getTypeDTO(pokemon.getType().getId());
-            Set<MoveDTO> alteredMoves = new HashSet<>();
-            pokemonDTO.getMoveSet().forEach(moveDTO -> {
-                Optional<MoveDTO> moveInDB = getMoveDTO(moveDTO.getPokedexId());
-                if(moveInDB.isPresent()){
-                    alteredMoves.add(moveInDB.get());
-                }else{
-                    Optional<TypeDTO> optionalMoveType = getTypeDTO(moveDTO.getType().getPokedexId());
-                    optionalMoveType.ifPresent(moveType -> {
-                        moveDTO.setType(moveType);
-                        alteredMoves.add(moveDTO);
-                    });
-                }
-            });
-            if (pokemonType.isPresent() && alteredMoves.size() == pokemonDTO.getMoveSet().size()) {
-                Optional<PokemonSpeciesDTO> specie = getSpecieDTO(pokemon.getId());
-                if(specie.isEmpty()){
-                    pokemonDTO.getPokemonSpeciesDTO().setType(pokemonType.get());
-                }
-                specie.ifPresent(pokemonDTO::setPokemonSpeciesDTO);
-                pokemonDTO.setMoveSet(alteredMoves);
-                return pokemonRepository.save(pokemonDTO);
-            }
+            normalizeDTO(pokemonDTO);
+            return pokemonRepository.save(pokemonDTO);
         }
         return null;
     }
