@@ -50,8 +50,9 @@ public class PokemonService {
         this.swapBank = new HashMap<>();
     }
 
-    public Pokemon getById(int pokemonId) {
-        return pokemonMarshaller.fromDTO(pokemonRepository.findById(pokemonId).orElse(null));
+    public PokemonFrontEndDTO getById(int pokemonId) {
+        Pokemon pokemonBusiness = pokemonMarshaller.fromDTO(pokemonRepository.findById(pokemonId).orElse(null));
+        return pokemonToFrontEndMarshaller.toDTO(pokemonBusiness);
     }
 
     public PokemonDTO insert(Pokemon pokemon) {
