@@ -113,18 +113,6 @@ public class PokemonService {
         return changedPokemon;
     }
 
-    private Optional<MoveDTO> getMoveDTO(int pokedexId){
-        return moveRepository.findByPokedexId(pokedexId);
-    }
-
-    private Optional<TypeDTO> getTypeDTO(int pokedexId){
-        return typeRepository.findByPokedexId(pokedexId);
-    }
-
-    private Optional<PokemonSpeciesDTO> getSpecieDTO(int pokedexId){
-        return pokemonSpeciesRepository.findByPokedexId(pokedexId);
-    }
-
     private void normalizeDTO(PokemonDTO pokemonToNormalize) {
         Set<MoveDTO> movesDTO = new HashSet<>();
         Optional<PokemonSpeciesDTO> speciesDTO = pokemonSpeciesRepository.findByPokedexId(pokemonToNormalize.getPokemonSpeciesDTO().getPokedexId());
