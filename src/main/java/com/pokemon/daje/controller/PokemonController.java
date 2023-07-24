@@ -28,24 +28,26 @@ public class PokemonController {
         serverEmitters =new HashSet<>();
     }
 
-    @GetMapping("/pokemons")
-    public ResponseEntity<List<Pokemon>> getSixRandom() {
+    @GetMapping("/pokemon")
+    public ResponseEntity<List<PokemonFrontEndDTO>> getSixRandom() {
         return ResponseEntity.ok(pokemonService.getSixRandomPokemon());
     }
-
-    @GetMapping("/pokemons/{id}")
-    public ResponseEntity<Pokemon> getById(@PathVariable int id) {
+    @GetMapping("/pokemon/{id}")
+    public ResponseEntity<PokemonFrontEndDTO> getById(@PathVariable int id) {
         return ResponseEntity.ok(pokemonService.getById(id));
     }
-
-    @PostMapping("/pokemons")
+    @PostMapping("/pokemon")
     public void insert(@RequestBody Pokemon pokemon) {
         pokemonService.insert(pokemon);
     }
+    @DeleteMapping("/pokemon/{id}")
+    public void delete(@PathVariable int id) {
+        pokemonService.deleteById(id);
+    }
 
-    @PostMapping("/pokemons/swap")
-    public Pokemon swap(@RequestBody Pokemon pokemon) {
-        Pokemon toSend = pokemonService.swap(pokemon);
+    @PostMapping("/pokemon/exchange")
+    public PackageExchange swap(@RequestBody PokemonExchangeDTO pokemon) {
+        PackageExchange toSend = pokemonService.inizializePokemonsSwap(pokemon);
         List<SseEmitter> usedEmitter = new ArrayList<>();
         serverEmitters.forEach(sseEmitter -> {
                     try {
