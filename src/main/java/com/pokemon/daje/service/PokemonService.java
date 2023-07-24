@@ -41,6 +41,8 @@ public class PokemonService {
 
         this.pokemonRepository = pokemonRepository;
         this.pokemonMarshaller = pokemonMarshaller;
+        this.pokemonToFrontEndMarshaller = pokemonToFrontEndMarshaller;
+        this.pokemonToExchangeMarshaller = pokemonToExchangeMarshaller;
         this.typeRepository = typeRepository;
         this.moveRepository = moveRepository;
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
