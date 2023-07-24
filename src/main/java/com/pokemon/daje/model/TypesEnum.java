@@ -48,4 +48,12 @@ public enum TypesEnum {
             .filter(type -> type.getName().equals(name.toLowerCase())).findFirst()
             .orElse(UNKNOWN);
     }
+    public static TypesEnum fromNumber(int id) {
+        List<TypesEnum> listEnum = List.of(TypesEnum.values());
+        if(listEnum.stream().anyMatch(objEnum -> objEnum.id == id)){
+            return listEnum.get(id);
+        }else{
+            return TypesEnum.UNKNOWN;
+        }
+    }
 }
