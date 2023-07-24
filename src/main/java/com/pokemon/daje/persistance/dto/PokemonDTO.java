@@ -26,10 +26,10 @@ public class PokemonDTO implements DTOInterface {
     private int currentHealthPoints;
     @Column(name = "max_health_points")
     private int maxHealthPoints;
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name="pokedex_id", referencedColumnName = "id")
     private PokemonSpeciesDTO pokemonSpeciesDTO;
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany
     @JoinTable(name="pokemons_move_set",
             joinColumns=
             @JoinColumn(name="pokemon_db_id", referencedColumnName="id"),
