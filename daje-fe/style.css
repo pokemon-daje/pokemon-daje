@@ -13,7 +13,7 @@ body {
   justify-content: space-around;
   min-height: 100vh;
  /* background: linear-gradient(to left top, #031A9A, #8B53FF);*/
- background: url(/images/pokemon-1536855_1280.png);
+ background: url(/images/backgrounImage.jpg);
  background-size: cover;
  background-repeat: no-repeat;
  flex-direction: column;
@@ -26,10 +26,10 @@ body {
 #message{
   font-family: 'Permanent Marker', cursive;
   font-weight: 500;
-  font-size: 1.80rem;
+  font-size: 3.00rem;
   margin: 30px 0 5px;
   color: #ffcc00;
-  text-shadow: 3px 3px #004c8c;
+  text-shadow: 6px 6px #004c8c;
 }
 #logo img{
   text-align: center;
@@ -108,7 +108,7 @@ body {
   border: 3px #004c8c solid;
 }
 .carousel .card .img {
-  background: #8B53FF;
+  background: #ffcc00;
   height: 148px;
   width: 148px;
   border-radius: 50%;
