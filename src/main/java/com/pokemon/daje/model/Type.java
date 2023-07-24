@@ -1,15 +1,9 @@
 package com.pokemon.daje.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Objects;
-
-
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 public class Type implements BusinessInterface{
