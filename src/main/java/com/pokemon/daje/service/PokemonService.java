@@ -30,7 +30,13 @@ public class PokemonService {
     private Map<String, PokemonSwapDeposit> swapBank;
 
     @Autowired
-    public PokemonService(PokemonRepository pokemonRepository, PokemonMarshaller pokemonMarshaller, TypeRepository typeRepository, MoveRepository moveRepository, PokemonSpeciesRepository pokemonSpeciesRepository, RandomPokemonStorage randomPokemonStorage) {
+    public PokemonService(PokemonRepository pokemonRepository,
+                          PokemonMarshaller pokemonMarshaller,
+                          PokemonToFrontEndMarshaller pokemonToFrontEndMarshaller,
+                          PokemonToExchangeMarshaller pokemonToExchangeMarshaller,
+                          TypeRepository typeRepository, MoveRepository moveRepository,
+                          PokemonSpeciesRepository pokemonSpeciesRepository) {
+
         this.pokemonRepository = pokemonRepository;
         this.pokemonMarshaller = pokemonMarshaller;
         this.typeRepository = typeRepository;
