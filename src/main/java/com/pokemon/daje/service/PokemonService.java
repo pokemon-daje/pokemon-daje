@@ -152,7 +152,6 @@ public class PokemonService {
     }
 
     private ResponseCode validatePokemonExchangeDTO(PokemonExchangeDTO pokemonExchangeDTO){
-        int code = 0;
         Optional<PokemonSpeciesDTO> pokemonSpeciesDTO = pokemonSpeciesRepository.findByPokedexId(pokemonExchangeDTO.getId());
         Set<MoveDTO> moves = new HashSet<>();
         pokemonExchangeDTO.getMoves().forEach(move -> {
