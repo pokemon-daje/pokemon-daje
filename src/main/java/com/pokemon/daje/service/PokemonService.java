@@ -1,7 +1,9 @@
 package com.pokemon.daje.service;
 
-import com.pokemon.daje.model.Pokemon;
-import com.pokemon.daje.model.Types;
+import com.pokemon.daje.controller.json.dto.*;
+import com.pokemon.daje.controller.json.marshaller.PokemonToExchangeMarshaller;
+import com.pokemon.daje.controller.json.marshaller.PokemonToFrontEndMarshaller;
+import com.pokemon.daje.model.*;
 import com.pokemon.daje.persistance.dao.MoveRepository;
 import com.pokemon.daje.persistance.dao.PokemonRepository;
 import com.pokemon.daje.persistance.dao.PokemonSpeciesRepository;
