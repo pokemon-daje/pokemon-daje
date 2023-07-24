@@ -99,15 +99,39 @@ outdated/deprecated. By generating individual SSH keys, we were able to
 successfully clone the project from the Git repository.
 
 ###_Zscaler Application_: 
-
-
+Zscaler is a security tool installed on some team members' machines. 
+It inspects inbound and outbound network traffic, including SSL, and instantly 
+blocks malware, threats, etc.
+Once the basic project structure was created using Gradle, the tool prevented the 
+download of the necessary libraries to build the project.
+Having identified that Zscaler's filters were causing the issue, we decided to switch to Maven.
 
 ###_Cors_:
+Cross-Origin Resource Sharing is a security setting that checks whether the requesting resource 
+is 'safe,' meaning the backend allows access to its resources from the frontend.  
 
-(per comunicazione fra backend e frontend)
+_Our issue_: The backend did not permit access to the frontend.  
+
+_Solution_: We managed CORS permissions on the backend through Spring Security."
 
 ###_Pokemon exchange_:
+Problems encountered: 
+ - normalization on species, type, move;
+ - management with double confirmation linked to a single exchange
 
+**Normalization**: Due to the relational mapping and uniqueness of the codes for each element,
+pokemon pokedex_id duplicity problems were created.  
+This also affected the **management with double confirmation** linked to a single exchange, since 
+it requires confirmation from the recipient and the applicant;
+
+**_Solutions_**: the normalization of data in specific methods has been centralized; Instead, for double 
+confirmations, a 'division' into levels was carried out:
+- _1st level_ = receipt of request, exchange is created by giving an identifier with which to decide 
+which pokemon to exchange.
+- _2nd level_= confirmation of the answer and analysis of the same with consequent acceptance.
+
+Solution schema:
+![](image/pokemonExchangeSequence.png)
 ***
 
 ##<a name="Online-references">Online references</a>
