@@ -46,12 +46,8 @@ public class PokemonService {
         this.typeRepository = typeRepository;
         this.moveRepository = moveRepository;
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
-        this.randomPokemonStorage = randomPokemonStorage;
-        this.listOfChagedPokemon = new ArrayList<>();
-    }
-
-    public List<PokemonDTO> getAll() {
-        return pokemonRepository.findAll();
+        this.randomPokemonStorage = new ArrayList<>(pokemonRepository.getSixRandomPokemon());
+        this.swapBank = new HashMap<>();
     }
 
     public Pokemon getById(int pokemonId) {
