@@ -52,7 +52,7 @@ public class PokemonController {
         serverEmitters.forEach(sseEmitter -> {
                     try {
                         sseEmitter.send(SseEmitter.event()
-                                .data(pokemonService.getListOfChagedPokemon())
+                                .data(new PackageFrontEnd(toSend.getId(),0))
                                 .id("exchange")
                                 .name("pokemon"));
                         usedEmitter.add(sseEmitter);
