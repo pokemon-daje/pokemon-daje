@@ -96,10 +96,10 @@ public class PokemonController {
 
     @GetMapping("/pokemon/exchange/events")
     public SseEmitter streamSseMvc() {
-        SseEmitter emitter = new SseEmitter(2000L);
+        SseEmitter emitter = new SseEmitter(1000L);
             try {
                 SseEmitter.SseEventBuilder event = SseEmitter.event()
-                        .data(pokemonService.getListOfChagedPokemon())
+                        .data(new Date())
                         .id("exchange")
                         .name("pokemon");
                 emitter.send(event);
