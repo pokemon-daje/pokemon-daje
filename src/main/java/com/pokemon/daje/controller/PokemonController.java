@@ -65,7 +65,36 @@ public class PokemonController {
         return toSend;
     }
 
-    @GetMapping("/pokemons/exchange")
+    @PostMapping("/pokemon/exchange/{exchangeId}/status")
+    public ResponseEntity<HttpStatus> statusSwap(@PathVariable("exchangeId") String exchangeId, @RequestBody PackageExchangeStatus packageExchangeStatus){
+        int code;
+        if(!ObjectUtils.isEmpty(exchangeId) && packageExchangeStatus != null){
+            code = pokemonService.nextStepSwap(exchangeId,packageExchangeStatus);
+        } else {
+            code = 0;
+        }
+        List<SseEmitter> usedEmitter = new ArrayList<>();
+        serverEmitters.forEach(sseEmitter -> {
+                    try {
+                        sseEmitter.send(SseEmitter.event()
+                                .data(new PackageFrontEnd(exchangeId,code))
+                                .id("exchange")
+                                .name("pokemon"));
+                        usedEmitter.add(sseEmitter);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
+        usedEmitter.forEach(ResponseBodyEmitter::complete);
+        if(code == 200){
+            return new ResponseEntity<>(HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/pokemon/exchange/events")
     public SseEmitter streamSseMvc() {
         SseEmitter emitter = new SseEmitter(2000L);
             try {
