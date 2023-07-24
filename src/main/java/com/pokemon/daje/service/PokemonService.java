@@ -125,4 +125,55 @@ public class PokemonService {
         return pokemonSpeciesRepository.findByPokedexId(pokedexId);
     }
 
+    private void normalizeDTO(PokemonDTO pokemonToNormalize) {
+        Set<MoveDTO> movesDTO = new HashSet<>();
+        Optional<PokemonSpeciesDTO> speciesDTO = pokemonSpeciesRepository.findByPokedexId(pokemonToNormalize.getPokemonSpeciesDTO().getPokedexId());
+        pokemonToNormalize.getMoveSet().forEach(move -> {
+            Optional<MoveDTO> moveDTO = moveRepository.findByPokedexId(move.getPokedexId());
+            moveDTO.ifPresent(movesDTO::add);
+        });
+        speciesDTO.ifPresent(pokemonToNormalize::setPokemonSpeciesDTO);
+        pokemonToNormalize.setMoveSet(movesDTO);
+    }
+
+    private ResponseCode validatePokemonExchangeDTO(PokemonExchangeDTO pokemonExchangeDTO){
+        int code = 0;
+        Optional<PokemonSpeciesDTO> pokemonSpeciesDTO = pokemonSpeciesRepository.findByPokedexId(pokemonExchangeDTO.getId());
+        Set<MoveDTO> moves = new HashSet<>();
+        pokemonExchangeDTO.getMoves().forEach(move -> {
+            Optional<MoveDTO> moveDTO= moveRepository.findByPokedexIdOrGetUnknow(move);
+            moveDTO.ifPresent(moves::add);
+        });
+        return pokemonSpeciesDTO.isPresent() && !moves.isEmpty()? ResponseCode.SUCCESS : ResponseCode.BAD_REQUEST;
+    }
+
+    private PokemonDTO validateAndGivePokemonToSave(PokemonExchangeDTO pokemonExchangeDTO) {
+        PokemonDTO pokemonToPersistDTO = null;
+        if (pokemonExchangeDTO != null && !ResponseCode.BAD_REQUEST.equals(validatePokemonExchangeDTO(pokemonExchangeDTO))) {
+            Pokemon pokemonBusiness = pokemonToExchangeMarshaller.fromDTO(pokemonExchangeDTO);
+            pokemonToPersistDTO = pokemonMarshaller.toDTO(pokemonBusiness);
+            normalizeDTO(pokemonToPersistDTO);
+        }
+        return pokemonToPersistDTO;
+    }
+
+    private PokemonExchangeDTO mapPokemonToGiveForExchange(PokemonDTO pokemonDTO) {
+        PokemonExchangeDTO pokemonExchangeDTO = null;
+        if (pokemonDTO != null) {
+            Pokemon pokemonBusiness = pokemonMarshaller.fromDTO(pokemonDTO);
+            pokemonExchangeDTO = pokemonToExchangeMarshaller.toDTO(pokemonBusiness);
+        }
+        return pokemonExchangeDTO;
+    }
+
+    @Scheduled(fixedDelay = 30000)
+    private void checkTimeBank() {
+        List<String> spoiledExchange = new ArrayList<>();
+        swapBank.forEach((key, exchange) -> {
+            if (System.currentTimeMillis() - exchange.getDepositTime() > 5000) {
+                spoiledExchange.add(key);
+            }
+        });
+        spoiledExchange.forEach(key -> swapBank.remove(key));
+    }
 }
