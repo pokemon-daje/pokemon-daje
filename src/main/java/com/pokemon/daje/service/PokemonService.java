@@ -21,6 +21,8 @@ import java.util.*;
 public class PokemonService {
     private final PokemonRepository pokemonRepository;
     private final PokemonMarshaller pokemonMarshaller;
+    private final PokemonToFrontEndMarshaller pokemonToFrontEndMarshaller;
+    private final PokemonToExchangeMarshaller pokemonToExchangeMarshaller;
     private final TypeRepository typeRepository;
     private final MoveRepository moveRepository;
     private final PokemonSpeciesRepository pokemonSpeciesRepository;
