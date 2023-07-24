@@ -13,8 +13,8 @@ import com.pokemon.daje.persistance.dto.PokemonDTO;
 import com.pokemon.daje.persistance.dto.PokemonSpeciesDTO;
 import com.pokemon.daje.persistance.dto.TypeDTO;
 import com.pokemon.daje.persistance.marshaller.PokemonMarshaller;
-import com.pokemon.daje.util.RandomPokemonStorage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
