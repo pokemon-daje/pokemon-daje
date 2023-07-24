@@ -33,9 +33,11 @@ public class PokemonMarshaller implements
             pokemon.setCurrentHP(dto.getCurrentHealthPoints());
             pokemon.setMaxHP(dto.getMaxHealthPoints());
             pokemon.setType(typeMarshaller.fromDTO(dto.getPokemonSpeciesDTO().getType()));
+
             Set<Move> moveSet = new HashSet<>();
             dto.getMoveSet().forEach(move -> moveSet.add(moveMarshaller.fromDTO(move)));
             pokemon.setMoves(moveSet);
+
             pokemon.setOriginalTrainer(dto.getTrainerName());
         }
         return pokemon;
@@ -46,16 +48,18 @@ public class PokemonMarshaller implements
         PokemonDTO pokemonDTO = null;
         if (business != null){
             pokemonDTO = new PokemonDTO();
-            pokemonDTO.getPokemonSpeciesDTO().setPokedexId(business.getId());
             pokemonDTO.setName(business.getName());
-            pokemonDTO.getPokemonSpeciesDTO().setName(business.getName());
-            pokemonDTO.getPokemonSpeciesDTO().setSpriteUrl(business.getSpriteUrl());
             pokemonDTO.setCurrentHealthPoints(business.getCurrentHP());
             pokemonDTO.setMaxHealthPoints(business.getMaxHP());
-            pokemonDTO.getPokemonSpeciesDTO().setType(typeMarshaller.toDTO(business.getType()));
+
+            pokemonDTO.getPokemonSpeciesDTO().setPokedexId(business.getId());
+            pokemonDTO.getPokemonSpeciesDTO().setName(business.getName());
+            pokemonDTO.getPokemonSpeciesDTO().setSpriteUrl(business.getSpriteUrl());
+
             Set<MoveDTO> moveSet = new HashSet<>();
             business.getMoves().forEach(move -> moveSet.add(moveMarshaller.toDTO(move)));
             pokemonDTO.setMoveSet(moveSet);
+
             pokemonDTO.setTrainerName(business.getOriginalTrainer());
         }
         return pokemonDTO;
