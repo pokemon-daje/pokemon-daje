@@ -34,8 +34,6 @@ public class MoveMarshaller implements
         if (business != null){
             moveDTO = new MoveDTO();
             moveDTO.setPokedexId(business.getId());
-            moveDTO.setName(business.getName());
-            moveDTO.setPower(business.getPower());
             moveDTO.setType(typeMarshaller.toDTO(business.getType()));
         }
         return moveDTO;
