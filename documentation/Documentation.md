@@ -1,7 +1,7 @@
 ![](image/logo.png)
 ByTeam-Daje.
 
-#Index:
+# Index:
 - [Introduction](#Introduction)
   - Requirements
   - Project description
@@ -22,12 +22,12 @@ ByTeam-Daje.
 
 ***
 
-##<a name="Introduction">Introduction</a>
+## <a name="Introduction">Introduction</a>
 
-###Requirements:
+### Requirements:
 See all requirements [Here](https://github.com/ErGren/Smarmellearning/blob/main/it/lezione_speciale_pokemon/lezione_speciale_pokemon.md)
 
-###Project description:
+### Project description:
 Pokemon Daje is a web application that:
 
 - Handles Pokemon exchange requests sent by a client.
@@ -40,9 +40,9 @@ Pokemon Daje is a web application that:
 
 ***
 
-##<a name="Software-Technologies">Software technologies</a>
+## <a name="Software-Technologies">Software technologies</a>
 
-- ##<a name="Backend">Backend</a>
+- ## <a name="Backend">Backend</a>
 
 ### _Spring Boot Framework and JDK 17_:
 Spring Boot Framework and JDK 17 have made it possible to develop the project in a simpler and more 
@@ -80,25 +80,33 @@ below, the diagram of its structure:
 ![](image/E-R_Scheme.png)
     
  
-- ##<a name="FrontEnd">Frontend</a>
+- ## <a name="FrontEnd">Frontend</a>
 
 ### _html_:
+
+
 ### _css_:
+
+
 ### _Bootstrap_:
+
+
 ### _Js_:
+
+
 ### _Node_:
 
 ***
 
-- ##<a name="encountered-issues">Encountered issues</a>
+- ## <a name="encountered-issues">Encountered issues</a>
 
-###_Initial clone from git_:  
+### _Initial clone from git_:  
 The project cloning, via HTTP, initially caused issues for our team. 
 Therefore, we decided to switch to using SSH key since the usage of HTTP is 
 outdated/deprecated. By generating individual SSH keys, we were able to 
 successfully clone the project from the Git repository.
 
-###_Zscaler Application_: 
+### _Zscaler Application_: 
 Zscaler is a security tool installed on some team members' machines. 
 It inspects inbound and outbound network traffic, including SSL, and instantly 
 blocks malware, threats, etc.
@@ -106,7 +114,7 @@ Once the basic project structure was created using Gradle, the tool prevented th
 download of the necessary libraries to build the project.
 Having identified that Zscaler's filters were causing the issue, we decided to switch to Maven.
 
-###_Cors_:
+### _Cors_:
 Cross-Origin Resource Sharing is a security setting that checks whether the requesting resource 
 is 'safe,' meaning the backend allows access to its resources from the frontend.  
 
@@ -114,7 +122,7 @@ _Our issue_: The backend did not permit access to the frontend.
 
 _Solution_: We managed CORS permissions on the backend through Spring Security."
 
-###_Pokemon exchange_:
+### _Pokemon exchange_:
 Problems encountered: 
  - normalization on species, type, move;
  - management with double confirmation linked to a single exchange
@@ -130,19 +138,19 @@ confirmations, a 'division' into levels was carried out:
 which pokemon to exchange.
 - _2nd level_= confirmation of the answer and analysis of the same with consequent acceptance.
 
-Solution schema:
+**Solution schema:**
 ![](image/pokemonExchangeSequence.png)
 ***
 
-##<a name="Online-references">Online references</a>
+## <a name="Online-references">Online references</a>
 
-- ###front-end:
+- ### front-end:
   - [for bootstrap](https://getbootstrap.com/docs/5.3/getting-started/introduction/)
   - [for fetch](https://www.html.it/pag/66525/fetch-api/)
   - Gimp Application - for text color of frontend's words
   - [for html and css functionalities](https://www.w3schools.com/)
 
-- ###backend:
+- ### backend:
   - Baeldung
   - [for MySql](https://medium.com/@tushar0618/how-to-create-er-diagram-of-a-database-in-mysql-workbench-209fbf63fd03)
 
