@@ -26,8 +26,8 @@ public class PokemonService {
     private final TypeRepository typeRepository;
     private final MoveRepository moveRepository;
     private final PokemonSpeciesRepository pokemonSpeciesRepository;
-    private final RandomPokemonStorage randomPokemonStorage;
-    private List<Pokemon> listOfChagedPokemon;
+    private final List<PokemonDTO> randomPokemonStorage;
+    private Map<String, PokemonSwapDeposit> swapBank;
 
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository, PokemonMarshaller pokemonMarshaller, TypeRepository typeRepository, MoveRepository moveRepository, PokemonSpeciesRepository pokemonSpeciesRepository, RandomPokemonStorage randomPokemonStorage) {
