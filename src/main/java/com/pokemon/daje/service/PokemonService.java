@@ -68,9 +68,15 @@ public class PokemonService {
         pokemonRepository.deleteById(id);
     }
 
-    public List<Pokemon> getSixRandomPokemon() {
+    public List<PokemonFrontEndDTO> getSixRandomPokemon() {
         List<PokemonDTO> pokemonDTOList = pokemonRepository.getSixRandomPokemon();
-        return pokemonDTOList.stream().map(pokemonMarshaller::fromDTO).toList();
+        return pokemonDTOList.stream().map(pokemonDTO -> {
+            int databaseId = pokemonDTO.getDbId();
+            Pokemon businessPokemon = pokemonMarshaller.fromDTO(pokemonDTO);
+            PokemonFrontEndDTO pokemonFrontEndDTO = pokemonToFrontEndMarshaller.toDTO(businessPokemon);
+            pokemonFrontEndDTO.setDatabaseId(databaseId);
+            return pokemonFrontEndDTO;
+        }).toList();
     }
 
     public Pokemon swap(Pokemon pokemon) {
