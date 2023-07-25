@@ -2,6 +2,7 @@ package com.pokemon.daje.controller;
 
 import com.pokemon.daje.controller.json.dto.*;
 import com.pokemon.daje.model.Pokemon;
+import com.pokemon.daje.model.ProgressingProcessCode;
 import com.pokemon.daje.service.PokemonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
