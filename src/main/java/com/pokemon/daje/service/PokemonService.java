@@ -121,6 +121,7 @@ public class PokemonService {
     }
 
     public int choosePokemonToSwap() {
+        checkPokemonsListSize();
         Random random = new Random();
         PokemonDTO pokemonSwap = null;
         if (!randomPokemonStorage.isEmpty()) {
