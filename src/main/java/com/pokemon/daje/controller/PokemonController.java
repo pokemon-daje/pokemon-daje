@@ -50,8 +50,8 @@ public class PokemonController {
     public ResponseEntity<PackageExchange> swap(@RequestBody PokemonExchangeDTO pokemon) {
         PackageExchange pack = pokemonService.inizializePokemonsSwap(pokemon);
         ResponseEntity<PackageExchange> toSend = new ResponseEntity<>(pack,HttpStatus.OK);
-        if(pack != null){
-            sendDataToFrontEnd(pack.getId(),0);
+        if(pack == null){
+            sendDataToFrontEnd("exchange error",400);
             toSend = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return toSend;
