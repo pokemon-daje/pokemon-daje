@@ -70,30 +70,28 @@ public class PokemonController {
 
     @PostMapping("/pokemon/exchange/{exchangeId}/status")
     public ResponseEntity<HttpStatus> statusSwap(@PathVariable("exchangeId") String exchangeId, @RequestBody PackageExchangeStatus packageExchangeStatus){
-        int code;
-        if(!ObjectUtils.isEmpty(exchangeId) && packageExchangeStatus != null){
+        ProgressingProcessCode code;
+        if(!ObjectUtils.isEmpty(exchangeId) && packageExchangeStatus != null
+                && !ProgressingProcessCode.UNKWON.equals(ProgressingProcessCode.fromNumber(packageExchangeStatus.getStatus()))
+        ){
             code = pokemonService.nextStepSwap(exchangeId,packageExchangeStatus);
         } else {
-            code = 0;
+            code = ProgressingProcessCode.BAD_REQUEST;
         }
-        List<SseEmitter> usedEmitter = new ArrayList<>();
-        serverEmitters.forEach(sseEmitter -> {
-                    try {
-                        sseEmitter.send(SseEmitter.event()
-                                .data(new PackageFrontEnd(exchangeId,code))
-                                .id("exchange")
-                                .name("pokemon"));
-                        usedEmitter.add(sseEmitter);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        );
-        usedEmitter.forEach(ResponseBodyEmitter::complete);
-        if(code == 200){
-            return new ResponseEntity<>(HttpStatus.OK);
-        }else{
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        sendDataToFrontEnd(exchangeId,code.getCode());
+        switch (code){
+            case SUCCESS -> {
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            case BAD_REQUEST -> {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            case RESOURCE_NOT_FOUND -> {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            default -> {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
