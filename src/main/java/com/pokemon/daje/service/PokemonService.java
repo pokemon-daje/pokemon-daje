@@ -141,19 +141,19 @@ public class PokemonService {
         pokemonToNormalize.setMoveSet(movesDTO);
     }
 
-    private ResponseCode validatePokemonExchangeDTO(PokemonExchangeDTO pokemonExchangeDTO){
+    private ProgressingProcessCode validatePokemonExchangeDTO(PokemonExchangeDTO pokemonExchangeDTO){
         Optional<PokemonSpeciesDTO> pokemonSpeciesDTO = pokemonSpeciesRepository.findByPokedexId(pokemonExchangeDTO.getId());
         Set<MoveDTO> moves = new HashSet<>();
         pokemonExchangeDTO.getMoves().forEach(move -> {
             Optional<MoveDTO> moveDTO= moveRepository.findByPokedexIdOrGetUnknow(move);
             moveDTO.ifPresent(moves::add);
         });
-        return pokemonSpeciesDTO.isPresent() && !moves.isEmpty()? ResponseCode.SUCCESS : ResponseCode.BAD_REQUEST;
+        return pokemonSpeciesDTO.isPresent() && !moves.isEmpty()? ProgressingProcessCode.SUCCESS : ProgressingProcessCode.BAD_REQUEST;
     }
 
     private PokemonDTO validateAndGivePokemonToSave(PokemonExchangeDTO pokemonExchangeDTO) {
         PokemonDTO pokemonToPersistDTO = null;
-        if (pokemonExchangeDTO != null && !ResponseCode.BAD_REQUEST.equals(validatePokemonExchangeDTO(pokemonExchangeDTO))) {
+        if (pokemonExchangeDTO != null && !ProgressingProcessCode.BAD_REQUEST.equals(validatePokemonExchangeDTO(pokemonExchangeDTO))) {
             Pokemon pokemonBusiness = pokemonToExchangeMarshaller.fromDTO(pokemonExchangeDTO);
             pokemonToPersistDTO = pokemonMarshaller.toDTO(pokemonBusiness);
             normalizeDTO(pokemonToPersistDTO);
