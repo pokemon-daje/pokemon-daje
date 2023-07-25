@@ -102,30 +102,20 @@ public class PokemonService {
         return exchangeSwapDTO;
     }
 
-    public int nextStepSwap(String exchangeid, PackageExchangeStatus packageExchangeStatus) {
-        int code = 0;
-        if (packageExchangeStatus.getStatus() == ResponseCode.SUCCESS.getCode()) {
+    public ProgressingProcessCode nextStepSwap(String exchangeid, PackageExchangeStatus packageExchangeStatus) {
+        ProgressingProcessCode code = ProgressingProcessCode.SUCCESS;
+        if (packageExchangeStatus.getStatus() == ProgressingProcessCode.SUCCESS.getCode() && swapBank.containsKey(exchangeid)) {
             PokemonSwapDeposit exchange = swapBank.get(exchangeid);
             PokemonDTO pokemonToSave = exchange != null ? exchange.getPokemonToSave() : null;
             PokemonDTO pokemonToDelete = exchange != null ? exchange.getPokemonToDelete() : null;
 
-            if (pokemonToSave != null && pokemonToDelete != null) {
-                try {
-                    pokemonToSave = pokemonRepository.save(pokemonToSave);
-                } catch (Exception ex) {
-                    return ResponseCode.SERVER_ERROR.getCode();
-                }
-                try {
-                    pokemonRepository.delete(pokemonToDelete);
-                } catch (Exception ex) {
-                    pokemonRepository.delete(pokemonToSave);
-                    return ResponseCode.SERVER_ERROR.getCode();
-                }
-                code = ResponseCode.SUCCESS.getCode();
-            } else {
-                code = ResponseCode.BAD_REQUEST.getCode();
-            }
+            code = progressWithSwap(pokemonToSave,pokemonToDelete);
             swapBank.remove(exchangeid);
+        }else if((packageExchangeStatus.getStatus() == ProgressingProcessCode.SUCCESS.getCode()
+                || packageExchangeStatus.getStatus() == ProgressingProcessCode.BAD_REQUEST.getCode()
+                || packageExchangeStatus.getStatus() == ProgressingProcessCode.SERVER_ERROR.getCode())
+                && !swapBank.containsKey(exchangeid)){
+            code = ProgressingProcessCode.RESOURCE_NOT_FOUND;
         }
         return code;
     }
@@ -189,5 +179,44 @@ public class PokemonService {
             }
         });
         spoiledExchange.forEach(key -> swapBank.remove(key));
+    }
+    private ProgressingProcessCode progressWithSwap(PokemonDTO pokemonToSave, PokemonDTO pokemonToDelete){
+        ProgressingProcessCode code = ProgressingProcessCode.SUCCESS;
+        if (pokemonToSave != null && pokemonToDelete != null) {
+            try {
+                pokemonToSave = pokemonRepository.save(pokemonToSave);
+            } catch (Exception ex) {
+                return ProgressingProcessCode.SERVER_ERROR;
+            }
+            try {
+                pokemonRepository.delete(pokemonToDelete);
+            } catch (Exception ex) {
+                pokemonRepository.delete(pokemonToSave);
+                return ProgressingProcessCode.SERVER_ERROR;
+            }
+        } else {
+            code = ProgressingProcessCode.BAD_REQUEST;
+        }
+        return code;
+    }
+    
+    private void checkPokemonsListSize(){
+        Consumer<List<PokemonDTO>> checkIfPokemArePresent = (pokemonList) -> {
+            if(pokemonList.isEmpty()) {
+                try {
+                    pokemonList.add(loadPokemonFromProperty());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        checkIfPokemArePresent.accept(randomPokemonStorage);
+    }
+
+    private PokemonDTO loadPokemonFromProperty() throws IOException {
+        PokemonDTO pokemonDTO = ObjectMapperFactory.buildStrictGenericObjectMapper().readValue(new File("./fallbackpokemon.json"), PokemonDTO.class);
+        normalizeDTO(pokemonDTO);
+        pokemonDTO = pokemonRepository.save(pokemonDTO);
+        return pokemonDTO;
     }
 }
