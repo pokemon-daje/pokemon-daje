@@ -64,6 +64,18 @@ public class PokemonController {
         usedEmitter.forEach(ResponseBodyEmitter::complete);
         return toSend;
     }
+    @GetMapping("/pokemon/exchange")
+    public ResponseEntity<HttpStatus> swapErrorGet(@RequestBody PokemonExchangeDTO pokemon) {
+        return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+    }
+    @PutMapping("/pokemon/exchange")
+    public ResponseEntity<HttpStatus> swapErrorPut(@RequestBody PokemonExchangeDTO pokemon) {
+        return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+    }
+    @DeleteMapping("/pokemon/exchange")
+    public ResponseEntity<HttpStatus> swapErrorDelete(@RequestBody PokemonExchangeDTO pokemon) {
+        return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+    }
 
     @PostMapping("/pokemon/exchange/{exchangeId}/status")
     public ResponseEntity<HttpStatus> statusSwap(@PathVariable("exchangeId") String exchangeId, @RequestBody PackageExchangeStatus packageExchangeStatus){
