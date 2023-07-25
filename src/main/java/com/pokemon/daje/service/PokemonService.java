@@ -14,6 +14,7 @@ import com.pokemon.daje.persistance.dto.PokemonSpeciesDTO;
 import com.pokemon.daje.persistance.marshaller.PokemonMarshaller;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,8 @@ public class PokemonService {
     private final PokemonSpeciesRepository pokemonSpeciesRepository;
     private final List<PokemonDTO> randomPokemonStorage;
     private Map<String, PokemonSwapDeposit> swapBank;
+    @Value("${pokemon.fallback.path}")
+    private String pathPokemonFallBack;
 
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository,
@@ -218,7 +221,7 @@ public class PokemonService {
     }
 
     private PokemonDTO loadPokemonFromProperty() throws IOException {
-        PokemonDTO pokemonDTO = ObjectMapperFactory.buildStrictGenericObjectMapper().readValue(new File("./fallbackpokemon.json"), PokemonDTO.class);
+        PokemonDTO pokemonDTO = ObjectMapperFactory.buildStrictGenericObjectMapper().readValue(new File(pathPokemonFallBack), PokemonDTO.class);
         normalizeDTO(pokemonDTO);
         pokemonDTO = pokemonRepository.save(pokemonDTO);
         return pokemonDTO;
