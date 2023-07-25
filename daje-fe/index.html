@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Infinite Card Slider JavaScript | CodingNepal</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Fontawesome Link for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <script src="script.js" defer></script>
+    <script src="fetch.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+  </head>
+  <body>
+
+      <img src="/images/logo_pokemon_daje.png" class="img-fluid" alt="..." id="logo">
+  
+     
+    <div>
+    <div class="wrapper">
+      <i id="left" class="fa-solid fa-angle-left"></i>
+      <ul class="carousel">
+        <li class="card">
+          <div class="img"><img src="https://i.pinimg.com/564x/39/10/c8/3910c826f8b0d7f4d89e3dc30a050a05.jpg" alt="img" draggable="false"></div>
+          <h2>Blanche Pearson</h2>
+          <span>Sales Manager</span>
+        </li>
+       <li class="card">
+          <div class="img"><img src="https://i.pinimg.com/564x/2d/32/cf/2d32cf3c3042861de658c96052673408.jpg" alt="img" draggable="false"></div>
+          <h2>Joenas Brauers</h2>
+          <span>Web Developer</span>
+          <button type="button" class="btn" id="btn_modal" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            me voi vedè bene?
+          </button>
+
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  ...
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+              </div>
+            </div>
+         
+        </li>
+       <li class="card">
+          <div class="img"><img src="https://i.pinimg.com/564x/15/ca/3e/15ca3e1cc06bcdbc380662f2432008ee.jpg" alt="img" draggable="false"></div>
+          <h2>Lariach French</h2>
+          <span>Online Teacher</span>
+        </li>
+        <li class="card">
+          <div class="img"><img src="https://i.pinimg.com/564x/79/93/bb/7993bba7c70055e0e7952174ae39f4bb.jpg" alt="img" draggable="false"></div>
+          <h2>James Khosravi</h2>
+          <span>Freelancer</span>
+        </li>
+        <li class="card">
+          <div class="img"><img src="https://i.pinimg.com/564x/00/48/4b/00484bb59dd53af00e2465fee96733bb.jpg" alt="img" draggable="false"></div>
+          <h2>Kristina Zasiadko</h2>
+          <span>Bank Manager</span>
+        </li>
+        <li class="card">
+          <div class="img"><img src="https://i.pinimg.com/564x/9b/e8/f2/9be8f2a81b006e2f8897f1889107d0f7.jpg" alt="img" draggable="false"></div>
+          <h2>Donald Horton</h2>
+          <span>App Designer</span>
+        </li> 
+      </ul>
+      <i id="right" class="fa-solid fa-angle-right"></i>
+    </div>
+  </div>
+
+  <div class="message" role="alert" id="message">
+  -- Movete a scambià sti cazzo de pokémon.... daje n' pò. --
+  </div>
+
+  </body>
+</html>
