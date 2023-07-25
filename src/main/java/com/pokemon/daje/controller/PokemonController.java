@@ -114,4 +114,57 @@ public class PokemonController {
         return emitter;
     }
 
+//    @PostMapping("/pokemon/getpackage")
+//    public void getPackagePokemons(@RequestBody List<GatherDataPokemonSpecie> pokemonExchangeDTOList) throws IOException {
+//        int ok =0;
+//        StringBuilder scriptBuilder = new StringBuilder().append("insert into pokemon_species(pokedex_id,type_id,name,sprite_url) values \n");
+//        pokemonExchangeDTOList.forEach(pokemon -> {
+//            scriptBuilder.append("(").append(pokemon.getId()+",")
+//                    .append(TypesEnum.fromString(pokemon.getType()).getId()+",")
+//                    .append("'"+pokemon.getName()+"'"+",")
+//                    .append("'"+pokemon.getSprite()+"'")
+//                    .append("), \n");
+//        });
+//        File newFile = new File("D:/download/insertPokemonSpecies.sql");
+//        FileWriter write = new FileWriter(newFile);
+//        write.write(scriptBuilder.toString());
+//        write.close();
+//    }
+//
+//    @PostMapping("/pokemon/getpackage/moves")
+//    public void getPackageMoves(@RequestBody List<GatherDataPokemonMove> pokemonMoveExchangeDTOList) throws IOException {
+//        int ok =0;
+//        StringBuilder scriptBuilder = new StringBuilder().append("insert into move(pokedex_move_id,type_id,name,power) values \n");
+//        pokemonMoveExchangeDTOList.forEach(pokemon -> {
+//            scriptBuilder.append("(").append(pokemon.getPokedexID()+",")
+//                    .append(TypesEnum.fromString(pokemon.getType()).getId()+",")
+//                    .append("'"+pokemon.getName()+"'"+",")
+//                    .append(pokemon.getPower())
+//                    .append("), \n");
+//        });
+//        File newFile = new File("D:/download/insertPokemonMoves.sql");
+//        FileWriter write = new FileWriter(newFile);
+//        write.write(scriptBuilder.toString());
+//        write.close();
+//    }
+    @GetMapping(value = {"*/*.html","*.html", "*/","/*","*/*"})
+    public ResponseEntity<HttpStatus> test() throws IOException {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+    private void sendDataToFrontEnd(String exchangeId, int code){
+        List<SseEmitter> usedEmitter = new ArrayList<>();
+        serverEmitters.forEach(sseEmitter -> {
+                    try {
+                        sseEmitter.send(SseEmitter.event()
+                                .data(new PackageFrontEnd(exchangeId,code))
+                                .id("exchange")
+                                .name("pokemon"));
+                        usedEmitter.add(sseEmitter);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
+        usedEmitter.forEach(ResponseBodyEmitter::complete);
+    }
 }
