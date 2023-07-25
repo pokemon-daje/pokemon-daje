@@ -16,7 +16,7 @@ ByTeam-Daje.
     - Css
     - Bootstrap
     - Js
-    - Node
+    - Node Js
 - [Encountered issues](#Encountered-issues)
 - [Online References](#Online-references)
 
@@ -25,7 +25,7 @@ ByTeam-Daje.
 ## <a name="Introduction">Introduction</a>
 
 ### Requirements:
-See all requirements [Here](https://github.com/ErGren/Smarmellearning/blob/main/it/lezione_speciale_pokemon/lezione_speciale_pokemon.md)
+See all requirements [Here](https://github.com/ErGren/Smarmellearning/blob/main/it/lezione_speciale_pokemon/lezione_speciale_pokemon.md).
 
 ### Project description:
 Pokemon Daje is a web application that:
@@ -55,7 +55,7 @@ Swagger is an open-source framework used for designing, documenting, and visuali
 It provides tools to describe API endpoints, request and response formats, and other related 
 information, making it easier for developers to understand and interact with the API.  
 
-see all our Api, click [here](http://localhost:8080/swagger-ui/index.html) 
+see all our Api, click [here](http://localhost:8080/swagger-ui/index.html). 
 
 ### _Docker_:
 Docker is a platform that enables containerization of applications. 
@@ -65,11 +65,11 @@ These containers are lightweight, portable, and isolated from the underlying
 system, making it easy to deploy and run applications consistently across 
 different environments, such as development, testing, and production.
   
-For all these reasons, we have decided to run the MySQL database in a Docker container
+For all these reasons, we have decided to run the MySQL database in a Docker container.
 
 ### _Mysql database_:
 After carefully reading the requirements and having reasoned together, this type of database was chosen because:
-- Open-source relational database (RDBMS),
+- open-source relational database (RDBMS),
 - fast and lightweight for light workload applications where high performance on simple queries is critical.
 - easy to use,
 - displaying the structure of the database itself and the data stored in it,
@@ -81,21 +81,28 @@ below, the diagram of its structure:
     
  
 - ## <a name="FrontEnd">Frontend</a>
+### _Html_:
+"_Hyper Text Markup Language_", used for the page structure and the User Interface 
+where clients, based on their requests, can view the registered and exchanged Pokémon.
 
-### _html_:
-
-
-### _css_:
-
+### _Css_:
+"_Cascading Style Sheets_", is a language used to define the presentation of elements within an HTML page 
+(e.g., colors, text formats, etc.). A CSS file has been added to the HTML, it manages the 
+styling of Pokémon data along with their information and the layout of the whole web page 
+(using specific frameworks).
 
 ### _Bootstrap_:
-
+Bootstrap is a framework based on CSS and has been used to handle the layout of the web 
+page and make it responsive (adaptable to various devices).
 
 ### _Js_:
+"_JavaScript_" is a programming language used to add dynamic content to web pages and for 
+making asynchronous AJAX calls to the backend.
 
-
-### _Node_:
-
+### _Node Js_:
+A JavaScript framework that executes server-side code.
+It has been used to connect the frontend with the server, making it accessible to third 
+parties (external clients).
 ***
 
 - ## <a name="encountered-issues">Encountered issues</a>
@@ -144,19 +151,22 @@ which pokemon to exchange.
 
 ## <a name="Online-references">Online references</a>
 
-- ### front-end:
-  - [for bootstrap](https://getbootstrap.com/docs/5.3/getting-started/introduction/)
-  - [for fetch](https://www.html.it/pag/66525/fetch-api/)
+- ### Frontend:
+  - [For Bootstrap](https://getbootstrap.com/docs/5.3/getting-started/introduction/)
+  - [For Fetch](https://www.html.it/pag/66525/fetch-api/)
+  - [For Html, Css and Js functionalities](https://www.w3schools.com/)
   - Gimp Application - for text color of frontend's words
-  - [for html and css functionalities](https://www.w3schools.com/)
-  - [for images](https://www.pinterest.it/) 
-- ### backend:
+  - [For images of pokémons](https://www.pokemon.com/us/pokedex) 
+  - [For moves of pokémon](https://pokemondb.net/move/generation/1)
+  - [For types of pokémons and theire moves](https://bulbapedia.bulbagarden.net/wiki/Type)
+
+- ### Backend:
   - Baeldung
-  - [for MySql](https://medium.com/@tushar0618/how-to-create-er-diagram-of-a-database-in-mysql-workbench-209fbf63fd03)
+  - [For MySql](https://medium.com/@tushar0618/how-to-create-er-diagram-of-a-database-in-mysql-workbench-209fbf63fd03)
 
 
-- ### for documentation:
-  - [for swagger](https://swagger.io/docs/specification/2-0/what-is-swagger/)
+- ### For documentation:
+  - [For Swagger](https://swagger.io/docs/specification/2-0/what-is-swagger/)
 
 
 
