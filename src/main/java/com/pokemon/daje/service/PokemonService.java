@@ -69,6 +69,11 @@ public class PokemonService {
         }
         return null;
     }
+    public PokemonFrontEndDTO insertFromFrontEnd(Pokemon pokemon){
+        PokemonDTO pokemonDTO = insert(pokemon);
+        Pokemon pokemonBusinessFromDB = pokemonMarshaller.fromDTO(pokemonDTO);
+        return pokemonToFrontEndMarshaller.toDTO(pokemonBusinessFromDB);
+    }
 
     public void deleteById(int id) {
         pokemonRepository.deleteById(id);

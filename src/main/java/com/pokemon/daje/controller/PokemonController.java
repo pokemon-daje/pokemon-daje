@@ -31,15 +31,27 @@ public class PokemonController {
 
     @GetMapping("/pokemon")
     public ResponseEntity<List<PokemonFrontEndDTO>> getSixRandom() {
-        return ResponseEntity.ok(pokemonService.getSixRandomPokemon());
+        List<PokemonFrontEndDTO> pokemonDTOList = pokemonService.getSixRandomPokemon();
+        if(!pokemonDTOList.isEmpty()){
+            return new ResponseEntity<>(pokemonDTOList,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(pokemonDTOList,HttpStatus.INTERNAL_SERVER_ERROR);
     }
     @GetMapping("/pokemon/{id}")
     public ResponseEntity<PokemonFrontEndDTO> getById(@PathVariable int id) {
-        return ResponseEntity.ok(pokemonService.getById(id));
+        PokemonFrontEndDTO pokemonFrontEndDTO = pokemonService.getById(id);
+        if(pokemonFrontEndDTO != null){
+            return new ResponseEntity<>(pokemonFrontEndDTO,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     @PostMapping("/pokemon")
-    public void insert(@RequestBody Pokemon pokemon) {
-        pokemonService.insert(pokemon);
+    public ResponseEntity<PokemonFrontEndDTO> insert(@RequestBody Pokemon pokemon) {
+        PokemonFrontEndDTO pokemonFrontEnd = pokemonService.insertFromFrontEnd(pokemon);
+        if(pokemonFrontEnd != null){
+            return new ResponseEntity<>(pokemonFrontEnd,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     @DeleteMapping("/pokemon/{id}")
     public void delete(@PathVariable int id) {
