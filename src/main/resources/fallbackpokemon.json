@@ -1,0 +1,15 @@
+{
+  "dbId":0,
+  "name": "fallBack",
+  "currentHealthPoints": 0,
+  "maxHealthPoints": 100,
+  "pokemonSpeciesDTO": {
+    "pokedexId": 1
+  },
+  "moveSet": [
+    {
+    "pokedexId": 1
+    }
+  ],
+  "trainerName": "team DAJE"
+}
