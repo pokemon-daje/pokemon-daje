@@ -11,13 +11,16 @@ import com.pokemon.daje.persistance.dao.TypeRepository;
 import com.pokemon.daje.persistance.dto.MoveDTO;
 import com.pokemon.daje.persistance.dto.PokemonDTO;
 import com.pokemon.daje.persistance.dto.PokemonSpeciesDTO;
-import com.pokemon.daje.persistance.dto.TypeDTO;
 import com.pokemon.daje.persistance.marshaller.PokemonMarshaller;
+import io.swagger.v3.core.util.ObjectMapperFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 
 @Service
 public class PokemonService {
