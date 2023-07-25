@@ -1,23 +1,20 @@
 package com.pokemon.daje.controller;
 
+import com.pokemon.daje.controller.json.dto.*;
 import com.pokemon.daje.model.Pokemon;
+import com.pokemon.daje.model.ProgressingProcessCode;
 import com.pokemon.daje.service.PokemonService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -32,75 +29,87 @@ public class PokemonController {
         serverEmitters =new HashSet<>();
     }
 
-    @Operation(summary = "Takes six Pokemon from the database randomly")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "ok"),
-            @ApiResponse(responseCode = "400", description = "bad request"),
-            @ApiResponse(responseCode = "500", description = "internal server error"),
-    })
-    @GetMapping("/pokemons")
-    public ResponseEntity<List<Pokemon>> getSixRandom() {
-        return ResponseEntity.ok(pokemonService.getSixRandomPokemon());
+    @GetMapping("/pokemon")
+    public ResponseEntity<List<PokemonFrontEndDTO>> getSixRandom() {
+        List<PokemonFrontEndDTO> pokemonDTOList = pokemonService.getSixRandomPokemon();
+        if(!pokemonDTOList.isEmpty()){
+            return new ResponseEntity<>(pokemonDTOList,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(pokemonDTOList,HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    @Operation(summary = "Get Pokemon by Id")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "ok"),
-            @ApiResponse(responseCode = "400", description = "Invalid id supplied"),
-            @ApiResponse(responseCode = "500", description = "internal server error"),
-    })
-    @GetMapping("/pokemons/{id}")
-    public ResponseEntity<Pokemon> getById(@Parameter(description = "id of the pokemon to be searched")@PathVariable int id) {
-        return ResponseEntity.ok(pokemonService.getById(id));
+    @GetMapping("/pokemon/{id}")
+    public ResponseEntity<PokemonFrontEndDTO> getById(@PathVariable int id) {
+        PokemonFrontEndDTO pokemonFrontEndDTO = pokemonService.getById(id);
+        if(pokemonFrontEndDTO != null){
+            return new ResponseEntity<>(pokemonFrontEndDTO,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-
-    @Operation(summary = "Create a new Pokemon")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "ok"),
-            @ApiResponse(responseCode = "500", description = "internal server error",content = @Content),
-    })
-    @PostMapping("/pokemons")
-    public void insert(@RequestBody Pokemon pokemon) {
-        pokemonService.insert(pokemon);
+    @PostMapping("/pokemon")
+    public ResponseEntity<PokemonFrontEndDTO> insert(@RequestBody Pokemon pokemon) {
+        PokemonFrontEndDTO pokemonFrontEnd = pokemonService.insertFromFrontEnd(pokemon);
+        if(pokemonFrontEnd != null){
+            return new ResponseEntity<>(pokemonFrontEnd,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @Operation(summary = "Pokemon exchange")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "ok"),
-            @ApiResponse(responseCode = "500", description = "internal server error",
-                    content = @Content),
-    })
-    @PostMapping("/pokemons/swap")
-    public Pokemon swap(@RequestBody Pokemon pokemon) {
-        Pokemon toSend = pokemonService.swap(pokemon);
-        List<SseEmitter> usedEmitter = new ArrayList<>();
-        serverEmitters.forEach(sseEmitter -> {
-                    try {
-                        sseEmitter.send(SseEmitter.event()
-                                .data(pokemonService.getListOfChagedPokemon())
-                                .id("exchange")
-                                .name("pokemon"));
-                        usedEmitter.add(sseEmitter);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        );
-        usedEmitter.forEach(ResponseBodyEmitter::complete);
+    @PostMapping("/pokemon/exchange")
+    public ResponseEntity<PackageExchange> swap(@RequestBody PokemonExchangeDTO pokemon) {
+        PackageExchange pack = pokemonService.inizializePokemonsSwap(pokemon);
+        ResponseEntity<PackageExchange> toSend = new ResponseEntity<>(pack,HttpStatus.OK);
+        if(pack == null){
+            sendDataToFrontEnd("exchange error",400);
+            toSend = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         return toSend;
     }
+    @GetMapping("/pokemon/exchange")
+    public ResponseEntity<HttpStatus> swapErrorGet(@RequestBody PokemonExchangeDTO pokemon) {
+        return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+    }
+    @PutMapping("/pokemon/exchange")
+    public ResponseEntity<HttpStatus> swapErrorPut(@RequestBody PokemonExchangeDTO pokemon) {
+        return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+    }
+    @DeleteMapping("/pokemon/exchange")
+    public ResponseEntity<HttpStatus> swapErrorDelete(@RequestBody PokemonExchangeDTO pokemon) {
+        return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+    }
 
-    @Operation(summary = "This method returns a Server-Sent Events (SSE) stream of the list of changed Pokemon")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "The SSE stream is returned", content = @Content),
-            @ApiResponse(responseCode = "400", description = "bad request"),
-            @ApiResponse(responseCode = "500", description = "internal server error"),
-    })
-    @GetMapping("/pokemons/exchange")
+    @PostMapping("/pokemon/exchange/{exchangeId}/status")
+    public ResponseEntity<HttpStatus> statusSwap(@PathVariable("exchangeId") String exchangeId, @RequestBody PackageExchangeStatus packageExchangeStatus){
+        ProgressingProcessCode code;
+        if(!ObjectUtils.isEmpty(exchangeId) && packageExchangeStatus != null
+                && !ProgressingProcessCode.UNKWON.equals(ProgressingProcessCode.fromNumber(packageExchangeStatus.getStatus()))
+        ){
+            code = pokemonService.nextStepSwap(exchangeId,packageExchangeStatus);
+        } else {
+            code = ProgressingProcessCode.BAD_REQUEST;
+        }
+        sendDataToFrontEnd(exchangeId,code.getCode());
+        switch (code){
+            case SUCCESS -> {
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            case BAD_REQUEST -> {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            case RESOURCE_NOT_FOUND -> {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            default -> {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    @GetMapping("/pokemon/exchange/events")
     public SseEmitter streamSseMvc() {
-        SseEmitter emitter = new SseEmitter(2000L);
+        SseEmitter emitter = new SseEmitter(1000L);
             try {
                 SseEmitter.SseEventBuilder event = SseEmitter.event()
-                        .data(pokemonService.getListOfChagedPokemon())
+                        .data(new Date())
                         .id("exchange")
                         .name("pokemon");
                 emitter.send(event);
@@ -115,16 +124,57 @@ public class PokemonController {
         return emitter;
     }
 
-
-    @Operation(summary = "Delete Pokemon by Id")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok",content = @Content),
-            @ApiResponse(responseCode = "400", description = "Invalid id supplied"),
-            @ApiResponse(responseCode = "500", description = "Internal server error"),
-    })
-    @DeleteMapping("/pokemons/{id}")
-    public void delete(@Parameter(description = "id of the pokemon to be deleted")
-                        @PathVariable int id) {
-        pokemonService.deleteById(id);
+//    @PostMapping("/pokemon/getpackage")
+//    public void getPackagePokemons(@RequestBody List<GatherDataPokemonSpecie> pokemonExchangeDTOList) throws IOException {
+//        int ok =0;
+//        StringBuilder scriptBuilder = new StringBuilder().append("insert into pokemon_species(pokedex_id,type_id,name,sprite_url) values \n");
+//        pokemonExchangeDTOList.forEach(pokemon -> {
+//            scriptBuilder.append("(").append(pokemon.getId()+",")
+//                    .append(TypesEnum.fromString(pokemon.getType()).getId()+",")
+//                    .append("'"+pokemon.getName()+"'"+",")
+//                    .append("'"+pokemon.getSprite()+"'")
+//                    .append("), \n");
+//        });
+//        File newFile = new File("D:/download/insertPokemonSpecies.sql");
+//        FileWriter write = new FileWriter(newFile);
+//        write.write(scriptBuilder.toString());
+//        write.close();
+//    }
+//
+//    @PostMapping("/pokemon/getpackage/moves")
+//    public void getPackageMoves(@RequestBody List<GatherDataPokemonMove> pokemonMoveExchangeDTOList) throws IOException {
+//        int ok =0;
+//        StringBuilder scriptBuilder = new StringBuilder().append("insert into move(pokedex_move_id,type_id,name,power) values \n");
+//        pokemonMoveExchangeDTOList.forEach(pokemon -> {
+//            scriptBuilder.append("(").append(pokemon.getPokedexID()+",")
+//                    .append(TypesEnum.fromString(pokemon.getType()).getId()+",")
+//                    .append("'"+pokemon.getName()+"'"+",")
+//                    .append(pokemon.getPower())
+//                    .append("), \n");
+//        });
+//        File newFile = new File("D:/download/insertPokemonMoves.sql");
+//        FileWriter write = new FileWriter(newFile);
+//        write.write(scriptBuilder.toString());
+//        write.close();
+//    }
+    @GetMapping(value = {"*/*.html","*.html", "*/","/*","*/*"})
+    public ResponseEntity<HttpStatus> test() throws IOException {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+    private void sendDataToFrontEnd(String exchangeId, int code){
+        List<SseEmitter> usedEmitter = new ArrayList<>();
+        serverEmitters.forEach(sseEmitter -> {
+                    try {
+                        sseEmitter.send(SseEmitter.event()
+                                .data(new PackageFrontEnd(exchangeId,code))
+                                .id("exchange")
+                                .name("pokemon"));
+                        usedEmitter.add(sseEmitter);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
+        usedEmitter.forEach(ResponseBodyEmitter::complete);
     }
 }

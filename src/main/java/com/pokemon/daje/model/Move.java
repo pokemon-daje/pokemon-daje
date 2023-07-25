@@ -1,23 +1,24 @@
 package com.pokemon.daje.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Objects;
-
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-
 public class Move implements BusinessInterface {
 
     private Integer id;
     private String name;
     private Type type;
     private Integer power;
+
+    public Move() {
+    }
+
+    public Move(Integer id) {
+        this.id = id;
+    }
 
     @Override
     public boolean equals(Object o) {

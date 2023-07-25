@@ -1,8 +1,11 @@
 package com.pokemon.daje.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
-public enum Types {
+public enum TypesEnum {
     ICE("ice", 1),
     GHOST("ghost", 2),
     FAIRY("fairy", 3),
@@ -27,7 +30,7 @@ public enum Types {
 
     private final int id;
 
-    Types(String name, int id) {
+    TypesEnum(String name, int id) {
         this.name = name;
         this.id = id;
     }
@@ -40,9 +43,17 @@ public enum Types {
         return this.id;
     }
 
-    public static Types fromString(String name) {
-        return Arrays.stream(Types.values())
+    public static TypesEnum fromString(String name) {
+        return Arrays.stream(TypesEnum.values())
             .filter(type -> type.getName().equals(name.toLowerCase())).findFirst()
             .orElse(UNKNOWN);
+    }
+    public static TypesEnum fromNumber(int id) {
+        List<TypesEnum> listEnum = List.of(TypesEnum.values());
+        if(listEnum.stream().anyMatch(objEnum -> objEnum.id == id)){
+            return listEnum.get(id);
+        }else{
+            return TypesEnum.UNKNOWN;
+        }
     }
 }

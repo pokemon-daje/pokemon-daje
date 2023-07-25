@@ -1,7 +1,7 @@
 package com.pokemon.daje.persistance.marshaller;
 
 import com.pokemon.daje.model.Type;
-import com.pokemon.daje.model.Types;
+import com.pokemon.daje.model.TypesEnum;
 import com.pokemon.daje.persistance.dto.TypeDTO;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +26,7 @@ public class TypeMarshaller implements BaseMarshaller<Type, TypeDTO>{
         TypeDTO typeDTO = null;
         if (business != null){
             typeDTO = new TypeDTO();
-            typeDTO.setPokedexId(Types.fromString(business.getName()).getId());
+            typeDTO.setPokedexId(TypesEnum.fromString(business.getName()).getId());
             typeDTO.setName(business.getName());
             typeDTO.setImageUrl(business.getImageUrl());
         }
