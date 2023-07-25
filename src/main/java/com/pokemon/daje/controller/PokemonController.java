@@ -53,10 +53,6 @@ public class PokemonController {
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    @DeleteMapping("/pokemon/{id}")
-    public void delete(@PathVariable int id) {
-        pokemonService.deleteById(id);
-    }
 
     @PostMapping("/pokemon/exchange")
     public ResponseEntity<PackageExchange> swap(@RequestBody PokemonExchangeDTO pokemon) {
