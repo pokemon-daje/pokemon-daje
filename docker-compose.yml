@@ -12,6 +12,8 @@ services:
       - 3306:3306
     volumes:
       - ./scripts/schema.sql:/docker-entrypoint-initdb.d/1.sql
-      - ./scripts/insertType.sql:/docker-entrypoint-initdb.d/2.sql
+      - ./scripts/insertTypes.sql:/docker-entrypoint-initdb.d/2.sql
+      - ./scripts/insertPokemonSpecies.sql:/docker-entrypoint-initdb.d/3.sql
+      - ./scripts/insertPokemonMoves.sql:/docker-entrypoint-initdb.d/4.sql
     command: mysqld --sql_mode="" --character-set-server=utf8 --collation-server=utf8_slovenian_ci --init-connect='SET NAMES UTF8;' --innodb-flush-log-at-trx-commit=0
 
