@@ -46,22 +46,13 @@ public class PokemonController {
     }
 
     @PostMapping("/pokemon/exchange")
-    public PackageExchange swap(@RequestBody PokemonExchangeDTO pokemon) {
-        PackageExchange toSend = pokemonService.inizializePokemonsSwap(pokemon);
-        List<SseEmitter> usedEmitter = new ArrayList<>();
-        serverEmitters.forEach(sseEmitter -> {
-                    try {
-                        sseEmitter.send(SseEmitter.event()
-                                .data(new PackageFrontEnd(toSend.getId(),0))
-                                .id("exchange")
-                                .name("pokemon"));
-                        usedEmitter.add(sseEmitter);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        );
-        usedEmitter.forEach(ResponseBodyEmitter::complete);
+    public ResponseEntity<PackageExchange> swap(@RequestBody PokemonExchangeDTO pokemon) {
+        PackageExchange pack = pokemonService.inizializePokemonsSwap(pokemon);
+        ResponseEntity<PackageExchange> toSend = new ResponseEntity<>(pack,HttpStatus.OK);
+        if(pack != null){
+            sendDataToFrontEnd(pack.getId(),0);
+            toSend = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         return toSend;
     }
     @GetMapping("/pokemon/exchange")
