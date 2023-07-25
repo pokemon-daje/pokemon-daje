@@ -88,7 +88,7 @@ public class PokemonService {
             PokemonDTO pokemonToPersistDTO = validateAndGivePokemonToSave(pokemon);
             int pokemonToGiveId = choosePokemonToSwap();
             Optional<PokemonDTO> pokemonDTOToGive= pokemonRepository.findById(pokemonToGiveId);
-            if(pokemonDTOToGive.isPresent()){
+            if(pokemonDTOToGive.isPresent() && pokemonToPersistDTO != null){
                 normalizeDTO(pokemonDTOToGive.get());
                 String idSwap = UUID.randomUUID().toString();
                 exchangeSwapDTO = new PackageExchange(idSwap, mapPokemonToGiveForExchange(pokemonDTOToGive.get()));
