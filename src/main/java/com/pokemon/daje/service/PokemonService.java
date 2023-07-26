@@ -12,8 +12,11 @@ import com.pokemon.daje.persistance.dto.MoveDTO;
 import com.pokemon.daje.persistance.dto.PokemonDTO;
 import com.pokemon.daje.persistance.dto.PokemonSpeciesDTO;
 import com.pokemon.daje.persistance.marshaller.PokemonMarshaller;
+import com.pokemon.daje.util.exception.PokemonServiceException;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.filters.ExpiresFilter;
+import org.hibernate.internal.ExceptionConverterImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -84,7 +87,8 @@ public class PokemonService {
         }
         return null;
     }
-    public PokemonFrontEndDTO insertFromFrontEnd(Pokemon pokemon){
+
+    public PokemonFrontEndDTO insertFromFrontEnd(Pokemon pokemon) {
         PokemonDTO pokemonDTO = insert(pokemon);
         Pokemon pokemonBusinessFromDB = pokemonMarshaller.fromDTO(pokemonDTO);
         return pokemonToFrontEndMarshaller.toDTO(pokemonBusinessFromDB);
@@ -110,8 +114,8 @@ public class PokemonService {
         if (pokemon != null) {
             PokemonDTO pokemonToPersistDTO = validateAndGivePokemonToSave(pokemon);
             int pokemonToGiveId = choosePokemonToSwap();
-            Optional<PokemonDTO> pokemonDTOToGive= pokemonRepository.findById(pokemonToGiveId);
-            if(pokemonDTOToGive.isPresent() && pokemonToPersistDTO != null){
+            Optional<PokemonDTO> pokemonDTOToGive = pokemonRepository.findById(pokemonToGiveId);
+            if (pokemonDTOToGive.isPresent() && pokemonToPersistDTO != null) {
                 normalizeDTO(pokemonDTOToGive.get());
                 String idSwap = UUID.randomUUID().toString();
                 exchangeSwapDTO = new PackageExchange(idSwap, mapPokemonToGiveForExchange(pokemonDTOToGive.get()));
@@ -135,12 +139,12 @@ public class PokemonService {
             PokemonDTO pokemonToSave = exchange != null ? exchange.getPokemonToSave() : null;
             PokemonDTO pokemonToDelete = exchange != null ? exchange.getPokemonToDelete() : null;
 
-            code = progressWithSwap(pokemonToSave,pokemonToDelete);
+            code = progressWithSwap(pokemonToSave, pokemonToDelete);
             swapBank.remove(exchangeid);
-        }else if((packageExchangeStatus.getStatus() == ProgressingProcessCode.SUCCESS.getCode()
+        } else if ((packageExchangeStatus.getStatus() == ProgressingProcessCode.SUCCESS.getCode()
                 || packageExchangeStatus.getStatus() == ProgressingProcessCode.BAD_REQUEST.getCode()
                 || packageExchangeStatus.getStatus() == ProgressingProcessCode.SERVER_ERROR.getCode())
-                && !swapBank.containsKey(exchangeid)){
+                && !swapBank.containsKey(exchangeid)) {
             code = ProgressingProcessCode.RESOURCE_NOT_FOUND;
         }
         return code;
@@ -168,14 +172,14 @@ public class PokemonService {
         pokemonToNormalize.setMoveSet(movesDTO);
     }
 
-    private ProgressingProcessCode validatePokemonExchangeDTO(PokemonExchangeDTO pokemonExchangeDTO){
+    private ProgressingProcessCode validatePokemonExchangeDTO(PokemonExchangeDTO pokemonExchangeDTO) {
         Optional<PokemonSpeciesDTO> pokemonSpeciesDTO = pokemonSpeciesRepository.findByPokedexId(pokemonExchangeDTO.getId());
         Set<MoveDTO> moves = new HashSet<>();
         pokemonExchangeDTO.getMoves().forEach(move -> {
-            Optional<MoveDTO> moveDTO= moveRepository.findByPokedexIdOrGetUnknow(move);
+            Optional<MoveDTO> moveDTO = moveRepository.findByPokedexIdOrGetUnknow(move);
             moveDTO.ifPresent(moves::add);
         });
-        return pokemonSpeciesDTO.isPresent() && !moves.isEmpty()? ProgressingProcessCode.SUCCESS : ProgressingProcessCode.BAD_REQUEST;
+        return pokemonSpeciesDTO.isPresent() && !moves.isEmpty() ? ProgressingProcessCode.SUCCESS : ProgressingProcessCode.BAD_REQUEST;
     }
 
     private PokemonDTO validateAndGivePokemonToSave(PokemonExchangeDTO pokemonExchangeDTO) {
@@ -207,43 +211,47 @@ public class PokemonService {
         });
         spoiledExchange.forEach(key -> swapBank.remove(key));
     }
-    private ProgressingProcessCode progressWithSwap(PokemonDTO pokemonToSave, PokemonDTO pokemonToDelete){
+
+    private ProgressingProcessCode progressWithSwap(PokemonDTO pokemonToSave, PokemonDTO pokemonToDelete) {
         ProgressingProcessCode code = ProgressingProcessCode.SUCCESS;
         if (pokemonToSave != null && pokemonToDelete != null) {
             try {
                 pokemonToSave = pokemonRepository.save(pokemonToSave);
-            } catch (Exception ex) {
-                return ProgressingProcessCode.SERVER_ERROR;
+            } catch (PokemonServiceException ex) {
+                code = ProgressingProcessCode.SERVER_ERROR;
+                throw new PokemonServiceException("Pokemon cannot be persisted", ex);
             }
             try {
                 pokemonRepository.delete(pokemonToDelete);
-            } catch (Exception ex) {
+            } catch (PokemonServiceException ex) {
                 pokemonRepository.delete(pokemonToSave);
-                return ProgressingProcessCode.SERVER_ERROR;
+                code = ProgressingProcessCode.SERVER_ERROR;
+                throw new PokemonServiceException("Pokemon cannot be persisted", ex);
             }
         } else {
             code = ProgressingProcessCode.BAD_REQUEST;
         }
         return code;
     }
-    
-    private void checkPokemonsListSize(){
+
+    private void checkPokemonsListSize() {
         Consumer<List<PokemonDTO>> checkIfPokemArePresent = (pokemonList) -> {
-            if(pokemonList.isEmpty()) {
-                try {
-                    pokemonList.add(loadPokemonFromProperty());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            if (pokemonList.isEmpty()) {
+                pokemonList.add(loadPokemonFromProperty());
             }
         };
         checkIfPokemArePresent.accept(randomPokemonStorage);
     }
 
-    private PokemonDTO loadPokemonFromProperty() throws IOException {
-        PokemonDTO pokemonDTO = ObjectMapperFactory.buildStrictGenericObjectMapper().readValue(new File(pathPokemonFallBack), PokemonDTO.class);
-        normalizeDTO(pokemonDTO);
-        pokemonDTO = pokemonRepository.save(pokemonDTO);
+    private PokemonDTO loadPokemonFromProperty() {
+        PokemonDTO pokemonDTO = null;
+        try {
+            pokemonDTO = ObjectMapperFactory.buildStrictGenericObjectMapper().readValue(new File(pathPokemonFallBack), PokemonDTO.class);
+            normalizeDTO(pokemonDTO);
+            pokemonDTO = pokemonRepository.save(pokemonDTO);
+        } catch (PokemonServiceException | IOException e) {
+            throw new PokemonServiceException("pokemon not loaded properly from propert", e);
+        }
         return pokemonDTO;
     }
 
