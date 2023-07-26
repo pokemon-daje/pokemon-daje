@@ -36,6 +36,7 @@ public class PokemonService {
     private Map<String, PokemonSwapDeposit> swapBank;
     @Value("${pokemon.fallback.path}")
     private String pathPokemonFallBack;
+    private Map<String, PokemonSwapDeposit> swapCacheLog;
 
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository,
@@ -54,6 +55,7 @@ public class PokemonService {
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
         this.randomPokemonStorage = new ArrayList<>(pokemonRepository.getSixRandomPokemon());
         this.swapBank = new HashMap<>();
+        this.swapCacheLog = new HashMap<>();
     }
 
     public PokemonFrontEndDTO getById(int pokemonId) {
@@ -100,6 +102,14 @@ public class PokemonService {
                 normalizeDTO(pokemonDTOToGive.get());
                 String idSwap = UUID.randomUUID().toString();
                 exchangeSwapDTO = new PackageExchange(idSwap, mapPokemonToGiveForExchange(pokemonDTOToGive.get()));
+                swapCacheLog.put(idSwap,
+                        new PokemonSwapDeposit(
+                                Map.of(
+                                        SwapBankAction.TOSAVE, pokemonToPersistDTO,
+                                        SwapBankAction.TODELETE, pokemonDTOToGive.get()
+                                )
+                        )
+                );
                 swapBank.put(idSwap,
                         new PokemonSwapDeposit(
                                 Map.of(
@@ -127,6 +137,9 @@ public class PokemonService {
                 || packageExchangeStatus.getStatus() == ProgressingProcessCode.SERVER_ERROR.getCode())
                 && !swapBank.containsKey(exchangeid)){
             code = ProgressingProcessCode.RESOURCE_NOT_FOUND;
+        }else{
+            swapBank.remove(exchangeid);
+            code = ProgressingProcessCode.SUCCESS;
         }
         return code;
     }
@@ -231,4 +244,19 @@ public class PokemonService {
         pokemonDTO = pokemonRepository.save(pokemonDTO);
         return pokemonDTO;
     }
+
+    public Map<SwapBankAction,PokemonFrontEndDTO> getPokemonsFromSwapCacheLog(String exchangeId){
+        PokemonSwapDeposit deposit = swapCacheLog.get(exchangeId);
+        PokemonFrontEndDTO toSave = null;
+        PokemonFrontEndDTO toDelete = null;
+        if(deposit!=null && deposit.getPokemonToDelete()!=null && deposit.getPokemonToSave()!=null){
+            Pokemon pokemonToDelete = pokemonMarshaller.fromDTO(deposit.getPokemonToDelete());
+            Pokemon pokemonToSave = pokemonMarshaller.fromDTO(deposit.getPokemonToSave());
+            toSave = pokemonToFrontEndMarshaller.toDTO(pokemonToSave);
+            toDelete = pokemonToFrontEndMarshaller.toDTO(pokemonToDelete);
+        }
+        return Map.of(SwapBankAction.TOSAVE,toSave,SwapBankAction.TODELETE,toDelete);
+    }
+
+
 }
