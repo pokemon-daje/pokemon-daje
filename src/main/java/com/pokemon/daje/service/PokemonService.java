@@ -13,6 +13,7 @@ import com.pokemon.daje.persistance.dto.PokemonDTO;
 import com.pokemon.daje.persistance.dto.PokemonSpeciesDTO;
 import com.pokemon.daje.persistance.marshaller.PokemonMarshaller;
 import io.swagger.v3.core.util.ObjectMapperFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,7 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
-
+@Slf4j
 @Service
 public class PokemonService {
     private final PokemonRepository pokemonRepository;
