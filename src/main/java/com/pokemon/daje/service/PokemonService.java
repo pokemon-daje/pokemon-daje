@@ -224,7 +224,7 @@ public class PokemonService {
         Consumer<List<PokemonDTO>> checkIfPokemArePresent = (pokemonList) -> {
             if(pokemonList.isEmpty()) {
                 try {
-                    pokemonList.add(loadPokemonFromProperty());
+                    loadPokemonFromProperty();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
