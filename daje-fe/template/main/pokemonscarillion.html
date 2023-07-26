@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Infinite Card Slider JavaScript | CodingNepal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Fontawesome Link for Icons -->
+</head>
+<body>
+<div class="container-wrapper">
+    <div class="wrapper">
+        <div class="band-left" onclick="openCurtains()">
+        </div>
+        <div class="band-right" onclick="openCurtains()">
+        </div>
+        <div class="curtain-carousel-right" onclick="openCurtains()">
+            <img src="/rightpokdexcurtain.png">
+        </div>
+        <div class="curtain-carousel-left" onclick="openCurtains()">
+            <img src="/leftpokdexcurtain.png">
+        </div>
+        <ul class="carousel-container">
+            <li class="card">
+                <div class="img"><img src="https://i.pinimg.com/564x/39/10/c8/3910c826f8b0d7f4d89e3dc30a050a05.jpg" alt="img" draggable="false"></div>
+                <h2>Blanche Pearson</h2>
+                <span>Sales Manager</span>
+            </li>
+            <li class="card">
+                <div class="img"><img src="https://i.pinimg.com/564x/2d/32/cf/2d32cf3c3042861de658c96052673408.jpg" alt="img" draggable="false"></div>
+                <h2>Joenas Brauers</h2>
+                <span>Web Developer</span>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPokemon">
+                    Launch demo modal
+                </button>
+            </li>
+            <li class="card">
+                <div class="img"><img src="https://i.pinimg.com/564x/15/ca/3e/15ca3e1cc06bcdbc380662f2432008ee.jpg" alt="img" draggable="false"></div>
+                <h2>Lariach French</h2>
+                <span>Online Teacher</span>
+            </li>
+            <li class="card">
+                <div class="img"><img src="https://i.pinimg.com/564x/79/93/bb/7993bba7c70055e0e7952174ae39f4bb.jpg" alt="img" draggable="false"></div>
+                <h2>James Khosravi</h2>
+                <span>Freelancer</span>
+            </li>
+            <li class="card">
+                <div class="img"><img src="https://i.pinimg.com/564x/00/48/4b/00484bb59dd53af00e2465fee96733bb.jpg" alt="img" draggable="false"></div>
+                <h2>Kristina Zasiadko</h2>
+                <span>Bank Manager</span>
+            </li>
+            <li class="card">
+                <div class="img"><img src="https://i.pinimg.com/564x/9b/e8/f2/9be8f2a81b006e2f8897f1889107d0f7.jpg" alt="img" draggable="false"></div>
+                <h2>Donald Horton</h2>
+                <span>App Designer</span>
+            </li>
+        </ul>
+        <div class="buttons">
+            <div id="left" class="btn-circle left"><img src="/leftarrow.svg" onclick="nextImg(-1)"></div>
+            <div id="right" class="btn-circle right"><img src="/rightarrow.svg" onclick="nextImg(1)"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
