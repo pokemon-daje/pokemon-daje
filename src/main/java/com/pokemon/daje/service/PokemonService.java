@@ -79,8 +79,15 @@ public class PokemonService {
         pokemonRepository.deleteById(id);
     }
 
-    public List<PokemonFrontEndDTO> getSixRandomPokemon() {
+    public List<PokemonFrontEndDTO> getSixRandomPokemon(){
         List<PokemonDTO> pokemonDTOList = pokemonRepository.getSixRandomPokemon();
+        if(pokemonDTOList.isEmpty()){
+            try{
+                loadPokemonFromProperty();
+            }catch (Exception ex){
+                log.info("errore nel leggere pokemon da property");
+            }
+        }
         return pokemonDTOList.stream().map(pokemonDTO -> {
             int databaseId = pokemonDTO.getDbId();
             Pokemon businessPokemon = pokemonMarshaller.fromDTO(pokemonDTO);
@@ -229,6 +236,7 @@ public class PokemonService {
         PokemonDTO pokemonDTO = ObjectMapperFactory.buildStrictGenericObjectMapper().readValue(new File(pathPokemonFallBack), PokemonDTO.class);
         normalizeDTO(pokemonDTO);
         pokemonDTO = pokemonRepository.save(pokemonDTO);
+        randomPokemonStorage.add(pokemonDTO);
         return pokemonDTO;
     }
 }
