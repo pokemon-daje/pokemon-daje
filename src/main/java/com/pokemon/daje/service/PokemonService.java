@@ -13,16 +13,23 @@ import com.pokemon.daje.persistance.dto.PokemonDTO;
 import com.pokemon.daje.persistance.dto.PokemonSpeciesDTO;
 import com.pokemon.daje.persistance.marshaller.PokemonMarshaller;
 import io.swagger.v3.core.util.ObjectMapperFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
 
+@Slf4j
 @Service
 public class PokemonService {
     private final PokemonRepository pokemonRepository;
@@ -36,6 +43,8 @@ public class PokemonService {
     private Map<String, PokemonSwapDeposit> swapBank;
     @Value("${pokemon.fallback.path}")
     private String pathPokemonFallBack;
+    private DataSource dataSource;
+
 
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository,
@@ -54,6 +63,12 @@ public class PokemonService {
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
         this.randomPokemonStorage = new ArrayList<>(pokemonRepository.getSixRandomPokemon());
         this.swapBank = new HashMap<>();
+        this.dataSource = DataSourceBuilder.create()
+                .driverClassName("com.mysql.jdbc.Driver")
+                .url("jdbc:mysql://localhost:3306/daje")
+                .username("daje")
+                .password("daje")
+                .build();
     }
 
     public PokemonFrontEndDTO getById(int pokemonId) {
@@ -230,5 +245,15 @@ public class PokemonService {
         normalizeDTO(pokemonDTO);
         pokemonDTO = pokemonRepository.save(pokemonDTO);
         return pokemonDTO;
+    }
+
+    @Scheduled(fixedDelay = 2000)
+    private void checkDatabaseConnection() {
+        try (Connection connection = dataSource.getConnection()) {
+            log.info("database connesso e funzionante");
+        } catch (Exception e) {
+            log.info("database non connesso o non funzionante");
+            System.exit(1);
+        }
     }
 }
