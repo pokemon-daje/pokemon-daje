@@ -62,7 +62,7 @@ public class PokemonService {
         this.randomPokemonStorage = new ArrayList<>(pokemonRepository.getSixRandomPokemon());
         this.swapBank = new HashMap<>();
         this.dataSource = DataSourceBuilder.create()
-                .driverClassName("com.mysql.jdbc.Driver")
+                .driverClassName("com.mysql.cj.jdbc.Driver")
                 .url("jdbc:mysql://localhost:3306/daje")
                 .username("daje")
                 .password("daje")
