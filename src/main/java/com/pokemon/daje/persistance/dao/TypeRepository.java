@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface TypeRepository extends JpaRepository<TypeDTO,Integer> {
     Optional<TypeDTO> findByPokedexId(int id);
     @Query("select t from TypeDTO as t where t.pokedexId = :id or t.pokedexId = 30000 ORDER BY(t.pokedexId) limit 1")
-    Optional<MoveDTO> findByPokedexIdOrGetUnknow(@Param("id") int id);
+    Optional<TypeDTO> findByPokedexIdOrGetUnknow(@Param("id") int id);
 }
