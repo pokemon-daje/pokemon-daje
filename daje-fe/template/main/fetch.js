@@ -54,20 +54,23 @@ function completeSwap(swap){
             ) {
                 let snglCardPokemon = document.getElementById(swap.pokemon_sent.database_id)
                 if(snglCardPokemon){
-
-                    updateCardStructure(snglCardPokemon, swap.pokemon_receive);
-
-                    let listPokePos = pokemons.findIndex(poke => poke.database_id === swap.pokemon_sent.ddatabase_id)
+                    let listPokePos = pokemons.findIndex(poke => poke.database_id === swap.pokemon_sent.database_id)
                     pokemons[listPokePos] = swap.pokemon_receive;
 
                     let listModPokePos = modifiedPokemons.findIndex(poke => poke.database_id === swap.pokemon_sent.database_id)
                     let posInScreen = modifiedPokemons[listModPokePos].pos;
                     let posPxInScreen = modifiedPokemons[listModPokePos].originalPos;
+
                     modifiedPokemons[listModPokePos] = {
                         ...swap.pokemon_receive,
                         pos: posInScreen,
                         originalPos: posPxInScreen
                     };
+                    snglCardPokemon.setAttribute("class","card");
+                    let id = `${swap.pokemon_receive.database_id}`;
+                    snglCardPokemon.setAttribute("id",id);
+                    moveCardWhenSwapHappens(modifiedPokemons[listModPokePos].pos)
+                    updateCardStructure(snglCardPokemon, swap.pokemon_receive);
                 }
             }
         }
