@@ -147,22 +147,21 @@ public class PokemonService {
     }
 
     public ProgressingProcessCode nextStepSwap(String exchangeid, PackageExchangeStatus packageExchangeStatus) {
-        ProgressingProcessCode code = ProgressingProcessCode.SUCCESS;
-        if (packageExchangeStatus.getStatus() == ProgressingProcessCode.SUCCESS.getCode() && swapBank.containsKey(exchangeid)) {
+        ProgressingProcessCode code;
+        if (packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode() && swapBank.containsKey(exchangeid)) {
             PokemonSwapDeposit exchange = swapBank.get(exchangeid);
             PokemonDTO pokemonToSave = exchange != null ? exchange.getPokemonToSave() : null;
             PokemonDTO pokemonToDelete = exchange != null ? exchange.getPokemonToDelete() : null;
 
-            code = progressWithSwap(pokemonToSave, pokemonToDelete);
-            swapBank.remove(exchangeid);
-        }else if((packageExchangeStatus.getStatus() == ProgressingProcessCode.SUCCESS.getCode()
-                || packageExchangeStatus.getStatus() == ProgressingProcessCode.BAD_REQUEST.getCode()
-                || packageExchangeStatus.getStatus() == ProgressingProcessCode.SERVER_ERROR.getCode())
+            code = progressWithSwap(exchangeid,pokemonToSave, pokemonToDelete);
+        }else if((packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode()
+                || packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_BAD_REQUEST.getCode()
+                || packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_DOWN_SERVER_ERROR.getCode())
                 && !swapBank.containsKey(exchangeid)){
-            code = ProgressingProcessCode.RESOURCE_NOT_FOUND;
+            code = ProgressingProcessCode.POKEMON_EXCHANGE_NOT_FOUND;
         }else{
             swapBank.remove(exchangeid);
-            code = ProgressingProcessCode.SUCCESS;
+            code = ProgressingProcessCode.POKEMON_REQUEST_SUCCESS;
         }
         return code;
     }
@@ -228,34 +227,33 @@ public class PokemonService {
         return pokemonExchangeDTO;
     }
 
-    @Scheduled(fixedDelay = 30000)
-    private void checkTimeBank() {
-        List<String> spoiledExchange = new ArrayList<>();
-        swapBank.forEach((key, exchange) -> {
-            if (System.currentTimeMillis() - exchange.getDepositTime() > 5000) {
-                spoiledExchange.add(key);
-            }
-        });
-        spoiledExchange.forEach(key -> swapBank.remove(key));
-    }
-    private ProgressingProcessCode progressWithSwap(PokemonDTO pokemonToSave, PokemonDTO pokemonToDelete){
-        ProgressingProcessCode code = ProgressingProcessCode.SUCCESS;
+    private ProgressingProcessCode progressWithSwap(String exchangeId,PokemonDTO pokemonToSave, PokemonDTO pokemonToDelete){
+        ProgressingProcessCode code = ProgressingProcessCode.POKEMON_REQUEST_SUCCESS;
         if (pokemonToSave != null && pokemonToDelete != null) {
             try {
                 pokemonToSave = pokemonRepository.save(pokemonToSave);
+                randomPokemonStorage.add(pokemonToSave);
             } catch (PokemonServiceException ex) {
-                code = ProgressingProcessCode.SERVER_ERROR;
+                code = ProgressingProcessCode.POKEMON_REQUEST_DOWN_SERVER_ERROR;
                 throw new PokemonServiceException("Pokemon cannot be persisted", ex);
             }
             try {
-                pokemonRepository.delete(pokemonToDelete);
+                pokemonRepository.deleteById(pokemonToDelete.getDbId());
+                PokemonSwapDeposit deposit = swapBank.get(exchangeId);
+                if(deposit!= null && deposit.getPokemonToSave() != null && deposit.getPokemonToDelete() != null){
+                    swapBank.remove(exchangeId);
+                    log.info("EXCHANGE WITH ID: {} HAS BEEN COMPLETED",exchangeId);
+                }else{
+                    throw new PokemonServiceException("EXCHANGE TOOK TOO MUCH TIME TO COMPLETE",new Throwable());
+                }
             } catch (PokemonServiceException ex) {
-                pokemonRepository.delete(pokemonToSave);
-                code = ProgressingProcessCode.SERVER_ERROR;
-                throw new PokemonServiceException("Pokemon cannot be persisted", ex);
+                pokemonRepository.deleteById(pokemonToSave.getDbId());
+                randomPokemonStorage.remove(pokemonToSave);
+                code = ProgressingProcessCode.POKEMON_REQUEST_DOWN_SERVER_ERROR;
+                throw new PokemonServiceException("POKEMON CANNOT BE PERSISTED", ex);
             }
         } else {
-            code = ProgressingProcessCode.BAD_REQUEST;
+            code = ProgressingProcessCode.POKEMON_BAD_REQUEST;
         }
         return code;
     }
