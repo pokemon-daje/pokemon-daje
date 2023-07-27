@@ -1,12 +1,78 @@
 let pokemons = [];
 let modifiedPokemons = [];
+let pokemonSwaps = new Map();
 
-var source = new EventSource(
-  "http://localhost:8080/api/pokemon/exchange/events"
-);
+let uuid = crypto.randomUUID();
+var source = new EventSource("http://localhost:8080/api/pokemon/exchange/events/"+uuid);
 source.addEventListener("pokemon", (event) => {
-  console.log(JSON.parse(event.data));
+    console.log(JSON.parse(event.data))
+    let swapEvent = JSON.parse(event.data);
+    manageSwap(swapEvent);
 });
+
+function manageSwap(swap){
+    if(swap != null
+        && pokemons.length > 0
+        && modifiedPokemons.length > 0){
+        switch (swap.status_request_code){
+            case 0: {
+                newSwap(swap)
+                break;
+            }
+            default: {
+                nextPhaseSwap(swap)
+                break;
+            }
+        }
+    }
+}
+
+function newSwap(swap){
+    switch (swap.status_response_code){
+        case 200: {
+            pokemonSwaps.set(swap.exchange_id,{time:Date.now(),pokemonReceive:swap.pokemon_receive,pokemonSent:swap.pokemon_sent});
+            break;
+        }
+    }
+}
+
+function nextPhaseSwap(swap){
+    switch (swap.status_request_code){
+        case 200: {
+            completeSwap(swap);
+            break;
+        }
+    }
+}
+
+function completeSwap(swap){
+    switch (swap.status_response_code){
+        case 200: {
+            if (pokemonSwaps.get(swap.exchange_id) != null
+                && swap.pokemon_receive != null
+                && swap.pokemon_sent != null
+            ) {
+                let snglCardPokemon = document.getElementById(swap.pokemon_sent.database_id)
+                if(snglCardPokemon){
+
+                    updateCardStructure(snglCardPokemon, swap.pokemon_receive);
+
+                    let listPokePos = pokemons.findIndex(poke => poke.database_id === swap.pokemon_sent.ddatabase_id)
+                    pokemons[listPokePos] = swap.pokemon_receive;
+
+                    let listModPokePos = modifiedPokemons.findIndex(poke => poke.database_id === swap.pokemon_sent.database_id)
+                    let posInScreen = modifiedPokemons[listModPokePos].pos;
+                    let posPxInScreen = modifiedPokemons[listModPokePos].originalPos;
+                    modifiedPokemons[listModPokePos] = {
+                        ...swap.pokemon_receive,
+                        pos: posInScreen,
+                        originalPos: posPxInScreen
+                    };
+                }
+            }
+        }
+    }
+}
 
 var getPokemons = () => fetch("http://localhost:8080/api/pokemon").then((data) => {
   if (data.ok) {
@@ -25,28 +91,44 @@ var getPokemons = () => fetch("http://localhost:8080/api/pokemon").then((data) =
       pokemons = response;
         let psIndex = 0;
         for (let snglPokemon of response) {
-          modifiedPokemons.push({...snglPokemon,pos:psIndex,originalPos:0})
+          modifiedPokemons.push({...snglPokemon,pos:psIndex,originalPos:0});
           psIndex++;
 
           let card = document.createElement("li");
-          card.setAttribute("class","card");
-          let id = `${snglPokemon.database_id}`;
-          card.setAttribute("id",id)
-
-          addImageToCard(card,snglPokemon);
-          addTitleToCard(card,snglPokemon);
-          addTrainerToCard(card,snglPokemon);
-          addModalButtonOpen(card,snglPokemon);
-          carouselContainer.appendChild(card);
-          addModalEvent(snglPokemon);
+          createCardStructure(carouselContainer,card,snglPokemon);
         }
         setTimeout(()=>{
-             gatherDataLoading()
+             gatherDataLoading();
         },100)
       });
   }
 });
 
+function createCardStructure(carouselContainer,card,snglPokemon){
+    card.setAttribute("class","card");
+    let id = `${snglPokemon.database_id}`;
+    card.setAttribute("id",id);
+
+    addImageToCard(card,snglPokemon);
+    addTitleToCard(card,snglPokemon);
+    addTrainerToCard(card,snglPokemon);
+    addModalButtonOpen(card,snglPokemon);
+    carouselContainer.appendChild(card);
+    addModalEvent(snglPokemon);
+}
+
+function updateCardStructure(card,snglPokemon){
+    card.setAttribute("class","card");
+    let id = `${snglPokemon.database_id}`;
+    card.setAttribute("id",id);
+    card.innerHTML = ""
+
+    addImageToCard(card,snglPokemon);
+    addTitleToCard(card,snglPokemon);
+    addTrainerToCard(card,snglPokemon);
+    addModalButtonOpen(card,snglPokemon);
+    addModalEvent(snglPokemon);
+}
 function addModalEvent(snglPokemon){
     let idButton=`#button${snglPokemon.database_id}`;
     document.querySelector(idButton).addEventListener('click', function (event) {
