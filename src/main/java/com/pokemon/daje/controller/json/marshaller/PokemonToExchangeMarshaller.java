@@ -3,6 +3,7 @@ package com.pokemon.daje.controller.json.marshaller;
 import com.pokemon.daje.controller.json.dto.PokemonExchangeDTO;
 import com.pokemon.daje.model.Move;
 import com.pokemon.daje.model.Pokemon;
+import com.pokemon.daje.model.Type;
 import com.pokemon.daje.persistance.marshaller.BaseMarshaller;
 import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ public class PokemonToExchangeMarshaller implements BaseMarshaller<Pokemon, Poke
                 pokemon.setId(dto.getId());
                 pokemon.setName(dto.getName());
                 pokemon.setCurrentHP(dto.getCurrentHP());
+                pokemon.setType(new Type(dto.getType()));
                 pokemon.setMaxHP(dto.getMaxHP());
                 pokemon.setOriginalTrainer(dto.getOriginalTrainer());
                 pokemon.setMoves(dto.getMoves().stream().map(Move::new).collect(Collectors.toSet()));
