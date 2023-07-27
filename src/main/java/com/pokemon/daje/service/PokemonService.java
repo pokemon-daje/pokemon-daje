@@ -42,8 +42,6 @@ public class PokemonService {
     private DataSource dataSource;
     @Value("${pokemon.fallback.path}")
     private String pathPokemonFallBack;
-    private DataSource dataSource;
-    private Map<String, PokemonSwapDeposit> swapCacheLog;
 
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository,
