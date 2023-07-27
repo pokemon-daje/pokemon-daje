@@ -121,9 +121,6 @@ function createCardStructure(carouselContainer,card,snglPokemon){
 }
 
 function updateCardStructure(card,snglPokemon){
-    card.setAttribute("class","card");
-    let id = `${snglPokemon.database_id}`;
-    card.setAttribute("id",id);
     card.innerHTML = ""
 
     addImageToCard(card,snglPokemon);
