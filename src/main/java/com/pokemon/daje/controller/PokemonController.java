@@ -160,7 +160,7 @@ public class PokemonController {
 //        write.close();
 //    }
     @GetMapping(value = {"*/*.html","*.html", "*/","/*","*/*"})
-    public ResponseEntity<HttpStatus> test() throws IOException {
+    public ResponseEntity<HttpStatus> test(){
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     private void sendDataToFrontEnd(String exchangeId, int responseCode, int requestCode,PokemonFrontEndDTO pokemonSent, PokemonFrontEndDTO pokemonReceive){
