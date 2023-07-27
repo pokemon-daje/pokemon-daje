@@ -27,7 +27,7 @@ public class PokemonDTO implements DTOInterface {
     @Column(name = "max_health_points")
     private int maxHealthPoints;
     @ManyToOne
-    @JoinColumn(name="pokedex_id", referencedColumnName = "id")
+    @JoinColumn(name="pokedex_id", referencedColumnName = "pokedex_id")
     private PokemonSpeciesDTO pokemonSpeciesDTO;
     @ManyToMany
     @JoinTable(name="pokemons_move_set",

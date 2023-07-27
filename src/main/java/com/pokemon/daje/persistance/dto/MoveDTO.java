@@ -20,7 +20,7 @@ public class MoveDTO implements DTOInterface {
     @Column(name = "name")
     private String name;
     @OneToOne
-    @JoinColumn(name = "type_id", referencedColumnName = "id")
+    @JoinColumn(name = "type_id", referencedColumnName = "pokedex_type_id")
     private TypeDTO type;
     @Column(name = "power")
     private int power;

@@ -21,6 +21,6 @@ public class PokemonSpeciesDTO implements DTOInterface {
     @Column(name = "sprite_url")
     private String spriteUrl;
     @OneToOne
-    @JoinColumn(name = "type_id", referencedColumnName = "id")
+    @JoinColumn(name = "type_id", referencedColumnName = "pokedex_type_id")
     private TypeDTO type;
 }
