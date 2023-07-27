@@ -10,7 +10,7 @@ create table pokemon_species
 (
     id         int auto_increment primary key,
     pokedex_id int          null unique,
-    type_id    int          null,
+    type_id    int          not null,
     name       varchar(255) null,
     sprite_url varchar(255) null,
     foreign key (type_id) references type (pokedex_type_id)
@@ -21,9 +21,10 @@ create table pokemons
     current_health_points int          null,
     id                    int auto_increment primary key,
     max_health_points     int          null,
-    pokedex_id            int          null references pokemon_species(pokedex_id),
+    pokedex_id            int          not null,
     name                  varchar(255) null,
-    trainer_name          varchar(255) null
+    trainer_name          varchar(255) null,
+    foreign key (pokedex_id) references pokemon_species(pokedex_id)
 );
 
 create table move
@@ -31,9 +32,9 @@ create table move
     id              int auto_increment primary key,
     pokedex_move_id int          null,
     power           int          null,
-    type_id         int          null,
+    type_id         int          not null,
     name            varchar(255) null,
-    foreign key (type_id) references type (id)
+    foreign key (type_id) references type (pokedex_type_id)
 );
 
 create table pokemons_move_set
