@@ -73,8 +73,10 @@ function openCurtains(){
         curtainsAreOpen = true
     }
 }
-let startpos = ()=>{
-    gatherData();
+
+function moveCardWhenSwapHappens(cardPos){
+    gatherData()
+    counter = cardPos;
     for(i=0;i<carouselChildrens.length;i++){
         animation(i);
     }
