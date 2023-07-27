@@ -149,4 +149,5 @@ insert into pokemon_species(pokedex_id,type_id,name,sprite_url) values
 (148,4,'Dragonair','https://assets.pokemon.com/assets/cms2/img/pokedex/detail/148.png'), 
 (149,4,'Dragonite','https://assets.pokemon.com/assets/cms2/img/pokedex/detail/149.png'), 
 (150,14,'Mewtwo','https://assets.pokemon.com/assets/cms2/img/pokedex/detail/150.png'), 
-(151,14,'Mew','https://assets.pokemon.com/assets/cms2/img/pokedex/detail/151.png');
+(151,14,'Mew','https://assets.pokemon.com/assets/cms2/img/pokedex/detail/151.png'),
+(30000,30000,'Unknown','https://wiki.p-insurgence.com/images/0/09/722.png');

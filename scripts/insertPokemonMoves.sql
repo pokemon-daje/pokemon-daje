@@ -159,4 +159,5 @@ insert into move(pokedex_move_id,type_id,name,power) values
 (158,16,'Vine Whip',45), 
 (159,17,'Vise Grip',55), 
 (160,18,'Water Gun',40), 
-(161,18,'Waterfall',80);
+(161,18,'Waterfall',80),
+(30000,30000,'Unknown',0);

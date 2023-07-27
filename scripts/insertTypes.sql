@@ -16,7 +16,8 @@ INSERT INTO type(pokedex_type_id, image_url, name) VALUES
             (15, 'https://archives.bulbagarden.net/media/upload/b/b5/Flying_icon_SwSh.png', 'flying'),
             (16, 'https://archives.bulbagarden.net/media/upload/a/a8/Grass_icon_SwSh.png', 'grass'),
             (17, 'https://archives.bulbagarden.net/media/upload/9/95/Normal_icon_SwSh.png', 'normal'),
-            (18, 'https://archives.bulbagarden.net/media/upload/8/80/Water_icon_SwSh.png', 'water');
+            (18, 'https://archives.bulbagarden.net/media/upload/8/80/Water_icon_SwSh.png', 'water'),
+            (30000,'https://wiki.p-insurgence.com/images/0/09/722.png','unknown');
 
 
 
