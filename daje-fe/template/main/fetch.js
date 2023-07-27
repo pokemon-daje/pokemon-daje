@@ -1,4 +1,5 @@
 let pokemons = [];
+let modifiedPokemons = [];
 
 var source = new EventSource(
   "http://localhost:8080/api/pokemon/exchange/events"
@@ -10,13 +11,27 @@ source.addEventListener("pokemon", (event) => {
 var getPokemons = () => fetch("http://localhost:8080/api/pokemon").then((data) => {
   if (data.ok) {
     data.json().then((response) => {
-        console.log(response);
       let carouselContainer = document.querySelector(".carousel-container");
-      carouselContainer.innerHTML="";
+      [...carouselContainer.children].forEach(child => {
+          let classValue= child.getAttribute("class");
+          if(classValue != "curtain-carousel-right"
+          && classValue != "curtain-carousel-left"
+          && classValue != "band-left"
+          && classValue != "band-right"){
+              carouselContainer.removeChild(child);
+          }
+      })
+        modifiedPokemon = [];
       pokemons = response;
+        let psIndex = 0;
         for (let snglPokemon of response) {
+          modifiedPokemons.push({...snglPokemon,pos:psIndex,originalPos:0})
+          psIndex++;
+
           let card = document.createElement("li");
           card.setAttribute("class","card");
+          let id = `${snglPokemon.database_id}`;
+          card.setAttribute("id",id)
 
           addImageToCard(card,snglPokemon);
           addTitleToCard(card,snglPokemon);
@@ -25,6 +40,9 @@ var getPokemons = () => fetch("http://localhost:8080/api/pokemon").then((data) =
           carouselContainer.appendChild(card);
           addModalEvent(snglPokemon);
         }
+        setTimeout(()=>{
+             gatherDataLoading()
+        },100)
       });
   }
 });
@@ -36,8 +54,8 @@ function addModalEvent(snglPokemon){
         modal.style.visibility = 'visible'
         modal.style.opacity = '0.5'
         modal.style.transform = 'scale(0.8)'
-        let poke = pokemons.find((poke) => poke.database_id === Number.parseInt(event.target.id));
-        modal.querySelector(".head-modal").innerHTML = poke.name;
+        let poke = pokemons.find((poke) => ("button"+poke.database_id) === event.target.id);
+        modal.querySelector("#head-modal").innerHTML = poke.name;
     });
 }
 
