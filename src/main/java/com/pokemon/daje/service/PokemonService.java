@@ -12,17 +12,26 @@ import com.pokemon.daje.persistance.dto.MoveDTO;
 import com.pokemon.daje.persistance.dto.PokemonDTO;
 import com.pokemon.daje.persistance.dto.PokemonSpeciesDTO;
 import com.pokemon.daje.persistance.marshaller.PokemonMarshaller;
+import com.pokemon.daje.util.exception.PokemonServiceException;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.filters.ExpiresFilter;
+import org.hibernate.internal.ExceptionConverterImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
+
 @Slf4j
 @Service
 public class PokemonService {
@@ -37,6 +46,8 @@ public class PokemonService {
     private Map<String, PokemonSwapDeposit> swapBank;
     @Value("${pokemon.fallback.path}")
     private String pathPokemonFallBack;
+    private DataSource dataSource;
+
 
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository,
@@ -55,6 +66,12 @@ public class PokemonService {
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
         this.randomPokemonStorage = new ArrayList<>(pokemonRepository.getSixRandomPokemon());
         this.swapBank = new HashMap<>();
+        this.dataSource = DataSourceBuilder.create()
+                .driverClassName("com.mysql.jdbc.Driver")
+                .url("jdbc:mysql://localhost:3306/daje")
+                .username("daje")
+                .password("daje")
+                .build();
     }
 
     public PokemonFrontEndDTO getById(int pokemonId) {
@@ -133,7 +150,7 @@ public class PokemonService {
             PokemonDTO pokemonToSave = exchange != null ? exchange.getPokemonToSave() : null;
             PokemonDTO pokemonToDelete = exchange != null ? exchange.getPokemonToDelete() : null;
 
-            code = progressWithSwap(pokemonToSave,pokemonToDelete);
+            code = progressWithSwap(pokemonToSave, pokemonToDelete);
             swapBank.remove(exchangeid);
         }else if((packageExchangeStatus.getStatus() == ProgressingProcessCode.SUCCESS.getCode()
                 || packageExchangeStatus.getStatus() == ProgressingProcessCode.BAD_REQUEST.getCode()
@@ -216,14 +233,16 @@ public class PokemonService {
         if (pokemonToSave != null && pokemonToDelete != null) {
             try {
                 pokemonToSave = pokemonRepository.save(pokemonToSave);
-            } catch (Exception ex) {
-                return ProgressingProcessCode.SERVER_ERROR;
+            } catch (PokemonServiceException ex) {
+                code = ProgressingProcessCode.SERVER_ERROR;
+                throw new PokemonServiceException("Pokemon cannot be persisted", ex);
             }
             try {
                 pokemonRepository.delete(pokemonToDelete);
-            } catch (Exception ex) {
+            } catch (PokemonServiceException ex) {
                 pokemonRepository.delete(pokemonToSave);
-                return ProgressingProcessCode.SERVER_ERROR;
+                code = ProgressingProcessCode.SERVER_ERROR;
+                throw new PokemonServiceException("Pokemon cannot be persisted", ex);
             }
         } else {
             code = ProgressingProcessCode.BAD_REQUEST;
@@ -233,22 +252,32 @@ public class PokemonService {
     
     private void checkPokemonsListSize(){
         Consumer<List<PokemonDTO>> checkIfPokemArePresent = (pokemonList) -> {
-            if(pokemonList.isEmpty()) {
-                try {
-                    loadPokemonFromProperty();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            if (pokemonList.isEmpty()) {
+                pokemonList.add(loadPokemonFromProperty());
             }
         };
         checkIfPokemArePresent.accept(randomPokemonStorage);
     }
 
-    private PokemonDTO loadPokemonFromProperty() throws IOException {
-        PokemonDTO pokemonDTO = ObjectMapperFactory.buildStrictGenericObjectMapper().readValue(new File(pathPokemonFallBack), PokemonDTO.class);
-        normalizeDTO(pokemonDTO);
-        pokemonDTO = pokemonRepository.save(pokemonDTO);
-        randomPokemonStorage.add(pokemonDTO);
+    private PokemonDTO loadPokemonFromProperty() {
+        PokemonDTO pokemonDTO = null;
+        try {
+            pokemonDTO = ObjectMapperFactory.buildStrictGenericObjectMapper().readValue(new File(pathPokemonFallBack), PokemonDTO.class);
+            normalizeDTO(pokemonDTO);
+            pokemonDTO = pokemonRepository.save(pokemonDTO);
+        } catch (PokemonServiceException | IOException e) {
+            throw new PokemonServiceException("pokemon not loaded properly from propert", e);
+        }
         return pokemonDTO;
+    }
+
+    @Scheduled(fixedDelay = 2000)
+    private void checkDatabaseConnection() {
+        try (Connection connection = dataSource.getConnection()) {
+            log.info("database connesso e funzionante");
+        } catch (Exception e) {
+            log.info("database non connesso o non funzionante");
+            System.exit(1);
+        }
     }
 }
