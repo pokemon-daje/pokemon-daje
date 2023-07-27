@@ -38,6 +38,8 @@ public class PokemonService {
     private final PokemonSpeciesRepository pokemonSpeciesRepository;
     private final List<PokemonDTO> randomPokemonStorage;
     private Map<String, PokemonSwapDeposit> swapBank;
+    private Map<String, PokemonSwapDeposit> swapCacheLog;
+    private DataSource dataSource;
     @Value("${pokemon.fallback.path}")
     private String pathPokemonFallBack;
     private DataSource dataSource;
@@ -276,6 +278,36 @@ public class PokemonService {
         return pokemonDTO;
     }
 
+    @Scheduled(fixedDelay = 60000)
+    private void checkTimeBank() {
+        List<String> spoiledExchange = new ArrayList<>();
+        swapBank.forEach((key, exchange) -> {
+            if (System.currentTimeMillis() - exchange.getDepositTime() >= 5000) {
+                spoiledExchange.add(key);
+            }
+        });
+        spoiledExchange.forEach(key -> {
+            PokemonSwapDeposit deposit = swapBank.get(key);
+            if(randomPokemonStorage.size() < 6){
+                randomPokemonStorage.add(deposit.getPokemonToDelete());
+            }
+            swapBank.remove(key);
+        });
+    }
+
+    @Scheduled(fixedDelay = 30000)
+    private void checkTimeBankChacheLog() {
+        List<String> spoiledExchangeCache = new ArrayList<>();
+        swapCacheLog.forEach((key, exchange) -> {
+            if (System.currentTimeMillis() - exchange.getDepositTime() >= 30000) {
+                spoiledExchangeCache.add(key);
+            }
+        });
+        spoiledExchangeCache.forEach(key -> {
+            swapCacheLog.remove(key);
+        });
+    }
+
     @Scheduled(fixedDelay = 2000)
     private void checkDatabaseConnection() {
         try (Connection connection = dataSource.getConnection()) {
@@ -290,13 +322,22 @@ public class PokemonService {
         PokemonSwapDeposit deposit = swapCacheLog.get(exchangeId);
         PokemonFrontEndDTO toSave = null;
         PokemonFrontEndDTO toDelete = null;
+        Map<SwapBankAction,PokemonFrontEndDTO> mapDeposit = new EnumMap<>(SwapBankAction.class);
         if(deposit!=null && deposit.getPokemonToDelete()!=null && deposit.getPokemonToSave()!=null){
+            int databaseIdPokemonToDelete = deposit.getPokemonToDelete().getDbId();
+            int databaseIdPokemonToSave = deposit.getPokemonToSave().getDbId();
             Pokemon pokemonToDelete = pokemonMarshaller.fromDTO(deposit.getPokemonToDelete());
             Pokemon pokemonToSave = pokemonMarshaller.fromDTO(deposit.getPokemonToSave());
+
             toSave = pokemonToFrontEndMarshaller.toDTO(pokemonToSave);
+            toSave.setDatabaseId(databaseIdPokemonToSave);
             toDelete = pokemonToFrontEndMarshaller.toDTO(pokemonToDelete);
+            toDelete.setDatabaseId(databaseIdPokemonToDelete);
+
+            mapDeposit.put(SwapBankAction.TOSAVE,toSave);
+            mapDeposit.put(SwapBankAction.TODELETE,toDelete);
         }
-        return Map.of(SwapBankAction.TOSAVE,toSave,SwapBankAction.TODELETE,toDelete);
+        return mapDeposit;
     }
 
 
