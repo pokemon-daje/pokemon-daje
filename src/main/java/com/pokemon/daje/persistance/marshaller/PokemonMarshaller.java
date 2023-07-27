@@ -46,7 +46,12 @@ public class PokemonMarshaller implements
     @Override
     public PokemonDTO toDTO(Pokemon business) {
         PokemonDTO pokemonDTO = null;
-        if (business != null){
+        if (business != null
+                && business.getMoves() != null
+                && !business.getMoves().isEmpty()
+                && business.getType() != null
+                && business.getType().getId() != null
+                && business.getMoves().stream().filter(move -> move.getId() != null).findFirst().isEmpty()){
             pokemonDTO = new PokemonDTO();
             pokemonDTO.setName(business.getName());
             pokemonDTO.setCurrentHealthPoints(business.getCurrentHP());
