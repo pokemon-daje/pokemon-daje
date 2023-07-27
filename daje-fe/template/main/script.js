@@ -54,8 +54,7 @@ function nextImg(integer){
 function animation(rootCard){
     let htmlCardPokemon = carouselChildrens[rootCard];
     let pokemonOfCard = modifiedPokemons.find(poke => poke.database_id == htmlCardPokemon.id);
-    carouselChildrens[rootCard].style.transform = `translate(${-(counter*firstCardOffSetWidth)+pokemonOfCard.originalPos+(firstCardOffSetWidth/2*pokemonOfCard.pos)-firstCardOffSetWidth*counter}px)`
-    carouselChildrens[i].style.zIndex = "1";
+    carouselChildrens[rootCard].style.transform = `translate(${-2*(counter*firstCardOffSetWidth)+pokemonOfCard.originalPos+(firstCardOffSetWidth/2*pokemonOfCard.pos)}px)`
 }
 
 function openCurtains(){
