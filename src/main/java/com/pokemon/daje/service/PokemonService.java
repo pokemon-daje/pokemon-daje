@@ -63,17 +63,22 @@ public class PokemonService {
     }
 
     public PokemonDTO insert(Pokemon pokemon) {
-        if (pokemon.getType() != null) {
-            PokemonDTO pokemonDTO = pokemonMarshaller.toDTO(pokemon);
+        PokemonDTO pokemonDTO = null;
+        if (pokemon.getType() != null && pokemon.getId() != null) {
+            pokemonDTO = pokemonMarshaller.toDTO(pokemon);
             normalizeDTO(pokemonDTO);
-            return pokemonRepository.save(pokemonDTO);
+            pokemonDTO = pokemonDTO != null ? pokemonRepository.save(pokemonDTO):null;
         }
-        return null;
+        return pokemonDTO;
     }
     public PokemonFrontEndDTO insertFromFrontEnd(Pokemon pokemon){
-        PokemonDTO pokemonDTO = insert(pokemon);
-        Pokemon pokemonBusinessFromDB = pokemonMarshaller.fromDTO(pokemonDTO);
-        return pokemonToFrontEndMarshaller.toDTO(pokemonBusinessFromDB);
+        PokemonFrontEndDTO pokemonFrontEnd = null;
+        if (pokemon.getType() != null && pokemon.getId() != null) {
+            PokemonDTO pokemonDTO = insert(pokemon);
+            Pokemon pokemonBusinessFromDB = pokemonMarshaller.fromDTO(pokemonDTO);
+            pokemonFrontEnd = pokemonToFrontEndMarshaller.toDTO(pokemonBusinessFromDB);
+        }
+        return pokemonFrontEnd;
     }
 
     public void deleteById(int id) {
@@ -151,24 +156,30 @@ public class PokemonService {
     }
 
     private void normalizeDTO(PokemonDTO pokemonToNormalize) {
-        Set<MoveDTO> movesDTO = new HashSet<>();
-        Optional<PokemonSpeciesDTO> speciesDTO = pokemonSpeciesRepository.findByPokedexId(pokemonToNormalize.getPokemonSpeciesDTO().getPokedexId());
-        pokemonToNormalize.getMoveSet().forEach(move -> {
-            Optional<MoveDTO> moveDTO = moveRepository.findByPokedexId(move.getPokedexId());
-            moveDTO.ifPresent(movesDTO::add);
-        });
-        speciesDTO.ifPresent(pokemonToNormalize::setPokemonSpeciesDTO);
-        pokemonToNormalize.setMoveSet(movesDTO);
+        if(pokemonToNormalize != null){
+            Set<MoveDTO> movesDTO = new HashSet<>();
+            Optional<PokemonSpeciesDTO> speciesDTO = pokemonSpeciesRepository.findByPokedexIdOrGetUnknow(pokemonToNormalize.getPokemonSpeciesDTO().getPokedexId());
+            pokemonToNormalize.getMoveSet().forEach(move -> {
+                Optional<MoveDTO> moveDTO = moveRepository.findByPokedexIdOrGetUnknow(move.getPokedexId());
+                moveDTO.ifPresent(movesDTO::add);
+            });
+            speciesDTO.ifPresent(pokemonToNormalize::setPokemonSpeciesDTO);
+            pokemonToNormalize.setMoveSet(movesDTO);
+        }
     }
 
     private ProgressingProcessCode validatePokemonExchangeDTO(PokemonExchangeDTO pokemonExchangeDTO){
-        Optional<PokemonSpeciesDTO> pokemonSpeciesDTO = pokemonSpeciesRepository.findByPokedexId(pokemonExchangeDTO.getId());
-        Set<MoveDTO> moves = new HashSet<>();
-        pokemonExchangeDTO.getMoves().forEach(move -> {
-            Optional<MoveDTO> moveDTO= moveRepository.findByPokedexIdOrGetUnknow(move);
-            moveDTO.ifPresent(moves::add);
-        });
-        return pokemonSpeciesDTO.isPresent() && !moves.isEmpty()? ProgressingProcessCode.SUCCESS : ProgressingProcessCode.BAD_REQUEST;
+        if(pokemonExchangeDTO != null){
+            Optional<PokemonSpeciesDTO> pokemonSpeciesDTO = pokemonSpeciesRepository.findByPokedexIdOrGetUnknow(pokemonExchangeDTO.getId());
+            Set<MoveDTO> moves = new HashSet<>();
+            pokemonExchangeDTO.getMoves().forEach(move -> {
+                Optional<MoveDTO> moveDTO= moveRepository.findByPokedexIdOrGetUnknow(move);
+                moveDTO.ifPresent(moves::add);
+            });
+            return pokemonSpeciesDTO.isPresent() && !moves.isEmpty()? ProgressingProcessCode.SUCCESS : ProgressingProcessCode.BAD_REQUEST;
+
+        }
+        return ProgressingProcessCode.BAD_REQUEST;
     }
 
     private PokemonDTO validateAndGivePokemonToSave(PokemonExchangeDTO pokemonExchangeDTO) {
