@@ -79,4 +79,3 @@ let startpos = ()=>{
         animation(i);
     }
 }
-startpos()
