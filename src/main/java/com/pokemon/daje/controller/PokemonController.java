@@ -3,6 +3,7 @@ package com.pokemon.daje.controller;
 import com.pokemon.daje.controller.json.dto.*;
 import com.pokemon.daje.model.Pokemon;
 import com.pokemon.daje.model.ProgressingProcessCode;
+import com.pokemon.daje.model.SwapBankAction;
 import com.pokemon.daje.service.PokemonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,8 +60,10 @@ public class PokemonController {
         PackageExchange pack = pokemonService.inizializePokemonsSwap(pokemon);
         ResponseEntity<PackageExchange> toSend = new ResponseEntity<>(pack,HttpStatus.OK);
         if(pack == null){
-            sendDataToFrontEnd("exchange error",400);
+            sentDataToFrontEnd("exchange error",200,400);
             toSend = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }else{
+            sentDataToFrontEnd(pack.getId(),200,0);
         }
         return toSend;
     }
@@ -84,10 +87,11 @@ public class PokemonController {
                 && !ProgressingProcessCode.UNKWON.equals(ProgressingProcessCode.fromNumber(packageExchangeStatus.getStatus()))
         ){
             code = pokemonService.nextStepSwap(exchangeId,packageExchangeStatus);
+            sentDataToFrontEnd(exchangeId,code.getCode(), packageExchangeStatus.getStatus());
         } else {
             code = ProgressingProcessCode.BAD_REQUEST;
         }
-        sendDataToFrontEnd(exchangeId,code.getCode());
+
         switch (code){
             case SUCCESS -> {
                 return new ResponseEntity<>(HttpStatus.OK);
@@ -161,12 +165,12 @@ public class PokemonController {
     public ResponseEntity<HttpStatus> test() throws IOException {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    private void sendDataToFrontEnd(String exchangeId, int code){
+    private void sendDataToFrontEnd(String exchangeId, int code, int requestCode,PokemonFrontEndDTO pokemonSent, PokemonFrontEndDTO pokemonReceive){
         List<SseEmitter> usedEmitter = new ArrayList<>();
         serverEmitters.forEach(sseEmitter -> {
                     try {
                         sseEmitter.send(SseEmitter.event()
-                                .data(new PackageFrontEnd(exchangeId,code))
+                                .data(new PackageFrontEnd(exchangeId,code,requestCode,pokemonSent,pokemonReceive))
                                 .id("exchange")
                                 .name("pokemon"));
                         usedEmitter.add(sseEmitter);
@@ -177,4 +181,10 @@ public class PokemonController {
         );
         usedEmitter.forEach(ResponseBodyEmitter::complete);
     }
+
+    private void sentDataToFrontEnd(String exchangeId, int code, int requestCode) {
+        Map<SwapBankAction, PokemonFrontEndDTO> mapDeposit = pokemonService.getPokemonsFromSwapCacheLog(exchangeId);
+        sendDataToFrontEnd(exchangeId, code, requestCode,mapDeposit.get(SwapBankAction.TODELETE), mapDeposit.get(SwapBankAction.TOSAVE));
+    }
+
 }
