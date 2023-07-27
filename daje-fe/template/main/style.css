@@ -13,6 +13,8 @@ body{
     background-repeat: no-repeat;
     background-image: url(https://media.discordapp.net/attachments/1093471819295637554/1133710961308598303/background1.jpg);
     background-size: 100%;
+    font-family: 'Permanent Marker', cursive;
+    font-family: 'REM', sans-serif;
 }
 
 .content-to-change{
@@ -70,11 +72,13 @@ body{
     display: flex;
     flex-direction: row;
     position: absolute;
-    justify-content: space-evenly;
+    justify-content: space-between;
     bottom: 38%;
-    width: 100%;
-    z-index: 3;
+    width: 55%;
+    z-index: 11;
     opacity: 0;
+    margin-bottom: 10%;
+    left: 22.5%;
 }
 
 .buttons div.left{
@@ -85,6 +89,8 @@ body{
     transition: transform 0.8s;
     z-index: 2;
     background-color: aliceblue;
+ 
+
 }
 .buttons div.right{
     display: flex;
@@ -103,7 +109,7 @@ body{
 }
 
 button[data-bs-dismiss="modal"]{
-    background-color: yellow;
+    background-color: ffcc00;
 }
 
 .btn-circle{
@@ -117,11 +123,20 @@ button[data-bs-dismiss="modal"]{
     vertical-align: bottom;
     top: 10%;
     text-align: center;
-    border-radius: 10%;
     transition: transform 0.8s;
+    border-radius: 3%;
+    border: solid 1px #004c8c;
+    background: linear-gradient(217deg, rgba(255,204,0,.8), rgba(255,0,0,0) 70.71%),
+    linear-gradient(130deg, rgba(255,204,0,.8), rgba(255,204,0,.8) 70.71%),
+    linear-gradient(350deg, rgba(0,0,255,.9), rgba(0,0,255,.8) 70.71%);  
 }
 
 .card button{
+    border-radius: 3%;
+    width: 60%;
+    background-color: #004c8c;
+    margin-left: 20%;
+    margin-bottom: 5%;
     border-radius: 10%;
 }
 
@@ -136,19 +151,38 @@ img[src="/logo_pokemon_daje.png"]{
 
 #modalPokemon{
     position: absolute;
-    height: 70%;
-    width: 50%;
-    top: 15%;
-    left: 25%;
-    position: absolute;
+    height: 48%;
+    width: 23%;
+    top: 20%;
+    left: 38%;
     background: white;
     z-index: 10;
-    border-radius: 30%;
     visibility: hidden;
     transition: transform 0.8s;
     transform: translate(-50%, -50%) scale(0.1) scale(1);
+    border-radius: 3% ;
+    border: solid 1px #004c8c;
+    background: linear-gradient(217deg, rgba(255,204,0,.8), rgba(255,0,0,0) 70.71%),
+    linear-gradient(130deg, rgba(255,204,0,.8), rgba(255,204,0,.8) 70.71%),
+    linear-gradient(350deg, rgba(0,0,255,.9), rgba(0,0,255,.8) 70.71%);  
+    text-align: left;
 }
+#modalPokemon img{
+    width: 10%;
+}
+#modalPokemon h5{
+    padding-left: 5%;
+    font-weight: bold;
+    font-size: 1em;
+    padding-top: 7%;
+}
+#modalPokemon p{
+    padding-left: 5%;
+    font-weight: bold;
+    font-size: 1em;
+    padding-top: 7%;
 
+}
 #message{
     font-family: 'Permanent Marker', cursive;
     font-weight: 500;
