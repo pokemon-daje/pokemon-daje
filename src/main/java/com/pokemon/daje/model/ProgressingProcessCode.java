@@ -3,11 +3,12 @@ package com.pokemon.daje.model;
 import java.util.stream.Stream;
 
 public enum ProgressingProcessCode {
-    SUCCESS(200),
-    BAD_REQUEST(400),
-    RESOURCE_NOT_FOUND(404),
-    SERVER_ERROR(500),
-    UNKWON(121212);
+    POKEMON_EXCHANGE_REQUEST_OPEN(0),
+    POKEMON_REQUEST_SUCCESS(200),
+    POKEMON_BAD_REQUEST(400),
+    POKEMON_EXCHANGE_NOT_FOUND(404),
+    POKEMON_REQUEST_DOWN_SERVER_ERROR(500),
+    POKEMON_REQUEST_UNKWON(121212);
 
     private int code;
     ProgressingProcessCode(int code) {
@@ -15,7 +16,7 @@ public enum ProgressingProcessCode {
     }
 
     public static ProgressingProcessCode fromNumber(int codeStatus) {
-        return Stream.of(ProgressingProcessCode.values()).filter(responseCode -> responseCode.code == codeStatus).findFirst().orElse(UNKWON);
+        return Stream.of(ProgressingProcessCode.values()).filter(responseCode -> responseCode.code == codeStatus).findFirst().orElse(POKEMON_REQUEST_UNKWON);
     }
 
     public int getCode(){

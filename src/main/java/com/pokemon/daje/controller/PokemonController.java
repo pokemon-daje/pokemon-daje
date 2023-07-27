@@ -58,10 +58,12 @@ public class PokemonController {
         PackageExchange pack = pokemonService.inizializePokemonsSwap(pokemon);
         ResponseEntity<PackageExchange> toSend = new ResponseEntity<>(pack,HttpStatus.OK);
         if(pack == null){
-            sentDataToFrontEnd("exchange error",200,400);
+            sentDataToFrontEnd("exchange error",ProgressingProcessCode.POKEMON_BAD_REQUEST.getCode()
+                    ,ProgressingProcessCode.POKEMON_EXCHANGE_REQUEST_OPEN.getCode());
             toSend = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }else{
-            sentDataToFrontEnd(pack.getId(),200,0);
+            sentDataToFrontEnd(pack.getId(),ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode()
+                    ,ProgressingProcessCode.POKEMON_EXCHANGE_REQUEST_OPEN.getCode());
         }
         return toSend;
     }
@@ -82,22 +84,22 @@ public class PokemonController {
     public ResponseEntity<HttpStatus> statusSwap(@PathVariable("exchangeId") String exchangeId, @RequestBody PackageExchangeStatus packageExchangeStatus){
         ProgressingProcessCode code;
         if(!ObjectUtils.isEmpty(exchangeId) && packageExchangeStatus != null
-                && !ProgressingProcessCode.UNKWON.equals(ProgressingProcessCode.fromNumber(packageExchangeStatus.getStatus()))
+                && !ProgressingProcessCode.POKEMON_REQUEST_UNKWON.equals(ProgressingProcessCode.fromNumber(packageExchangeStatus.getStatus()))
         ){
             code = pokemonService.nextStepSwap(exchangeId,packageExchangeStatus);
             sentDataToFrontEnd(exchangeId,code.getCode(), packageExchangeStatus.getStatus());
         } else {
-            code = ProgressingProcessCode.BAD_REQUEST;
+            code = ProgressingProcessCode.POKEMON_BAD_REQUEST;
         }
 
         switch (code){
-            case SUCCESS -> {
+            case POKEMON_REQUEST_SUCCESS -> {
                 return new ResponseEntity<>(HttpStatus.OK);
             }
-            case BAD_REQUEST -> {
+            case POKEMON_BAD_REQUEST -> {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-            case RESOURCE_NOT_FOUND -> {
+            case POKEMON_EXCHANGE_NOT_FOUND -> {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             default -> {
