@@ -123,7 +123,6 @@ public class PokemonService {
             int pokemonToGiveId = choosePokemonToSwap();
             Optional<PokemonDTO> pokemonDTOToGive= pokemonRepository.findById(pokemonToGiveId);
             if(pokemonDTOToGive.isPresent() && pokemonToPersistDTO != null){
-                normalizeDTO(pokemonDTOToGive.get());
                 String idSwap = UUID.randomUUID().toString();
                 exchangeSwapDTO = new PackageExchange(idSwap, mapPokemonToGiveForExchange(pokemonDTOToGive.get()));
                 swapCacheLog.put(idSwap,
@@ -193,22 +192,26 @@ public class PokemonService {
     }
 
     private ProgressingProcessCode validatePokemonExchangeDTO(PokemonExchangeDTO pokemonExchangeDTO){
-        if(pokemonExchangeDTO != null){
+        if(pokemonExchangeDTO.getId() != null
+                && pokemonExchangeDTO.getType() != null
+                && pokemonExchangeDTO.getMoves() != null
+                && !pokemonExchangeDTO.getMoves().isEmpty()
+                && !pokemonExchangeDTO.getMoves().stream().anyMatch(Objects::isNull)){
             Optional<PokemonSpeciesDTO> pokemonSpeciesDTO = pokemonSpeciesRepository.findByPokedexIdOrGetUnknow(pokemonExchangeDTO.getId());
             Set<MoveDTO> moves = new HashSet<>();
             pokemonExchangeDTO.getMoves().forEach(move -> {
                 Optional<MoveDTO> moveDTO= moveRepository.findByPokedexIdOrGetUnknow(move);
                 moveDTO.ifPresent(moves::add);
             });
-            return pokemonSpeciesDTO.isPresent() && !moves.isEmpty()? ProgressingProcessCode.SUCCESS : ProgressingProcessCode.BAD_REQUEST;
+            return pokemonSpeciesDTO.isPresent() && !moves.isEmpty()? ProgressingProcessCode.POKEMON_REQUEST_SUCCESS : ProgressingProcessCode.POKEMON_BAD_REQUEST;
 
         }
-        return ProgressingProcessCode.BAD_REQUEST;
+        return ProgressingProcessCode.POKEMON_BAD_REQUEST;
     }
 
     private PokemonDTO validateAndGivePokemonToSave(PokemonExchangeDTO pokemonExchangeDTO) {
         PokemonDTO pokemonToPersistDTO = null;
-        if (pokemonExchangeDTO != null && !ProgressingProcessCode.BAD_REQUEST.equals(validatePokemonExchangeDTO(pokemonExchangeDTO))) {
+        if (pokemonExchangeDTO != null && !ProgressingProcessCode.POKEMON_BAD_REQUEST.equals(validatePokemonExchangeDTO(pokemonExchangeDTO))) {
             Pokemon pokemonBusiness = pokemonToExchangeMarshaller.fromDTO(pokemonExchangeDTO);
             pokemonToPersistDTO = pokemonMarshaller.toDTO(pokemonBusiness);
             normalizeDTO(pokemonToPersistDTO);
