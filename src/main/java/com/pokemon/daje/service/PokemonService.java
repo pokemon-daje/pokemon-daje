@@ -7,7 +7,6 @@ import com.pokemon.daje.model.*;
 import com.pokemon.daje.persistance.dao.MoveRepository;
 import com.pokemon.daje.persistance.dao.PokemonRepository;
 import com.pokemon.daje.persistance.dao.PokemonSpeciesRepository;
-import com.pokemon.daje.persistance.dao.TypeRepository;
 import com.pokemon.daje.persistance.dto.MoveDTO;
 import com.pokemon.daje.persistance.dto.PokemonDTO;
 import com.pokemon.daje.persistance.dto.PokemonSpeciesDTO;
@@ -15,12 +14,9 @@ import com.pokemon.daje.persistance.marshaller.PokemonMarshaller;
 import com.pokemon.daje.util.exception.PokemonServiceException;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.filters.ExpiresFilter;
-import org.hibernate.internal.ExceptionConverterImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +24,6 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -39,7 +34,6 @@ public class PokemonService {
     private final PokemonMarshaller pokemonMarshaller;
     private final PokemonToFrontEndMarshaller pokemonToFrontEndMarshaller;
     private final PokemonToExchangeMarshaller pokemonToExchangeMarshaller;
-    private final TypeRepository typeRepository;
     private final MoveRepository moveRepository;
     private final PokemonSpeciesRepository pokemonSpeciesRepository;
     private final List<PokemonDTO> randomPokemonStorage;
@@ -54,14 +48,13 @@ public class PokemonService {
                           PokemonMarshaller pokemonMarshaller,
                           PokemonToFrontEndMarshaller pokemonToFrontEndMarshaller,
                           PokemonToExchangeMarshaller pokemonToExchangeMarshaller,
-                          TypeRepository typeRepository, MoveRepository moveRepository,
+                          MoveRepository moveRepository,
                           PokemonSpeciesRepository pokemonSpeciesRepository) {
 
         this.pokemonRepository = pokemonRepository;
         this.pokemonMarshaller = pokemonMarshaller;
         this.pokemonToFrontEndMarshaller = pokemonToFrontEndMarshaller;
         this.pokemonToExchangeMarshaller = pokemonToExchangeMarshaller;
-        this.typeRepository = typeRepository;
         this.moveRepository = moveRepository;
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
         this.randomPokemonStorage = new ArrayList<>(pokemonRepository.getSixRandomPokemon());
