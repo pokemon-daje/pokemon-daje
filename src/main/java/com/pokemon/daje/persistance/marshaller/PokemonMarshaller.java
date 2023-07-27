@@ -51,7 +51,7 @@ public class PokemonMarshaller implements
                 && !business.getMoves().isEmpty()
                 && business.getType() != null
                 && business.getType().getId() != null
-                && business.getMoves().stream().filter(move -> move.getId() != null).findFirst().isEmpty()){
+                && !business.getMoves().stream().anyMatch(move -> move.getId() == null)){
             pokemonDTO = new PokemonDTO();
             pokemonDTO.setName(business.getName());
             pokemonDTO.setCurrentHealthPoints(business.getCurrentHP());
