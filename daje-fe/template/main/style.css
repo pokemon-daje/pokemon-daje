@@ -13,8 +13,7 @@ body{
     background-repeat: no-repeat;
     background-image: url(https://media.discordapp.net/attachments/1093471819295637554/1133710961308598303/background1.jpg);
     background-size: 100%;
-    font-family: 'Permanent Marker', cursive;
-    font-family: 'REM', sans-serif;
+    font-family: 'Tektur', cursive;
 }
 
 .content-to-change{
@@ -126,9 +125,9 @@ button[data-bs-dismiss="modal"]{
     transition: transform 0.8s;
     border-radius: 3%;
     border: solid 1px #004c8c;
-    background: linear-gradient(217deg, rgba(255,204,0,.8), rgba(255,0,0,0) 70.71%),
+    /*background: linear-gradient(217deg, rgba(255,204,0,.8), rgba(255,0,0,0) 70.71%),
     linear-gradient(130deg, rgba(255,204,0,.8), rgba(255,204,0,.8) 70.71%),
-    linear-gradient(350deg, rgba(0,0,255,.9), rgba(0,0,255,.8) 70.71%);  
+    linear-gradient(350deg, rgba(0,0,255,.9), rgba(0,0,255,.8) 70.71%);  */
 }
 
 .card button{
@@ -162,13 +161,14 @@ img[src="/logo_pokemon_daje.png"]{
     transform: translate(-50%, -50%) scale(0.1) scale(1);
     border-radius: 3% ;
     border: solid 1px #004c8c;
-    background: linear-gradient(217deg, rgba(255,204,0,.8), rgba(255,0,0,0) 70.71%),
+    /*background: linear-gradient(217deg, rgba(255,204,0,.8), rgba(255,0,0,0) 70.71%),
     linear-gradient(130deg, rgba(255,204,0,.8), rgba(255,204,0,.8) 70.71%),
-    linear-gradient(350deg, rgba(0,0,255,.9), rgba(0,0,255,.8) 70.71%);  
+    linear-gradient(350deg, rgba(0,0,255,.9), rgba(0,0,255,.8) 70.71%);  */
     text-align: left;
 }
 #modalPokemon img{
     width: 10%;
+    padding-left: 3%;
 }
 #modalPokemon h5{
     padding-left: 5%;
@@ -181,8 +181,25 @@ img[src="/logo_pokemon_daje.png"]{
     font-weight: bold;
     font-size: 1em;
     padding-top: 7%;
-
 }
+#close{
+    font-size: 1vw; /* Imposta la dimensione del testo in percentuale relativa alla larghezza del viewport */
+    width: 7%;
+    height: 1%;
+    border: #ffcc00 solid 2px;
+    text-align: center;
+    position: relative;
+    left: 92%; 
+    margin-top: 1.5%;
+    cursor: pointer;
+    transition: transform 0.2s;
+    border-radius: 10%;
+    color: #ffcc00;
+}
+#close:hover {
+transform: scale(1.2);;
+  }
+
 #message{
     font-family: 'Permanent Marker', cursive;
     font-weight: 500;
