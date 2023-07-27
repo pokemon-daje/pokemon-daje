@@ -11,10 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.*;
 
 @Slf4j
@@ -22,12 +20,12 @@ import java.util.*;
 @RequestMapping("/api")
 public class PokemonController {
     final PokemonService pokemonService;
-    private Set<SseEmitter> serverEmitters;
+    private Map<String,SseEmitter> serverEmitters;
 
     @Autowired
     public PokemonController(PokemonService pokemonService) {
         this.pokemonService = pokemonService;
-        serverEmitters =new HashSet<>();
+        serverEmitters =new HashMap<>();
     }
 
     @GetMapping("/pokemon")
@@ -108,18 +106,18 @@ public class PokemonController {
         }
     }
 
-    @GetMapping("/pokemon/exchange/events")
-    public SseEmitter streamSseMvc() {
-        SseEmitter emitter = new SseEmitter(1000L);
+    @GetMapping("/pokemon/exchange/events/{eventId}")
+    public SseEmitter streamSseMvc(@PathVariable String eventId) {
+        SseEmitter emitter = new SseEmitter();
             try {
                 SseEmitter.SseEventBuilder event = SseEmitter.event()
                         .data(new Date())
-                        .id("exchange")
+                        .id("connection")
                         .name("pokemon");
                 emitter.send(event);
 
-                serverEmitters.add(emitter);
-                emitter.onCompletion(()->{serverEmitters.remove(emitter);});
+                serverEmitters.put(eventId,emitter);
+                emitter.onCompletion(()-> serverEmitters.remove(eventId));
                 emitter.onTimeout(emitter::complete);
 
             } catch (Exception ex) {
@@ -165,26 +163,36 @@ public class PokemonController {
     public ResponseEntity<HttpStatus> test() throws IOException {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    private void sendDataToFrontEnd(String exchangeId, int code, int requestCode,PokemonFrontEndDTO pokemonSent, PokemonFrontEndDTO pokemonReceive){
-        List<SseEmitter> usedEmitter = new ArrayList<>();
-        serverEmitters.forEach(sseEmitter -> {
-                    try {
-                        sseEmitter.send(SseEmitter.event()
-                                .data(new PackageFrontEnd(exchangeId,code,requestCode,pokemonSent,pokemonReceive))
-                                .id("exchange")
-                                .name("pokemon"));
-                        usedEmitter.add(sseEmitter);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+    private void sendDataToFrontEnd(String exchangeId, int responseCode, int requestCode,PokemonFrontEndDTO pokemonSent, PokemonFrontEndDTO pokemonReceive){
+        List<String> usedKeyEmitter = new ArrayList<>();
+        try{
+            serverEmitters.forEach((key,sseEmitter) -> {
+                        try {
+                            sseEmitter.send(SseEmitter.event()
+                                    .data(new PackageFrontEnd(exchangeId,responseCode,requestCode,pokemonSent,pokemonReceive))
+                                    .id("exchange")
+                                    .name("pokemon"));
+                        } catch (Exception ex) {
+                            String copyKey = key+"";
+                            usedKeyEmitter.add(copyKey);
+                            log.info("Connection with id: " + key + " has been closed");
+                        }
                     }
-                }
-        );
-        usedEmitter.forEach(ResponseBodyEmitter::complete);
+            );
+        }catch (Exception ex){
+            log.info("Server emitters gone crazy");
+        }
+        usedKeyEmitter.forEach(key -> {
+            SseEmitter emmiterToDelete = serverEmitters.get(key);
+            if(emmiterToDelete != null){
+                emmiterToDelete.complete();
+            }
+        });
     }
 
-    private void sentDataToFrontEnd(String exchangeId, int code, int requestCode) {
+    private void sentDataToFrontEnd(String exchangeId, int responseCode, int requestCode) {
         Map<SwapBankAction, PokemonFrontEndDTO> mapDeposit = pokemonService.getPokemonsFromSwapCacheLog(exchangeId);
-        sendDataToFrontEnd(exchangeId, code, requestCode,mapDeposit.get(SwapBankAction.TODELETE), mapDeposit.get(SwapBankAction.TOSAVE));
+        sendDataToFrontEnd(exchangeId, responseCode, requestCode,mapDeposit.get(SwapBankAction.TODELETE), mapDeposit.get(SwapBankAction.TOSAVE));
     }
 
 }
