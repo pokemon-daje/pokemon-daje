@@ -12,5 +12,5 @@ public interface PokemonSpeciesRepository extends JpaRepository<PokemonSpeciesDT
 
     Optional<PokemonSpeciesDTO> findByPokedexId(Integer integer);
     @Query("select p from PokemonSpeciesDTO as p where p.pokedexId = :id or p.pokedexId = 30000 ORDER BY(p.pokedexId) limit 1")
-    Optional<MoveDTO> findByPokedexIdOrGetUnknow(@Param("id") int id);
+    Optional<PokemonSpeciesDTO> findByPokedexIdOrGetUnknow(@Param("id") int id);
 }
