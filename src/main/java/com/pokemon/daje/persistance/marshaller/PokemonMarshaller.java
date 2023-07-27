@@ -47,6 +47,7 @@ public class PokemonMarshaller implements
     public PokemonDTO toDTO(Pokemon business) {
         PokemonDTO pokemonDTO = null;
         if (business != null
+                && business.getId() != null
                 && business.getMoves() != null
                 && !business.getMoves().isEmpty()
                 && business.getType() != null
