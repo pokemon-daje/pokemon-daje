@@ -92,6 +92,6 @@ function animateJolly(){
             jollyCard.style.opacity = "0"
             jollyCard.style.animation="";
             jollyCard.style.visibility="hidden";
-        },2805)
+        },2850)
     },790)
 }
