@@ -92,10 +92,6 @@ public class PokemonService {
         return pokemonFrontEnd;
     }
 
-    public void deleteById(int id) {
-        pokemonRepository.deleteById(id);
-    }
-
     public List<PokemonFrontEndDTO> getSixRandomPokemon(){
         List<PokemonDTO> pokemonDTOList = pokemonRepository.getSixRandomPokemon();
         if(pokemonDTOList.isEmpty()){
