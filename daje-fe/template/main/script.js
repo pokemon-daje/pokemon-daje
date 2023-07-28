@@ -29,7 +29,8 @@ function gatherDataLoading(){
 }
 function nextImg(integer){
     console.log("prova")
-    if(wrapper === null){
+    console.log("vaffanculo cazzo!")
+    if(wrapper == null){
         gatherData()
     }
     halfScreen= window.screen.width/2
@@ -57,7 +58,7 @@ function animation(rootCard){
 }
 
 function openCurtains(){
-    if(!curtainsAreOpen){
+   if(!curtainsAreOpen){
         let curtainLeft = document.querySelector(".curtain-carousel-left");
         let curtainRight = document.querySelector(".curtain-carousel-right");
         let buttonLeft = document.querySelector("#left");
@@ -68,9 +69,10 @@ function openCurtains(){
         curtainRight.style.transform = `translate(${+60}%)`;
         buttonLeft.style.transform = 'rotate(360deg)';
         buttonRight.style.transform = 'rotate(-360deg)';
-        getPokemons();
+          getPokemons();
         curtainsAreOpen = true
     }
+  
 }
 
 function moveCardWhenSwapHappens(cardPos){
