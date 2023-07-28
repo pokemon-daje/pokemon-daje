@@ -38,6 +38,7 @@ public class PokemonService {
     private final MoveRepository moveRepository;
     private final PokemonSpeciesRepository pokemonSpeciesRepository;
     private final SwapBank swapBank;
+    private final ObserverSwapBank observerSwapBank;
     private DataSource dataSource;
     @Value("${pokemon.fallback.path}")
     private String pathPokemonFallBack;
@@ -49,7 +50,8 @@ public class PokemonService {
                           PokemonToExchangeMarshaller pokemonToExchangeMarshaller,
                           MoveRepository moveRepository,
                           PokemonSpeciesRepository pokemonSpeciesRepository,
-                          SwapBank swapBank) {
+                          SwapBank swapBank,
+                          ObserverSwapBank observerSwapBank) {
         this.pokemonRepository = pokemonRepository;
         this.pokemonMarshaller = pokemonMarshaller;
         this.pokemonToFrontEndMarshaller = pokemonToFrontEndMarshaller;
@@ -57,6 +59,7 @@ public class PokemonService {
         this.moveRepository = moveRepository;
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
         this.swapBank = swapBank;
+        this.observerSwapBank = observerSwapBank;
         this.dataSource = DataSourceBuilder.create()
                 .driverClassName("com.mysql.cj.jdbc.Driver")
                 .url("jdbc:mysql://localhost:3306/daje")
@@ -104,39 +107,13 @@ public class PokemonService {
         }).toList();
     }
 
-    public PackageExchange inizializePokemonsSwap(PokemonExchangeDTO pokemon, HttpServletResponse response) {
-        PackageExchange exchangeSwapDTO = null;
-        if (pokemon != null) {
-            PokemonDTO pokemonToPersistDTO = validateAndGivePokemonToSave(pokemon);
-            int pokemonToGiveId = choosePokemonToSwap();
-            Optional<PokemonDTO> pokemonDTOToGive= pokemonRepository.findById(pokemonToGiveId);
-            if(pokemonDTOToGive.isPresent() && pokemonToPersistDTO != null){
-                String idSwap = UUID.randomUUID().toString();
-                swapBank.addDeposit(idSwap,pokemonToPersistDTO,pokemonDTOToGive.get());
-                exchangeSwapDTO = new PackageExchange(idSwap, mapPokemonToGiveForExchange(pokemonDTOToGive.get()));
-            }
+    private PokemonExchangeDTO mapPokemonToGiveForExchange(PokemonDTO pokemonDTO) {
+        PokemonExchangeDTO pokemonExchangeDTO = null;
+        if (pokemonDTO != null) {
+            Pokemon pokemonBusiness = pokemonMarshaller.fromDTO(pokemonDTO);
+            pokemonExchangeDTO = pokemonToExchangeMarshaller.toDTO(pokemonBusiness);
         }
-        return exchangeSwapDTO;
-    }
-
-    public ProgressingProcessCode nextStepSwap(String exchangeid, PackageExchangeStatus packageExchangeStatus) {
-        ProgressingProcessCode code;
-        if (packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode() && swapBank.doDepositExist(exchangeid)) {
-            PokemonSwapDeposit exchange = swapBank.getDeposit(exchangeid);
-            PokemonDTO pokemonToSave = exchange != null ? exchange.getPokemonToSave() : null;
-            PokemonDTO pokemonToDelete = exchange != null ? exchange.getPokemonToDelete() : null;
-
-            code = progressWithSwap(exchangeid,pokemonToSave, pokemonToDelete);
-        }else if((packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode()
-                || packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_BAD_REQUEST.getCode()
-                || packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_DOWN_SERVER_ERROR.getCode())
-                && !swapBank.doDepositExist(exchangeid)){
-            code = ProgressingProcessCode.POKEMON_EXCHANGE_NOT_FOUND;
-        }else{
-            swapBank.removeDeposit(exchangeid);
-            code = ProgressingProcessCode.POKEMON_REQUEST_SUCCESS;
-        }
-        return code;
+        return pokemonExchangeDTO;
     }
 
     public int choosePokemonToSwap() {
@@ -191,13 +168,39 @@ public class PokemonService {
         return pokemonToPersistDTO;
     }
 
-    private PokemonExchangeDTO mapPokemonToGiveForExchange(PokemonDTO pokemonDTO) {
-        PokemonExchangeDTO pokemonExchangeDTO = null;
-        if (pokemonDTO != null) {
-            Pokemon pokemonBusiness = pokemonMarshaller.fromDTO(pokemonDTO);
-            pokemonExchangeDTO = pokemonToExchangeMarshaller.toDTO(pokemonBusiness);
+    public PackageExchange inizializePokemonsSwap(PokemonExchangeDTO pokemon, HttpServletResponse response) {
+        PackageExchange exchangeSwapDTO = null;
+        if (pokemon != null) {
+            PokemonDTO pokemonToPersistDTO = validateAndGivePokemonToSave(pokemon);
+            int pokemonToGiveId = choosePokemonToSwap();
+            Optional<PokemonDTO> pokemonDTOToGive= pokemonRepository.findById(pokemonToGiveId);
+            if(pokemonDTOToGive.isPresent() && pokemonToPersistDTO != null){
+                String idSwap = UUID.randomUUID().toString();
+                swapBank.addDeposit(idSwap,pokemonToPersistDTO,pokemonDTOToGive.get());
+                exchangeSwapDTO = new PackageExchange(idSwap, mapPokemonToGiveForExchange(pokemonDTOToGive.get()));
+            }
         }
-        return pokemonExchangeDTO;
+        return exchangeSwapDTO;
+    }
+
+    public ProgressingProcessCode nextStepSwap(String exchangeid, PackageExchangeStatus packageExchangeStatus) {
+        ProgressingProcessCode code;
+        if (packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode() && swapBank.doDepositExist(exchangeid)) {
+            PokemonSwapDeposit exchange = swapBank.getDeposit(exchangeid);
+            PokemonDTO pokemonToSave = exchange != null ? exchange.getPokemonToSave() : null;
+            PokemonDTO pokemonToDelete = exchange != null ? exchange.getPokemonToDelete() : null;
+
+            code = progressWithSwap(exchangeid,pokemonToSave, pokemonToDelete);
+        }else if((packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode()
+                || packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_BAD_REQUEST.getCode()
+                || packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_DOWN_SERVER_ERROR.getCode())
+                && !swapBank.doDepositExist(exchangeid)){
+            code = ProgressingProcessCode.POKEMON_EXCHANGE_NOT_FOUND;
+        }else{
+            swapBank.removeDeposit(exchangeid);
+            code = ProgressingProcessCode.POKEMON_REQUEST_SUCCESS;
+        }
+        return code;
     }
 
     private ProgressingProcessCode progressWithSwap(String exchangeId,PokemonDTO pokemonToSave, PokemonDTO pokemonToDelete){
@@ -270,16 +273,6 @@ public class PokemonService {
         return pokemonDTO;
     }
 
-    @Scheduled(fixedDelay = 2000)
-    private void checkDatabaseConnection() {
-        try (Connection connection = dataSource.getConnection()) {
-            log.info("database connesso e funzionante");
-        } catch (Exception e) {
-            log.info("database non connesso o non funzionante");
-            System.exit(1);
-        }
-    }
-
     public Map<SwapBankAction,PokemonFrontEndDTO> getPokemonsFromSwapCacheLog(String exchangeId){
         PokemonSwapDeposit deposit = swapBank.getCacheOfDeposit(exchangeId);
         PokemonFrontEndDTO toSave = null;
@@ -302,5 +295,14 @@ public class PokemonService {
         return mapDeposit;
     }
 
+    @Scheduled(fixedDelay = 2000)
+    private void checkDatabaseConnection() {
+        try (Connection connection = dataSource.getConnection()) {
+            log.info("database connesso e funzionante");
+        } catch (Exception e) {
+            log.info("database non connesso o non funzionante");
+            System.exit(1);
+        }
+    }
 
 }
