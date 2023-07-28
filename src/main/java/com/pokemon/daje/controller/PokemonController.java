@@ -14,18 +14,22 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @RestController
 @RequestMapping("/api")
 public class PokemonController {
     final PokemonService pokemonService;
-    private Map<String,SseEmitter> serverEmitters;
+    private Map<String, SseEmitter> serverEmitters;
+    ExecutorService sseMvcExecutor;
 
     @Autowired
     public PokemonController(PokemonService pokemonService) {
         this.pokemonService = pokemonService;
-        serverEmitters =new HashMap<>();
+        serverEmitters = new HashMap<>();
+        sseMvcExecutor = Executors.newSingleThreadExecutor();
     }
 
     @GetMapping("/pokemon")
@@ -111,20 +115,20 @@ public class PokemonController {
     @GetMapping("/pokemon/exchange/events/{eventId}")
     public SseEmitter streamSseMvc(@PathVariable String eventId) {
         SseEmitter emitter = new SseEmitter();
+        sseMvcExecutor.execute(() -> {
             try {
                 SseEmitter.SseEventBuilder event = SseEmitter.event()
                         .data(new Date())
                         .id("connection")
                         .name("pokemon");
                 emitter.send(event);
-
-                serverEmitters.put(eventId,emitter);
-                emitter.onCompletion(()-> serverEmitters.remove(eventId));
-                emitter.onTimeout(emitter::complete);
+                serverEmitters.put(eventId, emitter);
+                emitter.onTimeout(() -> serverEmitters.remove(eventId));
 
             } catch (Exception ex) {
                 emitter.completeWithError(ex);
             }
+        });
         return emitter;
     }
 
@@ -165,29 +169,26 @@ public class PokemonController {
     public ResponseEntity<HttpStatus> test(){
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    private void sendDataToFrontEnd(String exchangeId, int responseCode, int requestCode,PokemonFrontEndDTO pokemonSent, PokemonFrontEndDTO pokemonReceive){
-        List<String> usedKeyEmitter = new ArrayList<>();
-        try{
-            serverEmitters.forEach((key,sseEmitter) -> {
-                        try {
-                            sseEmitter.send(SseEmitter.event()
-                                    .data(new PackageFrontEnd(exchangeId,responseCode,requestCode,pokemonSent,pokemonReceive))
-                                    .id("exchange")
-                                    .name("pokemon"));
-                        } catch (Exception ex) {
-                            String copyKey = key+"";
-                            usedKeyEmitter.add(copyKey);
-                            log.info("Connection with id: " + key + " has been closed");
+
+    private void sendDataToFrontEnd(String exchangeId, int responseCode, int requestCode, PokemonFrontEndDTO pokemonSent, PokemonFrontEndDTO pokemonReceive) {
+        sseMvcExecutor.execute(() -> {
+            try {
+                serverEmitters.forEach((key, sseEmitter) -> {
+                            try {
+                                sseEmitter.send(SseEmitter.event()
+                                        .data(new PackageFrontEnd(exchangeId, responseCode, requestCode, pokemonSent, pokemonReceive))
+                                        .id("exchange")
+                                        .name("pokemon"));
+                                sseEmitter.complete();
+                            } catch (Exception ex) {
+                                String copyKey = key + "";
+                                sseEmitter.complete();
+                                log.info("Connection with id: " + key + " has been closed");
+                            }
                         }
-                    }
-            );
-        }catch (Exception ex){
-            log.info("Server emitters gone crazy");
-        }
-        usedKeyEmitter.forEach(key -> {
-            SseEmitter emmiterToDelete = serverEmitters.get(key);
-            if(emmiterToDelete != null){
-                emmiterToDelete.complete();
+                );
+            } catch (Exception ex) {
+                log.info("Server emitters gone crazy");
             }
         });
     }
