@@ -1,6 +1,8 @@
-package com.pokemon.daje.model;
+package com.pokemon.daje.service;
 
 import com.pokemon.daje.controller.json.dto.WaiterExchangeResponse;
+import com.pokemon.daje.model.PokemonSwapDeposit;
+import com.pokemon.daje.model.SwapBankAction;
 import com.pokemon.daje.persistance.dto.PokemonDTO;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -13,7 +15,7 @@ public class SwapBank {
     private Map<String, PokemonSwapDeposit> swapCacheLog;
     private LinkedList<WaiterExchangeResponse> quequeOfRequests;
     private final List<PokemonDTO> randomPokemonStorage;
-
+    private ObserverSwapBank observer;
     public SwapBank() {
         this.swapBank = new HashMap<>();
         swapCacheLog = new HashMap<>();
