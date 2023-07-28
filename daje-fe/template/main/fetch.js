@@ -23,6 +23,27 @@ let colorPalette = {
     18: 'rgb(0, 191, 255)',
     30000: 'rgb(96,70,70)'
 };
+let colorPaletteDarken = {
+    1: "rgb(105,128,128)",
+    2: 'rgba(86,64,94,0.8)',
+    3: 'rgb(110,96,96)',
+    4: 'rgb(155,58,2)',
+    5: 'rgb(143,117,4)',
+    6: 'rgb(128,88,49)',
+    7: 'rgb(147,145,145)',
+    8: 'rgb(161,1,1)',
+    9: 'rgb(114,97,68)',
+    10: 'rgb(86,27,140)',
+    11: 'rgb(52,50,50)',
+    12: 'rgb(128,52,2)',
+    13: 'rgb(103,114,42)',
+    14: 'rgb(134,73,119)',
+    15: 'rgb(143,110,115)',
+    16: 'rgb(54,98,54)',
+    17: 'rgb(143,141,134)',
+    18: 'rgb(3,99,129)',
+    30000: 'rgb(65,47,47)'
+};
 let backgroundImage = {
     1: "https://vignette3.wikia.nocookie.net/legendarymob/images/c/ca/Ice_cave.jpg/revision/latest?cb=20160924215941",
     2: 'https://media.pokemoncentral.it/wiki/c/c0/Lavandonia_PO.png',
@@ -302,12 +323,6 @@ function addModalButtonOpen(card,snglPokemon){
     cardButton.innerHTML="check info";
     card.appendChild(cardButton)
 }
-
-document.getElementById('close').addEventListener('click', function() {
-  const modal = document.getElementById('modalPokemon');
-  modal.style.display = 'none';
-  modalOpen = false; // Imposta la variabile booleana a "false" per indicare che la modale è stata chiusa
-});
 
 
 
