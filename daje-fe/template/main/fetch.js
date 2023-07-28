@@ -1,8 +1,9 @@
 let pokemons = [];
 let modifiedPokemons = [];
 let pokemonSwaps = [];
+let modalOpen = false;
 let colorPalette = {
-    1: "#BCE6E6",
+    1: "rgba(188,230,230)",
     2: 'rgba(134,98,143,0.8)',
     3: 'rgb(255, 228, 225)',
     4: 'rgb(255, 100, 0)',
@@ -202,27 +203,54 @@ function addModalEvent(snglPokemon){
     modal.style.visibility = 'visible';
     modal.style.opacity = '1';
     modal.style.transform = 'scale(0.8)';
-
     let poke = pokemons.find((poke) => ("button" + poke.database_id) === event.target.id);
-    console.log(poke);
-
-    modal.querySelector("#current-hp").innerHTML = `<h5> CURRENT HP:  ${poke.current_hp} </h5>`;
-    modal.querySelector("#max-hp").innerHTML = `<h5> MAX HP:  ${poke.max_hp}</h5>`;
-
-    modal.querySelector("#type").innerHTML = `<p>TYPE NAME:  ${poke.type.name}   <img src="${poke.type.imageUrl}"></p>`;
-    const movesContainer = modal.querySelector("#moves-name");
-    movesContainer.innerHTML = ""; // Rimuove il contenuto precedente prima di aggiungere le nuove mosse
-    poke.moves.forEach(move => {
-      movesContainer.innerHTML += `<h5> MOVE NAME:  ${move.name}   </h5>`;
-    });
-
-    const movesContainerPower = modal.querySelector("#moves-power");
-    movesContainerPower.innerHTML = ""; // Rimuove il contenuto precedente prima di aggiungere i nuovi valori di potenza
-    poke.moves.forEach(move => {
-      movesContainerPower.innerHTML += `<h5> POWER: ${move.power}</h5>`;
-    });
-    setPaletteColorModal(modal,snglPokemon)
+    resetModalGenerealInfo(modal,snglPokemon)
+    populateMovesTable(snglPokemon)
   });
+}
+function populateMovesTable(poke){
+    let table = document.getElementById("moves-table")
+    table.style.boxShadow = `inset 0em 1em 3em ${colorPaletteDarken[poke.type.id]}`
+
+    let tableBody = document.getElementById("moves-table-body");
+    tableBody.innerHTML = "";
+    poke.moves.forEach(move => {
+        let trElement =document.createElement("tr")
+        trElement.style.backgroundColor = `${colorPalette[move.type.id]}`
+        trElement.style.border = `${colorPaletteDarken[move.type.id]} 5px solid`
+        trElement.style.boxShadow = `inset 0em 1em 3em ${colorPaletteDarken[poke.type.id]}`
+
+        let tr= `<td>${move.name}</td><td>${move.type?.name}</td><td>${move.power}</td>`;
+        trElement.innerHTML = tr;
+
+        tableBody.append(trElement);
+    });
+    document.querySelector('#close').addEventListener('click', function() {
+        let modal = document.querySelector('#modalPokemon');
+        modal.style.display = 'none';
+        modalOpen = false;
+    });
+}
+function resetModalGenerealInfo(modal,poke){
+    document.getElementById("general-info").innerHTML ="<h5 id=\"current-hp\"></h5>\n"
+        +"<h5 id=\"max-hp\"></h5>\n"
+        +"<p id=\"type\"></p>";
+    setPaletteColorModal(modal,poke)
+
+    document.getElementById("current-hp").innerHTML = `<h5>CURRENT HP: ${poke.current_hp} </h5>`;
+    document.getElementById("max-hp").innerHTML = `<h5>MAX HP: ${poke.max_hp}</h5>`;
+    document.getElementById("type").innerHTML = `<p>TYPE: <img src="${poke.type.imageUrl}">
+        <span style="visibility: hidden">${poke.type.name}</span>
+    </p>`;
+
+    let typeIMG = document.getElementById("type").querySelector("p img")
+    let typeName = document.getElementById("type").querySelector("p span")
+    typeIMG.addEventListener("mouseover", ()=>{
+        typeName.style.visibility = "visible";
+    })
+    typeIMG.addEventListener("mouseout", ()=>{
+        typeName.style.visibility = "hidden";
+    })
 }
 function setBackGroundCard(card,pokemon){
     card.style.backgroundColor = colorPalette[pokemon.type.id];
@@ -248,6 +276,7 @@ function addImageToCard(card,snglPokemon){
     imgCard.setAttribute("src",snglPokemon.sprite_url);
     imgContainer.appendChild(imgCard);
     card.appendChild(imgContainer);
+    setBackGroundCard(card,snglPokemon);
 }
 
 function addTitleToCard(card,snglPokemon){

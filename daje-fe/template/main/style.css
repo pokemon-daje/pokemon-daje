@@ -38,7 +38,7 @@ body{
 .curtain-carousel-right{
     position: relative;
     left: 31.3%;
-    width: 31.2%;
+    width: 31.3%;
     height: 100%;
     z-index: 2;
     background-color: rgb(242 47 47 / 1%);
@@ -160,7 +160,11 @@ button[data-bs-dismiss="modal"]{
 img[src="/logo_pokemon_daje.png"]{
     width: 30%;
 }
-
+.body-modal{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 #modalPokemon{
     position: absolute;
     display: flex;
@@ -175,8 +179,12 @@ img[src="/logo_pokemon_daje.png"]{
     border: solid 1px #004c8c;
     text-align: justify-all;
 }
+#general-info{
+    margin: auto;
+    text-align: left;
+}
 #modalPokemon img{
-    width: 10%;
+    width: 20%;
     padding-left: 3%;
 }
 #modalPokemon h5{
@@ -187,14 +195,47 @@ img[src="/logo_pokemon_daje.png"]{
     font-weight: bold;
     font-size: 1em;
 }
-#close-box{
+#modalPokemon #moves-table{
+    margin: 3%;
+    border-radius: 10%;
+    padding: 1%;
+}
+#modalPokemon #moves-table thead tr{
     display: flex;
-    justify-content: end;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+    margin: auto;
+}
+#modalPokemon #moves-table thead tr th{
+    font-size: 2em;
+}
+#modalPokemon #moves-table #moves-table-body{
+    border-radius: 10%;
+    width: 100%;
+}
+#modalPokemon #moves-table #moves-table-body tr{
+    margin: 2%;
+    padding: 2%;
+    border-radius: 15%;
+}
+#modalPokemon #moves-table tr{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+    margin: auto;
+}
+#modalPokemon #moves-table tr td{
+    text-align: left;
+}
+#close-box{
+    position: absolute;
+    top: 0%;
+    right: 5%;
 }
 #close{
     font-size: 1vw; /* Imposta la dimensione del testo in percentuale relativa alla larghezza del viewport */
-    width: 7%;
-    height: 1%;
     border: #ff0000e3 solid  2px;
     text-align: center;
     cursor: pointer;
