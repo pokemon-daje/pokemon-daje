@@ -88,17 +88,29 @@ body{
     transition: transform 0.8s;
     z-index: 2;
     background-color: aliceblue;
- 
+}
+.buttons div.left:hover{
+    transform: scale(1.1);  
+    background-color: #ff0000d7;
+   border: solid 2px #ffffff;
+   cursor: pointer;
 
 }
 .buttons div.right{
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    border: red solid 0.2em;
+    border: #ff0000d7 solid 0.2em;
     transition: transform 0.8s;
     z-index: 2;
     background-color: aliceblue;
+}
+.buttons div.right:hover{
+    transform: scale(1.1);  
+    background-color: #ff0000;
+   border: solid 2px #ffffff;
+   cursor: pointer;
+
 }
 
 .buttons div img{
@@ -125,9 +137,9 @@ button[data-bs-dismiss="modal"]{
     transition: transform 0.8s;
     border-radius: 3%;
     border: solid 1px #004c8c;
-    /*background: linear-gradient(217deg, rgba(255,204,0,.8), rgba(255,0,0,0) 70.71%),
+    background: linear-gradient(217deg, rgba(255,204,0,.8), rgba(255,0,0,0) 70.71%),
     linear-gradient(130deg, rgba(255,204,0,.8), rgba(255,204,0,.8) 70.71%),
-    linear-gradient(350deg, rgba(0,0,255,.9), rgba(0,0,255,.8) 70.71%);  */
+    linear-gradient(350deg, rgba(0,0,255,.9), rgba(0,0,255,.8) 70.71%); 
 }
 
 .card button{
@@ -138,7 +150,11 @@ button[data-bs-dismiss="modal"]{
     margin-bottom: 5%;
     border-radius: 10%;
 }
-
+.card button:hover{
+    transform: scale(1.1);  
+    background-color: #ffffff;
+    color: #004c8c;
+    }
 .card .img{
     display: flex;
     justify-content: center;
@@ -186,7 +202,7 @@ img[src="/logo_pokemon_daje.png"]{
     font-size: 1vw; /* Imposta la dimensione del testo in percentuale relativa alla larghezza del viewport */
     width: 7%;
     height: 1%;
-    border: #ffcc00 solid 2px;
+    border: #ff0000e3 solid  2px;
     text-align: center;
     position: relative;
     left: 92%; 
@@ -194,10 +210,10 @@ img[src="/logo_pokemon_daje.png"]{
     cursor: pointer;
     transition: transform 0.2s;
     border-radius: 10%;
-    color: #ffcc00;
+    color: #ff0000e3;
 }
 #close:hover {
-transform: scale(1.2);;
+transform: scale(1.2);
   }
 
 #message{
