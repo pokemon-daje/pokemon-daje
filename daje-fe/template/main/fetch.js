@@ -1,6 +1,12 @@
 let pokemons = [];
 let modifiedPokemons = [];
-let pokemonSwaps = new Map();
+let pokemonSwaps = [];
+setInterval(()=>{
+    let swap = pokemonSwaps.shift();
+    if(swap !== null && swap !== undefined){
+        startUIUpdateDoToSwap(swap);
+    }
+},3000)
 
 let uuid = crypto.randomUUID();
 var source = new EventSource("http://localhost:8080/api/pokemon/exchange/events/"+uuid);
@@ -19,7 +25,7 @@ function manageSwap(swap){
                 newSwap(swap)
                 break;
             }
-            default: {
+            case 200: {
                 nextPhaseSwap(swap)
                 break;
             }
@@ -30,7 +36,6 @@ function manageSwap(swap){
 function newSwap(swap){
     switch (swap.status_response_code){
         case 200: {
-            pokemonSwaps.set(swap.exchange_id,{time:Date.now(),pokemonReceive:swap.pokemon_receive,pokemonSent:swap.pokemon_sent});
             break;
         }
     }
@@ -48,33 +53,43 @@ function nextPhaseSwap(swap){
 function completeSwap(swap){
     switch (swap.status_response_code){
         case 200: {
-            if (pokemonSwaps.get(swap.exchange_id) != null
-                && swap.pokemon_receive != null
+            if (swap.pokemon_receive != null
                 && swap.pokemon_sent != null
             ) {
-                let snglCardPokemon = document.getElementById(swap.pokemon_sent.database_id)
-                if(snglCardPokemon){
-                    let listPokePos = pokemons.findIndex(poke => poke.database_id === swap.pokemon_sent.database_id)
-                    pokemons[listPokePos] = swap.pokemon_receive;
-
-                    let listModPokePos = modifiedPokemons.findIndex(poke => poke.database_id === swap.pokemon_sent.database_id)
-                    let posInScreen = modifiedPokemons[listModPokePos].pos;
-                    let posPxInScreen = modifiedPokemons[listModPokePos].originalPos;
-
-                    modifiedPokemons[listModPokePos] = {
-                        ...swap.pokemon_receive,
-                        pos: posInScreen,
-                        originalPos: posPxInScreen
-                    };
-                    snglCardPokemon.setAttribute("class","card");
-                    let id = `${swap.pokemon_receive.database_id}`;
-                    snglCardPokemon.setAttribute("id",id);
-                    moveCardWhenSwapHappens(modifiedPokemons[listModPokePos].pos)
-                    updateCardStructure(snglCardPokemon, swap.pokemon_receive);
-                }
+                pokemonSwaps.push({exchange_id:swap.exchange_id,time:Date.now(),pokemon_receive:swap.pokemon_receive,pokemon_sent:swap.pokemon_sent});
             }
         }
     }
+}
+
+function startUIUpdateDoToSwap(swap){
+    let snglCardPokemon = document.getElementById(swap.pokemon_sent.database_id)
+    if(snglCardPokemon){
+        let listModPokePos = configureDataForCard(swap);
+        animateOnSwap(swap,snglCardPokemon,listModPokePos);
+        updateCardStructure(snglCardPokemon, swap.pokemon_receive);
+    }
+}
+function configureDataForCard(swap){
+    let listPokePos = pokemons.findIndex(poke => poke.database_id === swap.pokemon_sent.database_id)
+    pokemons[listPokePos] = swap.pokemon_receive;
+
+    let listModPokePos = modifiedPokemons.findIndex(poke => poke.database_id === swap.pokemon_sent.database_id)
+    let posInScreen = modifiedPokemons[listModPokePos].pos;
+    let posPxInScreen = modifiedPokemons[listModPokePos].originalPos;
+
+    modifiedPokemons[listModPokePos] = {
+        ...swap.pokemon_receive,
+        pos: posInScreen,
+        originalPos: posPxInScreen
+    };
+    return listModPokePos;
+}
+function animateOnSwap(swap,cardPokemon,pokePos){
+    cardPokemon.setAttribute("class","card");
+    let id = `${swap.pokemon_receive.database_id}`;
+    cardPokemon.setAttribute("id",id);
+    moveCardWhenSwapHappens(modifiedPokemons[pokePos].pos)
 }
 
 var getPokemons = () => fetch("http://localhost:8080/api/pokemon").then((data) => {
