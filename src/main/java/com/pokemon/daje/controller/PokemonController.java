@@ -5,6 +5,7 @@ import com.pokemon.daje.model.Pokemon;
 import com.pokemon.daje.model.ProgressingProcessCode;
 import com.pokemon.daje.model.SwapBankAction;
 import com.pokemon.daje.service.PokemonService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class PokemonController {
 
     @GetMapping("/pokemon")
     public ResponseEntity<List<PokemonFrontEndDTO>> getSixRandom() {
-        List<PokemonFrontEndDTO> pokemonDTOList = pokemonService.getSixRandomPokemon();
+        List<PokemonFrontEndDTO> pokemonDTOList = pokemonService.getPokemonsFromStorage();
         if(!pokemonDTOList.isEmpty()){
             return new ResponseEntity<>(pokemonDTOList,HttpStatus.OK);
         }
