@@ -238,7 +238,7 @@ public class PokemonService {
                     swapBank.remove(exchangeId);
                     log.info("EXCHANGE WITH ID: {} HAS BEEN COMPLETED",exchangeId);
                 }else{
-                    throw new PokemonServiceException("EXCHANGE TOOK TOO MUCH TIME TO COMPLETE",new Throwable());
+                    throw new PokemonServiceException("EXCHANGE TOOK TOO MUCH TIME TO COMPLETE",new Throwable("POKEMON TO PERSIST"));
                 }
             } catch (PokemonServiceException ex) {
                 pokemonRepository.deleteById(pokemonToSave.getDbId());
