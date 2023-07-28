@@ -8,17 +8,17 @@ let curtainsAreOpen= false;
 function gatherData(){
     wrapper = document.querySelector(".wrapper");
     arrowBtns = document.querySelectorAll(".wrapper i");
-    carouselChildrens = [...document.querySelectorAll(".carousel-container li")];
+    carouselChildrens = [...document.querySelectorAll(".carousel-container li:not(#JOLLY)")];
     counter = 0;
     firstCardOffSetWidth = carouselChildrens[0].offsetWidth;
 }
 function gatherDataLoading(){
     wrapper = document.querySelector(".wrapper");
     arrowBtns = document.querySelectorAll(".wrapper i");
-    carouselChildrens = [...document.querySelectorAll(".carousel-container li")];
+    carouselChildrens = [...document.querySelectorAll(".carousel-container li:not(#JOLLY)")];
     counter = 0;
     firstCardOffSetWidth = carouselChildrens[0].offsetWidth;
-    for(cardPoke of carouselChildrens){
+    for(cardPoke of carouselChildrens.filter(child => child.id !== "JOLLY")){
         let pokemonOfCard = modifiedPokemons.find(poke => poke.database_id == cardPoke.id);
         let posPx = pokemonOfCard.pos*firstCardOffSetWidth + firstCardOffSetWidth/2 * pokemonOfCard.pos;
 
@@ -33,7 +33,7 @@ function nextImg(integer){
         gatherData()
     }
     halfScreen= window.screen.width/2
-    carouselChildrens = [...document.querySelectorAll(".carousel-container li")];
+    carouselChildrens = [...document.querySelectorAll(".carousel-container li:not(#JOLLY)")];
     firstCardOffSetWidth = carouselChildrens[0].offsetWidth;
     if(integer > 0){
         counter++;
@@ -41,20 +41,19 @@ function nextImg(integer){
     else{
         counter--;
     }
-    if(counter >= carouselChildrens.length){
+    if(counter >= carouselChildrens.filter(child => child.id !== "JOLLY").length){
         counter = 0;
     }else if(counter <= -1){
-        counter = carouselChildrens.length-1;
+        counter = carouselChildrens.filter(child => child.id !== "JOLLY").length-1;
     }
-    for(i=0;i<carouselChildrens.length;i++){
-        animation(i);
+    for(cardPoke of carouselChildrens.filter(child => child.id !== "JOLLY")){
+        animation(cardPoke);
     }
 }
 
 function animation(rootCard){
-    let htmlCardPokemon = carouselChildrens[rootCard];
-    let pokemonOfCard = modifiedPokemons.find(poke => poke.database_id == htmlCardPokemon.id);
-    carouselChildrens[rootCard].style.transform = `translate(${-2*(counter*firstCardOffSetWidth)+pokemonOfCard.originalPos+(firstCardOffSetWidth/2*pokemonOfCard.pos)}px)`
+    let pokemonOfCard = modifiedPokemons.find(poke => poke.database_id == rootCard.id);
+    rootCard.style.transform = `translate(${-2*(counter*firstCardOffSetWidth)+pokemonOfCard.originalPos+(firstCardOffSetWidth/2*pokemonOfCard.pos)}px)`
 }
 
 function openCurtains(){
@@ -77,7 +76,20 @@ function openCurtains(){
 function moveCardWhenSwapHappens(cardPos){
     gatherData()
     counter = cardPos;
-    for(i=0;i<carouselChildrens.length;i++){
-        animation(i);
+    for(cardPoke of carouselChildrens.filter(child => child.id !== "JOLLY")){
+        animation(cardPoke);
     }
+    animateJolly()
+}
+
+function animateJolly(){
+    setTimeout(()=>{
+        let jollyCard = document.getElementById("JOLLY")
+        jollyCard.style.animation = "jolly-transformation 2.8s linear 1"
+        setTimeout(()=>{
+            jollyCard.style.opacity = "0"
+            jollyCard.style.animation="";
+            jollyCard.style.visibility="hidden";
+        },2805)
+    },790)
 }
