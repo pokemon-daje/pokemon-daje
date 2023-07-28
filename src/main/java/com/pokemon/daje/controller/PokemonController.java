@@ -59,8 +59,8 @@ public class PokemonController {
     }
 
     @PostMapping("/pokemon/exchange")
-    public ResponseEntity<PackageExchange> swap(@RequestBody PokemonExchangeDTO pokemon) {
-        PackageExchange pack = pokemonService.inizializePokemonsSwap(pokemon);
+    public ResponseEntity<PackageExchange> swap(HttpServletResponse response, @RequestBody PokemonExchangeDTO pokemon) {
+        PackageExchange pack = pokemonService.inizializePokemonsSwap(pokemon,response);
         ResponseEntity<PackageExchange> toSend = new ResponseEntity<>(pack,HttpStatus.OK);
         if(pack == null){
             sentDataToFrontEnd("exchange error",ProgressingProcessCode.POKEMON_BAD_REQUEST.getCode()
