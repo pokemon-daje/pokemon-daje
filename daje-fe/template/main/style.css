@@ -180,7 +180,7 @@ img[src="/logo_pokemon_daje.png"]{
     text-align: justify-all;
 }
 #general-info{
-    margin: auto;
+    margin: 0 25%;
     text-align: left;
 }
 #modalPokemon img{
@@ -215,7 +215,7 @@ img[src="/logo_pokemon_daje.png"]{
     width: 100%;
 }
 #modalPokemon #moves-table #moves-table-body tr{
-    margin: 2%;
+    margin: 0 5%;
     padding: 2%;
     border-radius: 15%;
 }
