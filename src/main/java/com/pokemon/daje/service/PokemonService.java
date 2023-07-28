@@ -97,7 +97,7 @@ public class PokemonService {
             int databaseId = pokemonDTO.getDbId();
             Optional<PokemonDTO> optionalPokemonDTO = pokemonRepository.findById(databaseId);
             if(optionalPokemonDTO.isPresent()){
-                Pokemon businessPokemon = pokemonMarshaller.fromDTO(pokemonDTO);
+                Pokemon businessPokemon = pokemonMarshaller.fromDTO(optionalPokemonDTO.get());
                 PokemonFrontEndDTO pokemonFrontEndDTO = pokemonToFrontEndMarshaller.toDTO(businessPokemon);
                 pokemonFrontEndDTO.setDatabaseId(databaseId);
                 return pokemonFrontEndDTO;
