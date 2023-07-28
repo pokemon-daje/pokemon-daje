@@ -75,7 +75,6 @@ setInterval(()=>{
 let uuid = crypto.randomUUID();
 var source = new EventSource("http://localhost:8080/api/pokemon/exchange/events/"+uuid);
 source.addEventListener("pokemon", (event) => {
-    console.log(JSON.parse(event.data))
     let swapEvent = JSON.parse(event.data);
     manageSwap(swapEvent);
 });
