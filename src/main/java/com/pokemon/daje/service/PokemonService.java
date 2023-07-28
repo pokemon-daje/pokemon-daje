@@ -93,20 +93,16 @@ public class PokemonService {
     }
 
     public List<PokemonFrontEndDTO> getSixRandomPokemon(){
-        List<PokemonDTO> pokemonDTOList = pokemonRepository.getSixRandomPokemon();
-        if(pokemonDTOList.isEmpty()){
-            try{
-                loadPokemonFromProperty();
-            }catch (Exception ex){
-                log.info("errore nel leggere pokemon da property");
-            }
-        }
-        return pokemonDTOList.stream().map(pokemonDTO -> {
+        return randomPokemonStorage.stream().map(pokemonDTO -> {
             int databaseId = pokemonDTO.getDbId();
-            Pokemon businessPokemon = pokemonMarshaller.fromDTO(pokemonDTO);
-            PokemonFrontEndDTO pokemonFrontEndDTO = pokemonToFrontEndMarshaller.toDTO(businessPokemon);
-            pokemonFrontEndDTO.setDatabaseId(databaseId);
-            return pokemonFrontEndDTO;
+            Optional<PokemonDTO> optionalPokemonDTO = pokemonRepository.findById(databaseId);
+            if(optionalPokemonDTO.isPresent()){
+                Pokemon businessPokemon = pokemonMarshaller.fromDTO(pokemonDTO);
+                PokemonFrontEndDTO pokemonFrontEndDTO = pokemonToFrontEndMarshaller.toDTO(businessPokemon);
+                pokemonFrontEndDTO.setDatabaseId(databaseId);
+                return pokemonFrontEndDTO;
+            }
+            return null;
         }).toList();
     }
 

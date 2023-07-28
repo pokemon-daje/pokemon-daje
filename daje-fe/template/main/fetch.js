@@ -181,11 +181,13 @@ var getPokemons = () => fetch("http://localhost:8080/api/pokemon").then((data) =
         pokemons = response;
         let psIndex = 0;
         for (let snglPokemon of response) {
-          modifiedPokemons.push({...snglPokemon,pos:psIndex,originalPos:0});
-          psIndex++;
+            if(snglPokemon != null){
+                modifiedPokemons.push({...snglPokemon,pos:psIndex,originalPos:0});
+                psIndex++;
 
-          let card = document.createElement("li");
-          createCardStructure(carouselContainer,card,snglPokemon);
+                let card = document.createElement("li");
+                createCardStructure(carouselContainer,card,snglPokemon);
+            }
         }
         setTimeout(()=>{
              gatherDataLoading();
