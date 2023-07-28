@@ -223,6 +223,7 @@ function addModalEvent(snglPokemon){
     modal.style.visibility = 'visible';
     modal.style.opacity = '1';
     modal.style.transform = 'scale(0.8)';
+    modal.style.boxShadow = `0em 1em 3em ${snglPokemon.type.id}`;
     let poke = pokemons.find((poke) => ("button" + poke.database_id) === event.target.id);
     resetModalGenerealInfo(modal,snglPokemon)
     populateMovesTable(snglPokemon)
