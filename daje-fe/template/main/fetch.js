@@ -6,7 +6,7 @@ setInterval(()=>{
     if(swap !== null && swap !== undefined){
         startUIUpdateDoToSwap(swap);
     }
-},3000)
+},4000)
 
 let uuid = crypto.randomUUID();
 var source = new EventSource("http://localhost:8080/api/pokemon/exchange/events/"+uuid);
@@ -64,6 +64,7 @@ function completeSwap(swap){
 
 function startUIUpdateDoToSwap(swap){
     let snglCardPokemon = document.getElementById(swap.pokemon_sent.database_id)
+    changeDataOnJollyCard(swap.pokemon_sent)
     if(snglCardPokemon){
         let listModPokePos = configureDataForCard(swap);
         animateOnSwap(swap,snglCardPokemon,listModPokePos);
@@ -85,6 +86,15 @@ function configureDataForCard(swap){
     };
     return listModPokePos;
 }
+
+function changeDataOnJollyCard(snglPokemonToDelete){
+    let jolly = document.getElementById("JOLLY")
+    jolly.innerHTML = ""
+
+    addImageToCard(jolly,snglPokemonToDelete);
+    addTitleToCard(jolly,snglPokemonToDelete);
+    addTrainerToCard(jolly,snglPokemonToDelete);
+}
 function animateOnSwap(swap,cardPokemon,pokePos){
     cardPokemon.setAttribute("class","card");
     let id = `${swap.pokemon_receive.database_id}`;
@@ -100,8 +110,7 @@ var getPokemons = () => fetch("http://localhost:8080/api/pokemon").then((data) =
           let classValue= child.getAttribute("class");
           if(classValue != "curtain-carousel-right"
           && classValue != "curtain-carousel-left"
-          && classValue != "band-left"
-          && classValue != "band-right"){
+          && child.id !== 'JOLLY'){
               carouselContainer.removeChild(child);
           }
       })
