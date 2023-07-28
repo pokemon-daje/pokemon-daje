@@ -137,9 +137,6 @@ button[data-bs-dismiss="modal"]{
     transition: transform 0.8s;
     border-radius: 3%;
     border: solid 1px #004c8c;
-    background: linear-gradient(217deg, rgba(255,204,0,.8), rgba(255,0,0,0) 70.71%),
-    linear-gradient(130deg, rgba(255,204,0,.8), rgba(255,204,0,.8) 70.71%),
-    linear-gradient(350deg, rgba(0,0,255,.9), rgba(0,0,255,.8) 70.71%);
 }
 
 .card button{
@@ -166,35 +163,33 @@ img[src="/logo_pokemon_daje.png"]{
 
 #modalPokemon{
     position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-content: space-evenly;
     height: 48%;
     width: 23%;
     top: 20%;
     left: 38%;
-    background: white;
-    z-index: 10;
-    border-radius: 30%;
     visibility: hidden;
-    transition: transform 0.8s;
-    transform: translate(-50%, -50%) scale(0.1) scale(1);
-    border-radius: 3% ;
+    border-radius: 3%;
     border: solid 1px #004c8c;
-    text-align: left;
+    text-align: justify-all;
 }
 #modalPokemon img{
     width: 10%;
     padding-left: 3%;
 }
 #modalPokemon h5{
-    padding-left: 5%;
     font-weight: bold;
     font-size: 1em;
-    padding-top: 7%;
 }
 #modalPokemon p{
-    padding-left: 5%;
     font-weight: bold;
     font-size: 1em;
-    padding-top: 7%;
+}
+#close-box{
+    display: flex;
+    justify-content: end;
 }
 #close{
     font-size: 1vw; /* Imposta la dimensione del testo in percentuale relativa alla larghezza del viewport */
@@ -202,12 +197,9 @@ img[src="/logo_pokemon_daje.png"]{
     height: 1%;
     border: #ff0000e3 solid  2px;
     text-align: center;
-    position: relative;
-    left: 92%;
-    margin-top: 1.5%;
     cursor: pointer;
     transition: transform 0.2s;
-    border-radius: 10%;
+    border-radius: 30%;
     color: #ff0000e3;
 }
 #close:hover {
