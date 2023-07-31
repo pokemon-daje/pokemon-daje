@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PackageFrontEnd {
+public class FrontEndSendData {
     @JsonProperty("exchange_id")
     private String exchangeId;
     @JsonProperty("status_response_code")
@@ -19,7 +19,7 @@ public class PackageFrontEnd {
     private PokemonFrontEndDTO pokemonReceive;
 
 
-    public PackageFrontEnd(String exchangeId, int status, int requestStatus,PokemonFrontEndDTO pokemonSent, PokemonFrontEndDTO pokemonReceive) {
+    public FrontEndSendData(String exchangeId, int status, int requestStatus, PokemonFrontEndDTO pokemonSent, PokemonFrontEndDTO pokemonReceive) {
         this.exchangeId = exchangeId;
         this.status = status;
         this.requestStatus = requestStatus;
