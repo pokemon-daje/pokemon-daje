@@ -6,13 +6,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PackageResponseExchange {
+public class InitializeExchangeResponse {
     @JsonProperty("exchange_id")
     private String id;
     @JsonProperty("pokemon")
     private PokemonRequestExchangeDTO pokemonExchangeDTO;
 
-    public PackageResponseExchange(String id, PokemonRequestExchangeDTO pokemonExchangeDTO) {
+    public InitializeExchangeResponse(String id, PokemonRequestExchangeDTO pokemonExchangeDTO) {
         this.id = id;
         this.pokemonExchangeDTO = pokemonExchangeDTO;
     }
