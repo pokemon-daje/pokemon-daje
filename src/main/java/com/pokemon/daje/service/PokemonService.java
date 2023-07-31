@@ -284,9 +284,7 @@ public class PokemonService {
                 spoiledExchangeCache.add(key);
             }
         });
-        spoiledExchangeCache.forEach(key -> {
-            swapCacheLog.remove(key);
-        });
+        spoiledExchangeCache.forEach(swapCacheLog::remove);
     }
 
     @Scheduled(fixedDelay = 2000)
