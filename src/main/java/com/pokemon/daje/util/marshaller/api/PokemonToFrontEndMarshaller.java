@@ -1,8 +1,8 @@
-package com.pokemon.daje.controller.json.marshaller;
+package com.pokemon.daje.util.marshaller.api;
 
-import com.pokemon.daje.controller.json.dto.PokemonFrontEndDTO;
-import com.pokemon.daje.model.Pokemon;
-import com.pokemon.daje.persistance.marshaller.BaseMarshaller;
+import com.pokemon.daje.model.api_objects.PokemonFrontEndDTO;
+import com.pokemon.daje.model.business_data.Pokemon;
+import com.pokemon.daje.util.marshaller.persistance.BaseMarshaller;
 import org.springframework.stereotype.Component;
 
 @Component

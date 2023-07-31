@@ -1,18 +1,18 @@
-package com.pokemon.daje.controller.json.marshaller;
+package com.pokemon.daje.util.marshaller.api;
 
-import com.pokemon.daje.controller.json.dto.PokemonExchangeDTO;
-import com.pokemon.daje.model.Move;
-import com.pokemon.daje.model.Pokemon;
-import com.pokemon.daje.model.Type;
-import com.pokemon.daje.persistance.marshaller.BaseMarshaller;
+import com.pokemon.daje.model.api_objects.PokemonRequestExchangeDTO;
+import com.pokemon.daje.model.business_data.Move;
+import com.pokemon.daje.model.business_data.Pokemon;
+import com.pokemon.daje.model.business_data.Type;
+import com.pokemon.daje.util.marshaller.persistance.BaseMarshaller;
 import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
 @Component
-public class PokemonToExchangeMarshaller implements BaseMarshaller<Pokemon, PokemonExchangeDTO> {
+public class PokemonToExchangeMarshaller implements BaseMarshaller<Pokemon, PokemonRequestExchangeDTO> {
 
     @Override
-    public Pokemon fromDTO(PokemonExchangeDTO dto) {
+    public Pokemon fromDTO(PokemonRequestExchangeDTO dto) {
         Pokemon pokemon = null;
         if(dto != null && dto.getMoves() != null){
                 pokemon = new Pokemon();
@@ -28,10 +28,10 @@ public class PokemonToExchangeMarshaller implements BaseMarshaller<Pokemon, Poke
     }
 
     @Override
-    public PokemonExchangeDTO toDTO(Pokemon business) {
-        PokemonExchangeDTO pokemonDTO = null;
+    public PokemonRequestExchangeDTO toDTO(Pokemon business) {
+        PokemonRequestExchangeDTO pokemonDTO = null;
         if(business != null && business.getMoves() != null){
-                pokemonDTO = new PokemonExchangeDTO();
+                pokemonDTO = new PokemonRequestExchangeDTO();
                 pokemonDTO.setId(business.getId());
                 pokemonDTO.setName(business.getName());
                 pokemonDTO.setType(business.getId());
