@@ -1,7 +1,7 @@
 package com.pokemon.daje.service;
 
 import com.pokemon.daje.util.marshaller.api.PokemonToFrontEndMarshaller;
-import com.pokemon.daje.model.api_objects.PackageExchangeStatus;
+import com.pokemon.daje.model.api_objects.ConcludeSwapRequest;
 import com.pokemon.daje.model.api_objects.PokemonFrontEndDTO;
 import com.pokemon.daje.model.api_objects.PokemonRequestExchangeDTO;
 import com.pokemon.daje.model.business_data.Pokemon;
@@ -36,7 +36,7 @@ public class PokemonService {
     private final PokemonToFrontEndMarshaller pokemonToFrontEndMarshaller;
     private final MoveRepository moveRepository;
     private final PokemonSpeciesRepository pokemonSpeciesRepository;
-    private final SwapBankService swapBankService;
+    private final SwapScheduleService swapScheduleService;
     private DataSource dataSource;
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository,
@@ -44,13 +44,13 @@ public class PokemonService {
                           PokemonToFrontEndMarshaller pokemonToFrontEndMarshaller,
                           MoveRepository moveRepository,
                           PokemonSpeciesRepository pokemonSpeciesRepository,
-                          SwapBankService swapBankService) {
+                          SwapScheduleService swapScheduleService) {
         this.pokemonRepository = pokemonRepository;
         this.pokemonMarshaller = pokemonMarshaller;
         this.pokemonToFrontEndMarshaller = pokemonToFrontEndMarshaller;
         this.moveRepository = moveRepository;
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
-        this.swapBankService = swapBankService;
+        this.swapScheduleService = swapScheduleService;
         this.dataSource = DataSourceBuilder.create()
                 .driverClassName("com.mysql.cj.jdbc.Driver")
                 .url("jdbc:mysql://localhost:3306/daje")
@@ -82,7 +82,7 @@ public class PokemonService {
         return pokemonFrontEnd;
     }
     public List<PokemonFrontEndDTO> getPokemonsFromStorage(){
-        return swapBankService.getPokemonStorage().stream().map(pokemonDTO -> {
+        return swapScheduleService.getPokemonStorage().stream().map(pokemonDTO -> {
             int databaseId = pokemonDTO.getDbId();
             Optional<PokemonDTO> optionalPokemonDTO = pokemonRepository.findById(databaseId);
             if(optionalPokemonDTO.isPresent()){
@@ -107,7 +107,7 @@ public class PokemonService {
         }
     }
     public Map<SwapBankAction,PokemonFrontEndDTO> getPokemonsFromSwapCacheLog(String exchangeId){
-        PokemonSwapDeposit deposit = swapBankService.getCacheOfDeposit(exchangeId);
+        PokemonSwapDeposit deposit = swapScheduleService.getCacheOfDeposit(exchangeId);
         PokemonFrontEndDTO toSave = null;
         PokemonFrontEndDTO toDelete = null;
         Map<SwapBankAction,PokemonFrontEndDTO> mapDeposit = new EnumMap<>(SwapBankAction.class);
@@ -127,20 +127,20 @@ public class PokemonService {
         }
         return mapDeposit;
     }
-    public void addInizalizeExchangeRequest(AsyncContext response, PokemonRequestExchangeDTO pokemonDTO){
-        Map<ValueEnum, WrapperValue> valuesMap = new HashMap<>();
-        valuesMap.put(ValueEnum.REQUEST_CODE,new WrapperValue(ProgressingProcessCode.POKEMON_EXCHANGE_REQUEST_OPEN));
-        valuesMap.put(ValueEnum.POKEMON_RECEIVED_TO_EXCHANGE,new WrapperValue<>(pokemonDTO));
-        swapBankService.addQueueRequest(new ExchangeRequestInteraction(SwapFunctionAction.INIZIALIZE_SWAP,response,valuesMap));
+    public void addInitializeSwapRequest(AsyncContext response, PokemonRequestExchangeDTO pokemonDTO){
+        Map<ValueEnum, ValueWrapper> valuesMap = new EnumMap<>(ValueEnum.class);
+        valuesMap.put(ValueEnum.REQUEST_CODE,new ValueWrapper(ProgressingProcessCode.POKEMON_EXCHANGE_REQUEST_OPEN));
+        valuesMap.put(ValueEnum.POKEMON_RECEIVED_TO_EXCHANGE,new ValueWrapper(pokemonDTO));
+        swapScheduleService.addQueueRequest(new ExchangeRequestInteraction(SwapFunctionAction.INIZIALIZE_SWAP,response,valuesMap));
     }
-    public void concludeExchangeRequest(AsyncContext response, String exchangeId, PackageExchangeStatus packageExchangeStatus){
-        Map<ValueEnum, WrapperValue> valuesMap = new HashMap<>();
+    public void addConcludeSwapRequest(AsyncContext response, String exchangeId, ConcludeSwapRequest concludeSwapRequest){
+        Map<ValueEnum, ValueWrapper> valuesMap = new EnumMap<>(ValueEnum.class);
         ExchangeRequestInteraction waiter = new ExchangeRequestInteraction(SwapFunctionAction.CONCLUDE_SWAP,response);
-        if(swapBankService.doDepositExist(exchangeId) && packageExchangeStatus != null && packageExchangeStatus.getStatus() != null){
-            valuesMap.put(ValueEnum.EXCHANGE_ID,new WrapperValue(exchangeId));
-            valuesMap.put(ValueEnum.PACKAGE_EXCHANGE_STATUS,new WrapperValue<>(packageExchangeStatus));
+        if(swapScheduleService.doDepositExist(exchangeId) && concludeSwapRequest != null && concludeSwapRequest.getStatus() != null){
+            valuesMap.put(ValueEnum.EXCHANGE_ID, new ValueWrapper(exchangeId));
+            valuesMap.put(ValueEnum.POKEMON_REQUEST_SWAP_DTO,new ValueWrapper(concludeSwapRequest));
             waiter.setValuesMap(valuesMap);
-            swapBankService.addQueueRequest(waiter);
+            swapScheduleService.addQueueRequest(waiter);
         }else{
             waiter.sendData(null, HttpStatus.NOT_FOUND.value());
         }
