@@ -176,12 +176,12 @@ public class PokemonService {
         }
     }
 
-    private ProgressingProcessCode validatePokemonExchangeDTO(PokemonExchangeDTO pokemonExchangeDTO){
+    private ProgressingProcessCode validatePokemonSwapDTO(PokemonExchangeDTO pokemonExchangeDTO){
         if(pokemonExchangeDTO.getId() != null
                 && pokemonExchangeDTO.getType() != null
                 && pokemonExchangeDTO.getMoves() != null
                 && !pokemonExchangeDTO.getMoves().isEmpty()
-                && !pokemonExchangeDTO.getMoves().stream().anyMatch(Objects::isNull)){
+                && pokemonExchangeDTO.getMoves().stream().noneMatch(Objects::isNull)){
             Optional<PokemonSpeciesDTO> pokemonSpeciesDTO = pokemonSpeciesRepository.findByPokedexIdOrGetUnknow(pokemonExchangeDTO.getId());
             Set<MoveDTO> moves = new HashSet<>();
             pokemonExchangeDTO.getMoves().forEach(move -> {
