@@ -1,8 +1,8 @@
-package com.pokemon.daje.controller.json.dto;
+package com.pokemon.daje.model.api_objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pokemon.daje.model.Move;
-import com.pokemon.daje.model.Type;
+import com.pokemon.daje.model.business_data.Move;
+import com.pokemon.daje.model.business_data.Type;
 import com.pokemon.daje.persistance.dto.DTOInterface;
 import lombok.Getter;
 import lombok.Setter;
