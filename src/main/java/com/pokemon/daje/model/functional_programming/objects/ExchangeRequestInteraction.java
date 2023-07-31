@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.http.HttpResponse;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,17 +15,18 @@ import java.util.Map;
 public class ExchangeRequestInteraction {
     private final SwapFunctionAction action;
     private final AsyncContext asyncResponse;
-    private Map<ValueEnum, WrapperValue> valuesMap;
+    private Map<ValueEnum, ValueWrapper> valuesMap;
 
     public ExchangeRequestInteraction(SwapFunctionAction action,AsyncContext response) {
         this.action = action;
         this.asyncResponse = response;
-        this.valuesMap = new HashMap<>();
+        this.valuesMap = new EnumMap<>(ValueEnum.class);
     }
-    public ExchangeRequestInteraction(SwapFunctionAction action,AsyncContext response, Map<ValueEnum, WrapperValue> values) {
+    public ExchangeRequestInteraction(SwapFunctionAction action,AsyncContext response, Map<ValueEnum, ValueWrapper> values) {
         this.action = action;
         this.asyncResponse = response;
-        this.valuesMap = new HashMap<>(values);
+        this.valuesMap = new EnumMap<>(ValueEnum.class);
+        valuesMap.putAll(values);
     }
 
     public <D extends Object> void sendData(D data,int status){
@@ -38,7 +38,7 @@ public class ExchangeRequestInteraction {
         try {
             out = asyncResponse.getResponse().getWriter();
         } catch (IOException ex) {
-            log.info("COULD NOT INSTANCIATE PRINTWRITER",ex);
+            log.error("COULD NOT INSTANCE PRINTWRITER",ex);
         }
         try{
             if(data!=null && out != null){
@@ -54,19 +54,20 @@ public class ExchangeRequestInteraction {
                 out.write("{}");
                 out.flush();
             }
-            log.info("POKEMON SEND DATA ERROR",ex);
+            log.error("POKEMON SEND DATA ERROR",ex);
         }
     }
     public SwapFunctionAction getAction(){
         return action;
     };
-    public Map<ValueEnum, WrapperValue> getAllValues(){
+    public Map<ValueEnum, ValueWrapper> getAllValues(){
         return valuesMap;
     }
 
-    public void setValuesMap(Map<ValueEnum, WrapperValue> valuesMap) {
+    public void setValuesMap(Map<ValueEnum, ValueWrapper> valuesMap) {
         if(valuesMap != null){
-            this.valuesMap = new HashMap<>(valuesMap);
+            this.valuesMap = new EnumMap<>(ValueEnum.class);
+            this.valuesMap.putAll(valuesMap);
         }
     }
 }
