@@ -1,10 +1,9 @@
-package com.pokemon.daje.model;
+package com.pokemon.daje.model.business_data;
 
 import com.pokemon.daje.persistance.dto.PokemonDTO;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 @Getter
 @Setter
