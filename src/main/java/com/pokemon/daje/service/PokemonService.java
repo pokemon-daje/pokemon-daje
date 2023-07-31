@@ -213,33 +213,23 @@ public class PokemonService {
         return pokemonExchangeDTO;
     }
 
-    private ProgressingProcessCode progressWithSwap(String exchangeId,PokemonDTO pokemonToSave, PokemonDTO pokemonToDelete){
+    private ProgressingProcessCode progressWithSwap(PokemonDTO pokemonToSave, PokemonDTO pokemonToDelete) throws PokemonServiceException {
         ProgressingProcessCode code = ProgressingProcessCode.POKEMON_REQUEST_SUCCESS;
-        if (pokemonToSave != null && pokemonToDelete != null) {
-            try {
+        try{
+            if (pokemonToSave != null && pokemonToDelete != null) {
                 pokemonToSave = pokemonRepository.save(pokemonToSave);
-                randomPokemonStorage.add(pokemonToSave);
-            } catch (PokemonServiceException ex) {
-                code = ProgressingProcessCode.POKEMON_REQUEST_DOWN_SERVER_ERROR;
-                throw new PokemonServiceException("Pokemon cannot be persisted", ex);
-            }
-            try {
+                swapablePokemonStorage.add(pokemonToSave);
                 pokemonRepository.deleteById(pokemonToDelete.getDbId());
-                PokemonSwapDeposit deposit = swapBank.get(exchangeId);
-                if(deposit!= null && deposit.getPokemonToSave() != null && deposit.getPokemonToDelete() != null){
-                    swapBank.remove(exchangeId);
-                    log.info("EXCHANGE WITH ID: {} HAS BEEN COMPLETED",exchangeId);
-                }else{
-                    throw new PokemonServiceException("EXCHANGE TOOK TOO MUCH TIME TO COMPLETE",new Throwable("POKEMON TO PERSIST"));
-                }
-            } catch (PokemonServiceException ex) {
-                pokemonRepository.deleteById(pokemonToSave.getDbId());
-                randomPokemonStorage.remove(pokemonToSave);
-                code = ProgressingProcessCode.POKEMON_REQUEST_DOWN_SERVER_ERROR;
-                throw new PokemonServiceException("POKEMON CANNOT BE PERSISTED", ex);
+            } else {
+                code = ProgressingProcessCode.POKEMON_BAD_REQUEST;
             }
-        } else {
-            code = ProgressingProcessCode.POKEMON_BAD_REQUEST;
+        }catch (Exception ex){
+            pokemonRepository.deleteById(pokemonToSave.getDbId());
+            swapablePokemonStorage.remove(pokemonToSave);
+            pokemonRepository.save(pokemonToDelete);
+            swapablePokemonStorage.add(pokemonToDelete);
+            log.error("POKEMON CANNOT BE PERSISTED");
+            throw new PokemonServiceException("ERROR WHILE POKEMON SWAP WAS ABOUT TO BE PERSISTED");
         }
         return code;
     }
