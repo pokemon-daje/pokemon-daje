@@ -1,12 +1,14 @@
 package com.pokemon.daje.controller;
 
-import com.pokemon.daje.model.api_objects.PackageExchangeStatus;
-import com.pokemon.daje.model.api_objects.PackageFrontEnd;
+import com.pokemon.daje.model.api_objects.ConcludeSwapRequest;
+import com.pokemon.daje.model.api_objects.FrontEndSendData;
 import com.pokemon.daje.model.api_objects.PokemonFrontEndDTO;
 import com.pokemon.daje.model.api_objects.PokemonRequestExchangeDTO;
 import com.pokemon.daje.model.business_data.Pokemon;
 import com.pokemon.daje.model.business_data.SwapBankAction;
 import com.pokemon.daje.service.PokemonService;
+import com.pokemon.daje.service.SwapScheduleService;
+import jakarta.servlet.AsyncContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,10 +31,12 @@ public class PokemonController {
     final PokemonService pokemonService;
     private Map<String, SseEmitter> serverEmitters;
     private ExecutorService sseMvcExecutor;
+    private SwapScheduleService swapScheduleService;
 
     @Autowired
-    public PokemonController(PokemonService pokemonService) {
+    public PokemonController(PokemonService pokemonService, SwapScheduleService swapScheduleService) {
         this.pokemonService = pokemonService;
+        this.swapScheduleService = swapScheduleService;
         serverEmitters = new HashMap<>();
         sseMvcExecutor = Executors.newSingleThreadExecutor();
     }
@@ -61,8 +67,22 @@ public class PokemonController {
     }
 
     @PostMapping("/pokemon/exchange")
-    public void swap(HttpServletRequest request,HttpServletResponse response, @RequestBody PokemonRequestExchangeDTO pokemon) {
-        pokemonService.addInizalizeExchangeRequest(request.startAsync(request,response), pokemon);
+    public void initializeSwap(HttpServletRequest request, HttpServletResponse response, @RequestBody PokemonRequestExchangeDTO pokemon) {
+        AsyncContext asyncContext = request.startAsync(request,response);
+        if(pokemon != null
+                && pokemon.getId() != null
+                && pokemon.getMoves() != null
+                && pokemon.getType() != null
+                && !pokemon.getMoves().isEmpty()
+                && pokemon.getCurrentHP() != null
+                && pokemon.getMaxHP() != null
+                && pokemon.getOriginalTrainer() != null
+        ){
+            pokemonService.addInitializeSwapRequest(asyncContext, pokemon);
+        }
+        else{
+            responseBadRequest(asyncContext);
+        }
     }
     @GetMapping("/pokemon/exchange")
     public ResponseEntity<HttpStatus> swapErrorGet(@RequestBody PokemonRequestExchangeDTO pokemon) {
@@ -78,11 +98,16 @@ public class PokemonController {
     }
 
     @PostMapping("/pokemon/exchange/{exchangeId}/status")
-    public void statusSwap(@PathVariable("exchangeId") String exchangeId,
-                           @RequestBody PackageExchangeStatus packageExchangeStatus,
-                           HttpServletRequest request,
-                           HttpServletResponse response){
-        pokemonService.concludeExchangeRequest(request.startAsync(request,response), exchangeId,packageExchangeStatus);
+    public void concludeSwap(@PathVariable("exchangeId") String exchangeId,
+                             @RequestBody ConcludeSwapRequest concludeSwapRequest,
+                             HttpServletRequest request,
+                             HttpServletResponse response){
+        AsyncContext asyncContext = request.startAsync(request,response);
+        if(concludeSwapRequest.getStatus() != null){
+            pokemonService.addConcludeSwapRequest(asyncContext, exchangeId, concludeSwapRequest);
+        }else{
+            responseBadRequest(asyncContext);
+        }
     }
 
     @GetMapping("/pokemon/exchange/events/{eventId}")
@@ -115,7 +140,7 @@ public class PokemonController {
                 serverEmitters.forEach((key, sseEmitter) -> {
                             try {
                                 sseEmitter.send(SseEmitter.event()
-                                        .data(new PackageFrontEnd(exchangeId, responseCode, requestCode, pokemonSent, pokemonReceive))
+                                        .data(new FrontEndSendData(exchangeId, responseCode, requestCode, pokemonSent, pokemonReceive))
                                         .id("exchange")
                                         .name("pokemon"));
                                 sseEmitter.complete();
@@ -135,6 +160,18 @@ public class PokemonController {
     private void sendDataToFrontEnd(String exchangeId, int responseCode, int requestCode) {
         Map<SwapBankAction, PokemonFrontEndDTO> mapDeposit = pokemonService.getPokemonsFromSwapCacheLog(exchangeId);
         sendDataToFrontEnd(exchangeId, responseCode, requestCode,mapDeposit.get(SwapBankAction.TODELETE), mapDeposit.get(SwapBankAction.TOSAVE));
+    }
+
+    private void responseBadRequest(AsyncContext asyncContext){
+        try {
+            PrintWriter out = asyncContext.getResponse().getWriter();
+            HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            out.write("WHAT ARE YOU DOING");
+            out.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
