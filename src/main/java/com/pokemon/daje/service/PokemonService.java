@@ -290,9 +290,9 @@ public class PokemonService {
     @Scheduled(fixedDelay = 2000)
     private void checkDatabaseConnection() {
         try (Connection connection = dataSource.getConnection()) {
-            log.info("database connesso e funzionante");
+            log.info("DATABASE CONNECTION WORKING");
         } catch (Exception e) {
-            log.info("database non connesso o non funzionante");
+            log.error("DATABASE CONNECTION NOT WORKING");
             System.exit(1);
         }
     }
