@@ -1,9 +1,6 @@
-package com.pokemon.daje.model;
+package com.pokemon.daje.model.business_data;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 public enum TypesEnum {
     ICE("ice", 1),

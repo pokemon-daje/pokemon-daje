@@ -1,7 +1,7 @@
-package com.pokemon.daje.persistance.marshaller;
+package com.pokemon.daje.util.marshaller.persistance;
 
-import com.pokemon.daje.model.Type;
-import com.pokemon.daje.model.TypesEnum;
+import com.pokemon.daje.model.business_data.Type;
+import com.pokemon.daje.model.business_data.TypesEnum;
 import com.pokemon.daje.persistance.dto.TypeDTO;
 import org.springframework.stereotype.Component;
 

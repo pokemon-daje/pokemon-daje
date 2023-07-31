@@ -1,4 +1,4 @@
-package com.pokemon.daje.model.functional_programming;
+package com.pokemon.daje.model.functional_programming.objects;
 
 public enum SwapFunctionAction {
     INIZIALIZE_SWAP,

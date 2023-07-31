@@ -1,4 +1,4 @@
-package com.pokemon.daje.controller.json.dto;
+package com.pokemon.daje.model.api_objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -6,13 +6,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PackageExchange {
+public class PackageResponseExchange {
     @JsonProperty("exchange_id")
     private String id;
     @JsonProperty("pokemon")
-    private PokemonExchangeDTO pokemonExchangeDTO;
+    private PokemonRequestExchangeDTO pokemonExchangeDTO;
 
-    public PackageExchange(String id, PokemonExchangeDTO pokemonExchangeDTO) {
+    public PackageResponseExchange(String id, PokemonRequestExchangeDTO pokemonExchangeDTO) {
         this.id = id;
         this.pokemonExchangeDTO = pokemonExchangeDTO;
     }

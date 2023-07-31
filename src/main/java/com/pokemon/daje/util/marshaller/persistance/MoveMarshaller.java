@@ -1,6 +1,6 @@
-package com.pokemon.daje.persistance.marshaller;
+package com.pokemon.daje.util.marshaller.persistance;
 
-import com.pokemon.daje.model.Move;
+import com.pokemon.daje.model.business_data.Move;
 import com.pokemon.daje.persistance.dto.MoveDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

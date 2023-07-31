@@ -1,4 +1,4 @@
-package com.pokemon.daje.model;
+package com.pokemon.daje.model.business_data;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
