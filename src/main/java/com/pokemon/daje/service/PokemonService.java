@@ -312,8 +312,8 @@ public class PokemonService {
 
     public Map<SwapBankAction,PokemonFrontEndDTO> getPokemonsFromSwapCacheLog(String exchangeId){
         PokemonSwapDeposit deposit = swapCacheLog.get(exchangeId);
-        PokemonFrontEndDTO toSave = null;
-        PokemonFrontEndDTO toDelete = null;
+        PokemonFrontEndDTO toSave;
+        PokemonFrontEndDTO toDelete;
         Map<SwapBankAction,PokemonFrontEndDTO> mapDeposit = new EnumMap<>(SwapBankAction.class);
         if(deposit!=null && deposit.getPokemonToDelete()!=null && deposit.getPokemonToSave()!=null){
             int databaseIdPokemonToDelete = deposit.getPokemonToDelete().getDbId();
