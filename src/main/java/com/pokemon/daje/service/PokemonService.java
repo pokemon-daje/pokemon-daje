@@ -143,14 +143,14 @@ public class PokemonService {
             PokemonSwapDeposit exchange = swapBank.get(exchangeid);
             PokemonDTO pokemonToSave = exchange != null ? exchange.getPokemonToSave() : null;
             PokemonDTO pokemonToDelete = exchange != null ? exchange.getPokemonToDelete() : null;
-
-            code = progressWithSwap(exchangeid,pokemonToSave, pokemonToDelete);
-        }else if((packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode()
-                || packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_BAD_REQUEST.getCode()
-                || packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_DOWN_SERVER_ERROR.getCode())
-                && !swapBank.containsKey(exchangeid)){
+            try{
+                code = progressWithSwap(pokemonToSave, pokemonToDelete);
+            }catch (PokemonServiceException exception){
+                log.info("ERROR TRYING TO ASSOCIATE VARIABLE CODE TO RETURN VALUE OF PROGRESSWITHSWAP METHOD");
+            }
+        }else if((!swapBank.containsKey(exchangeid))){
             code = ProgressingProcessCode.POKEMON_EXCHANGE_NOT_FOUND;
-        }else{
+        }else {
             swapBank.remove(exchangeid);
             code = ProgressingProcessCode.POKEMON_REQUEST_SUCCESS;
         }
