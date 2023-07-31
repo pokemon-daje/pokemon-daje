@@ -92,6 +92,7 @@ public class PokemonService {
     }
 
     public List<PokemonFrontEndDTO> getSixRandomPokemon(){
+        checkPokemonsListSize();
         return swapablePokemonStorage.stream().map(pokemonDTO -> {
             int databaseId = pokemonDTO.getDbId();
             Optional<PokemonDTO> optionalPokemonDTO = pokemonRepository.findById(databaseId);
