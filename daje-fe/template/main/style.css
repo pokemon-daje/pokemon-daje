@@ -230,18 +230,18 @@ img[src="/logo_pokemon_daje.png"]{
     text-align: left;
 }
 #close-box{
-    position: absolute;
-    top: 0%;
-    right: 5%;
+   position: absolute;
+    top: 1%;
+    right: 2%;
 }
 #close{
-    font-size: 1vw; /* Imposta la dimensione del testo in percentuale relativa alla larghezza del viewport */
-    border: #ff0000e3 solid  2px;
+    font-size: .9vw; /* Imposta la dimensione del testo in percentuale relativa alla larghezza del viewport */
+    border: #66ff66 solid  2px;
     text-align: center;
     cursor: pointer;
     transition: transform 0.2s;
     border-radius: 30%;
-    color: #ff0000e3;
+    color: #66ff66;
 }
 #close:hover {
 transform: scale(1.2);
