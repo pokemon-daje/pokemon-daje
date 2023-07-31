@@ -235,22 +235,26 @@ public class PokemonService {
     }
     
     private void checkPokemonsListSize(){
-        Consumer<List<PokemonDTO>> checkIfPokemArePresent = (pokemonList) -> {
-            if (pokemonList.isEmpty()) {
-                pokemonList.add(loadPokemonFromProperty());
+        Consumer<List<PokemonDTO>> checkIfPokemArePresent = pokemonList -> {
+            try{
+                if (pokemonList.isEmpty()) {
+                    pokemonList.add(loadPokemonFromProperty());
+                }
+            }catch (PokemonServiceException exception){
+                log.error("FAILED TO LOAD POKEMON FALLBACK");
             }
         };
-        checkIfPokemArePresent.accept(randomPokemonStorage);
+        checkIfPokemArePresent.accept(swapablePokemonStorage);
     }
 
-    private PokemonDTO loadPokemonFromProperty() {
-        PokemonDTO pokemonDTO = null;
+    private PokemonDTO loadPokemonFromProperty() throws PokemonServiceException {
+        PokemonDTO pokemonDTO;
         try {
             pokemonDTO = ObjectMapperFactory.buildStrictGenericObjectMapper().readValue(new File(pathPokemonFallBack), PokemonDTO.class);
             normalizeDTO(pokemonDTO);
             pokemonDTO = pokemonRepository.save(pokemonDTO);
-        } catch (PokemonServiceException | IOException e) {
-            throw new PokemonServiceException("pokemon not loaded properly from propert", e);
+        } catch (Exception e) {
+            throw new PokemonServiceException("POKEMON NOT CORRECTLY LOADED FROM PROPERTY");
         }
         return pokemonDTO;
     }
