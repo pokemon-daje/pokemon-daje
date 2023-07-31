@@ -90,7 +90,7 @@ public class PokemonController {
         if(!ObjectUtils.isEmpty(exchangeId) && packageExchangeStatus != null
                 && !ProgressingProcessCode.POKEMON_REQUEST_UNKWON.equals(ProgressingProcessCode.fromNumber(packageExchangeStatus.getStatus()))
         ){
-            code = pokemonService.nextStepSwap(exchangeId,packageExchangeStatus);
+            code = pokemonService.concludeSwap(exchangeId,packageExchangeStatus);
             sentDataToFrontEnd(exchangeId,code.getCode(), packageExchangeStatus.getStatus());
         } else {
             code = ProgressingProcessCode.POKEMON_BAD_REQUEST;
