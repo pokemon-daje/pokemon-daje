@@ -110,16 +110,17 @@ public class PokemonService {
         PackageExchange exchangeSwapDTO = null;
         if (pokemon != null) {
             PokemonDTO pokemonToPersistDTO = validateAndGivePokemonToSave(pokemon);
-            int pokemonToGiveId = choosePokemonToSwap();
-            Optional<PokemonDTO> pokemonDTOToGive= pokemonRepository.findById(pokemonToGiveId);
-            if(pokemonDTOToGive.isPresent() && pokemonToPersistDTO != null){
+            PokemonDTO pokemonToGive = choosePokemonToSwap();
+            Set<MoveDTO> pokemonToGiveMoves = moveRepository.findAllByPokemonId(pokemonToGive.getDbId());
+            pokemonToGive.setMoveSet(pokemonToGiveMoves);
+            if(pokemonToPersistDTO != null){
                 String idSwap = UUID.randomUUID().toString();
-                exchangeSwapDTO = new PackageExchange(idSwap, mapPokemonToGiveForExchange(pokemonDTOToGive.get()));
+                exchangeSwapDTO = new PackageExchange(idSwap, mapPokemonToGiveForSwap(pokemonToGive));
                 swapCacheLog.put(idSwap,
                         new PokemonSwapDeposit(
                                 Map.of(
                                         SwapBankAction.TOSAVE, pokemonToPersistDTO,
-                                        SwapBankAction.TODELETE, pokemonDTOToGive.get()
+                                        SwapBankAction.TODELETE, pokemonToGive
                                 )
                         )
                 );
@@ -127,7 +128,7 @@ public class PokemonService {
                         new PokemonSwapDeposit(
                                 Map.of(
                                         SwapBankAction.TOSAVE, pokemonToPersistDTO,
-                                        SwapBankAction.TODELETE, pokemonDTOToGive.get()
+                                        SwapBankAction.TODELETE, pokemonToGive
                                 )
                         )
                 );
