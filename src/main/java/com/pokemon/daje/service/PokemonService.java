@@ -196,7 +196,7 @@ public class PokemonService {
 
     private PokemonDTO validateAndGivePokemonToSave(PokemonExchangeDTO pokemonExchangeDTO) {
         PokemonDTO pokemonToPersistDTO = null;
-        if (pokemonExchangeDTO != null && !ProgressingProcessCode.POKEMON_BAD_REQUEST.equals(validatePokemonExchangeDTO(pokemonExchangeDTO))) {
+        if (pokemonExchangeDTO != null && !ProgressingProcessCode.POKEMON_BAD_REQUEST.equals(validatePokemonSwapDTO(pokemonExchangeDTO))) {
             Pokemon pokemonBusiness = pokemonToExchangeMarshaller.fromDTO(pokemonExchangeDTO);
             pokemonToPersistDTO = pokemonMarshaller.toDTO(pokemonBusiness);
             normalizeDTO(pokemonToPersistDTO);
@@ -204,7 +204,7 @@ public class PokemonService {
         return pokemonToPersistDTO;
     }
 
-    private PokemonExchangeDTO mapPokemonToGiveForExchange(PokemonDTO pokemonDTO) {
+    private PokemonExchangeDTO mapPokemonToGiveForSwap(PokemonDTO pokemonDTO) {
         PokemonExchangeDTO pokemonExchangeDTO = null;
         if (pokemonDTO != null) {
             Pokemon pokemonBusiness = pokemonMarshaller.fromDTO(pokemonDTO);
