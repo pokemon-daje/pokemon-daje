@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.util.*;
 import java.util.function.Consumer;
@@ -157,15 +156,11 @@ public class PokemonService {
         return code;
     }
 
-    public int choosePokemonToSwap() {
+    public PokemonDTO choosePokemonToSwap() {
         checkPokemonsListSize();
         Random random = new Random();
-        PokemonDTO pokemonSwap = null;
-        if (!randomPokemonStorage.isEmpty()) {
-            int randomPos = random.nextInt(0, randomPokemonStorage.size());
-            pokemonSwap = randomPokemonStorage.remove(randomPos);
-        }
-        return pokemonSwap.getDbId();
+        int randomPos = random.nextInt(0, swapablePokemonStorage.size());
+        return swapablePokemonStorage.remove(randomPos);
     }
 
     private void normalizeDTO(PokemonDTO pokemonToNormalize) {
