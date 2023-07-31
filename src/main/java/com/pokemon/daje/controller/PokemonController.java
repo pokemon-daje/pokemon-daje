@@ -1,16 +1,18 @@
 package com.pokemon.daje.controller;
 
-import com.pokemon.daje.controller.json.dto.*;
-import com.pokemon.daje.model.Pokemon;
-import com.pokemon.daje.model.ProgressingProcessCode;
-import com.pokemon.daje.model.SwapBankAction;
+import com.pokemon.daje.model.api_objects.PackageExchangeStatus;
+import com.pokemon.daje.model.api_objects.PackageFrontEnd;
+import com.pokemon.daje.model.api_objects.PokemonFrontEndDTO;
+import com.pokemon.daje.model.api_objects.PokemonRequestExchangeDTO;
+import com.pokemon.daje.model.business_data.Pokemon;
+import com.pokemon.daje.model.business_data.SwapBankAction;
 import com.pokemon.daje.service.PokemonService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -24,7 +26,7 @@ import java.util.concurrent.Executors;
 public class PokemonController {
     final PokemonService pokemonService;
     private Map<String, SseEmitter> serverEmitters;
-    ExecutorService sseMvcExecutor;
+    private ExecutorService sseMvcExecutor;
 
     @Autowired
     public PokemonController(PokemonService pokemonService) {
@@ -59,58 +61,28 @@ public class PokemonController {
     }
 
     @PostMapping("/pokemon/exchange")
-    public ResponseEntity<PackageExchange> swap(HttpServletResponse response, @RequestBody PokemonExchangeDTO pokemon) {
-        PackageExchange pack = pokemonService.inizializePokemonsSwap(pokemon,response);
-        ResponseEntity<PackageExchange> toSend = new ResponseEntity<>(pack,HttpStatus.OK);
-        if(pack == null){
-            sentDataToFrontEnd("exchange error",ProgressingProcessCode.POKEMON_BAD_REQUEST.getCode()
-                    ,ProgressingProcessCode.POKEMON_EXCHANGE_REQUEST_OPEN.getCode());
-            toSend = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }else{
-            sentDataToFrontEnd(pack.getId(),ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode()
-                    ,ProgressingProcessCode.POKEMON_EXCHANGE_REQUEST_OPEN.getCode());
-        }
-        return toSend;
+    public void swap(HttpServletRequest request,HttpServletResponse response, @RequestBody PokemonRequestExchangeDTO pokemon) {
+        pokemonService.addInizalizeExchangeRequest(request.startAsync(request,response), pokemon);
     }
     @GetMapping("/pokemon/exchange")
-    public ResponseEntity<HttpStatus> swapErrorGet(@RequestBody PokemonExchangeDTO pokemon) {
+    public ResponseEntity<HttpStatus> swapErrorGet(@RequestBody PokemonRequestExchangeDTO pokemon) {
         return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
     }
     @PutMapping("/pokemon/exchange")
-    public ResponseEntity<HttpStatus> swapErrorPut(@RequestBody PokemonExchangeDTO pokemon) {
+    public ResponseEntity<HttpStatus> swapErrorPut(@RequestBody PokemonRequestExchangeDTO pokemon) {
         return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
     }
     @DeleteMapping("/pokemon/exchange")
-    public ResponseEntity<HttpStatus> swapErrorDelete(@RequestBody PokemonExchangeDTO pokemon) {
+    public ResponseEntity<HttpStatus> swapErrorDelete(@RequestBody PokemonRequestExchangeDTO pokemon) {
         return new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @PostMapping("/pokemon/exchange/{exchangeId}/status")
-    public ResponseEntity<HttpStatus> statusSwap(@PathVariable("exchangeId") String exchangeId, @RequestBody PackageExchangeStatus packageExchangeStatus){
-        ProgressingProcessCode code;
-        if(!ObjectUtils.isEmpty(exchangeId) && packageExchangeStatus != null
-                && !ProgressingProcessCode.POKEMON_REQUEST_UNKWON.equals(ProgressingProcessCode.fromNumber(packageExchangeStatus.getStatus()))
-        ){
-            code = pokemonService.nextStepSwap(exchangeId,packageExchangeStatus);
-            sentDataToFrontEnd(exchangeId,code.getCode(), packageExchangeStatus.getStatus());
-        } else {
-            code = ProgressingProcessCode.POKEMON_BAD_REQUEST;
-        }
-
-        switch (code){
-            case POKEMON_REQUEST_SUCCESS -> {
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-            case POKEMON_BAD_REQUEST -> {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            case POKEMON_EXCHANGE_NOT_FOUND -> {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            default -> {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+    public void statusSwap(@PathVariable("exchangeId") String exchangeId,
+                           @RequestBody PackageExchangeStatus packageExchangeStatus,
+                           HttpServletRequest request,
+                           HttpServletResponse response){
+        pokemonService.concludeExchangeRequest(request.startAsync(request,response), exchangeId,packageExchangeStatus);
     }
 
     @GetMapping("/pokemon/exchange/events/{eventId}")
@@ -160,7 +132,7 @@ public class PokemonController {
         });
     }
 
-    private void sentDataToFrontEnd(String exchangeId, int responseCode, int requestCode) {
+    private void sendDataToFrontEnd(String exchangeId, int responseCode, int requestCode) {
         Map<SwapBankAction, PokemonFrontEndDTO> mapDeposit = pokemonService.getPokemonsFromSwapCacheLog(exchangeId);
         sendDataToFrontEnd(exchangeId, responseCode, requestCode,mapDeposit.get(SwapBankAction.TODELETE), mapDeposit.get(SwapBankAction.TOSAVE));
     }
