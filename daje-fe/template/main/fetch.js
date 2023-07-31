@@ -6,21 +6,21 @@ let colorPalette = {
     1: "rgba(188,230,230)",
     2: 'rgba(134,98,143,0.8)',
     3: 'rgb(255, 228, 225)',
-    4: 'rgb(255, 100, 0)',
+    4: 'rgb(166, 16, 34)',
     5: 'rgb(255, 203, 5)',
     6: 'rgb(176,119,68)',
     7: 'rgb(192, 192, 192)',
-    8: 'rgb(255, 0, 0)',
+    8: 'rgb(203, 50, 52)',
     9: 'rgb(139, 115, 85)',
-    10: 'rgb(138, 43, 226)',
+    10: 'rgb(134, 115, 161)',
     11: 'rgb(75,73,73)',
-    12: 'rgb(255, 100, 0)',
+    12: 'rgb(236, 124, 38)',
     13: 'rgb(165,185,67)',
     14: 'rgb(232,125,204)',
     15: 'rgb(255, 192, 203)',
     16: 'rgb(100, 180, 100)',
     17: 'rgb(239, 235, 222)',
-    18: 'rgb(0, 191, 255)',
+    18: 'rgb(109, 177, 216)',
     30000: 'rgb(96,70,70)'
 };
 let colorPaletteDarken = {
@@ -84,11 +84,11 @@ function manageSwap(swap){
         && pokemons.length > 0
         && modifiedPokemons.length > 0){
         switch (swap.status_request_code){
-            case 0: {
+            case 0: { // inizio scambio
                 newSwap(swap)
                 break;
             }
-            case 200: {
+            case 200: { // scambio andato a buon fine
                 nextPhaseSwap(swap)
                 break;
             }
