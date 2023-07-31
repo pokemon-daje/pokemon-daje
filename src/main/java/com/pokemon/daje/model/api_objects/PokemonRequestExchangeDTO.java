@@ -1,4 +1,4 @@
-package com.pokemon.daje.controller.json.dto;
+package com.pokemon.daje.model.api_objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pokemon.daje.persistance.dto.DTOInterface;
@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 @Getter
 @Setter
-public class PokemonExchangeDTO implements DTOInterface {
+public class PokemonRequestExchangeDTO implements DTOInterface {
     @NotNull
     private Integer id;
     @NotNull
@@ -31,7 +31,7 @@ public class PokemonExchangeDTO implements DTOInterface {
     @JsonProperty("original_trainer")
     private String originalTrainer;
 
-    public PokemonExchangeDTO(){
+    public PokemonRequestExchangeDTO(){
         moves = new HashSet<>();
     }
 }
