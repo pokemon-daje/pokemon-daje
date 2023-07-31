@@ -190,7 +190,7 @@ public class SwapBankService {
                     ExecutorService swapExecutor = Executors.newSingleThreadExecutor();
                     executionersThreads.add(swapExecutor);
                     swapExecutor.execute(() -> {
-                        ExchangeRequestInteraction waiter = quequeOfRequests.removeFirst();
+                        ExchangeRequestInteraction waiter = removeFirst();
                         if (waiter != null) {
                             ExchangeExecutioner exchangeExecutioner = executionersMap.get(waiter.getAction());
                             if (exchangeExecutioner != null) {
