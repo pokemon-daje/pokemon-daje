@@ -11,7 +11,6 @@ import com.pokemon.daje.model.business_data.ProgressingProcessCode;
 import com.pokemon.daje.model.business_data.SwapBankAction;
 import com.pokemon.daje.persistance.dto.PokemonDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -112,6 +111,13 @@ public class SwapBankService {
         quequeOfRequests.add(exchangeRequestInteraction);
     }
 
+    private synchronized ExchangeRequestInteraction removeFirst(){
+        ExchangeRequestInteraction waiter = null;
+        if(!quequeOfRequests.isEmpty()){
+            waiter = quequeOfRequests.removeFirst();
+        }
+        return waiter;
+    }
     private <D extends Object> void responseInizializeExchange(ExchangeRequestInteraction waiter, D responseObject) {
         int code = HttpStatus.OK.value();
         if (responseObject == null) {
