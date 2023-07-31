@@ -1,32 +1,32 @@
 package com.pokemon.daje.service;
 
-import com.pokemon.daje.controller.json.dto.*;
-import com.pokemon.daje.controller.json.marshaller.PokemonToExchangeMarshaller;
-import com.pokemon.daje.controller.json.marshaller.PokemonToFrontEndMarshaller;
-import com.pokemon.daje.model.*;
+import com.pokemon.daje.util.marshaller.api.PokemonToFrontEndMarshaller;
+import com.pokemon.daje.model.api_objects.PackageExchangeStatus;
+import com.pokemon.daje.model.api_objects.PokemonFrontEndDTO;
+import com.pokemon.daje.model.api_objects.PokemonRequestExchangeDTO;
+import com.pokemon.daje.model.business_data.Pokemon;
+import com.pokemon.daje.model.business_data.PokemonSwapDeposit;
+import com.pokemon.daje.model.business_data.ProgressingProcessCode;
+import com.pokemon.daje.model.business_data.SwapBankAction;
+import com.pokemon.daje.model.functional_programming.objects.*;
 import com.pokemon.daje.persistance.dao.MoveRepository;
 import com.pokemon.daje.persistance.dao.PokemonRepository;
 import com.pokemon.daje.persistance.dao.PokemonSpeciesRepository;
 import com.pokemon.daje.persistance.dto.MoveDTO;
 import com.pokemon.daje.persistance.dto.PokemonDTO;
 import com.pokemon.daje.persistance.dto.PokemonSpeciesDTO;
-import com.pokemon.daje.persistance.marshaller.PokemonMarshaller;
-import com.pokemon.daje.util.exception.PokemonServiceException;
-import io.swagger.v3.core.util.ObjectMapperFactory;
-import jakarta.servlet.http.HttpServletResponse;
+import com.pokemon.daje.util.marshaller.persistance.PokemonMarshaller;
+import jakarta.servlet.AsyncContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
-import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.util.*;
-import java.util.function.Consumer;
 
 @Slf4j
 @Service
@@ -34,46 +34,35 @@ public class PokemonService {
     private final PokemonRepository pokemonRepository;
     private final PokemonMarshaller pokemonMarshaller;
     private final PokemonToFrontEndMarshaller pokemonToFrontEndMarshaller;
-    private final PokemonToExchangeMarshaller pokemonToExchangeMarshaller;
     private final MoveRepository moveRepository;
     private final PokemonSpeciesRepository pokemonSpeciesRepository;
-    private final SwapBank swapBank;
-    private final ObserverSwapBank observerSwapBank;
+    private final SwapBankService swapBankService;
     private DataSource dataSource;
-    @Value("${pokemon.fallback.path}")
-    private String pathPokemonFallBack;
-
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository,
                           PokemonMarshaller pokemonMarshaller,
                           PokemonToFrontEndMarshaller pokemonToFrontEndMarshaller,
-                          PokemonToExchangeMarshaller pokemonToExchangeMarshaller,
                           MoveRepository moveRepository,
                           PokemonSpeciesRepository pokemonSpeciesRepository,
-                          SwapBank swapBank,
-                          ObserverSwapBank observerSwapBank) {
+                          SwapBankService swapBankService) {
         this.pokemonRepository = pokemonRepository;
         this.pokemonMarshaller = pokemonMarshaller;
         this.pokemonToFrontEndMarshaller = pokemonToFrontEndMarshaller;
-        this.pokemonToExchangeMarshaller = pokemonToExchangeMarshaller;
         this.moveRepository = moveRepository;
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
-        this.swapBank = swapBank;
-        this.observerSwapBank = observerSwapBank;
+        this.swapBankService = swapBankService;
         this.dataSource = DataSourceBuilder.create()
                 .driverClassName("com.mysql.cj.jdbc.Driver")
                 .url("jdbc:mysql://localhost:3306/daje")
                 .username("daje")
                 .password("daje")
                 .build();
-        loadPokemonsFromDatabase();
     }
 
     public PokemonFrontEndDTO getById(int pokemonId) {
         Pokemon pokemonBusiness = pokemonMarshaller.fromDTO(pokemonRepository.findById(pokemonId).orElse(null));
         return pokemonToFrontEndMarshaller.toDTO(pokemonBusiness);
     }
-
     public PokemonDTO insert(Pokemon pokemon) {
         PokemonDTO pokemonDTO = null;
         if (pokemon.getType() != null && pokemon.getId() != null) {
@@ -92,9 +81,8 @@ public class PokemonService {
         }
         return pokemonFrontEnd;
     }
-
     public List<PokemonFrontEndDTO> getPokemonsFromStorage(){
-        return swapBank.getPokemonStorage().stream().map(pokemonDTO -> {
+        return swapBankService.getPokemonStorage().stream().map(pokemonDTO -> {
             int databaseId = pokemonDTO.getDbId();
             Optional<PokemonDTO> optionalPokemonDTO = pokemonRepository.findById(databaseId);
             if(optionalPokemonDTO.isPresent()){
@@ -106,27 +94,6 @@ public class PokemonService {
             return null;
         }).toList();
     }
-
-    private PokemonExchangeDTO mapPokemonToGiveForExchange(PokemonDTO pokemonDTO) {
-        PokemonExchangeDTO pokemonExchangeDTO = null;
-        if (pokemonDTO != null) {
-            Pokemon pokemonBusiness = pokemonMarshaller.fromDTO(pokemonDTO);
-            pokemonExchangeDTO = pokemonToExchangeMarshaller.toDTO(pokemonBusiness);
-        }
-        return pokemonExchangeDTO;
-    }
-
-    public int choosePokemonToSwap() {
-        checkPokemonsListSize();
-        Random random = new Random();
-        PokemonDTO pokemonSwap = null;
-        if (!swapBank.isPokemonStorageEmpty()) {
-            int randomPos = random.nextInt(0, swapBank.pokemonStorageSize());
-            pokemonSwap = swapBank.removeAndReturnPokemonByPosition(randomPos);
-        }
-        return pokemonSwap.getDbId();
-    }
-
     private void normalizeDTO(PokemonDTO pokemonToNormalize) {
         if(pokemonToNormalize != null){
             Set<MoveDTO> movesDTO = new HashSet<>();
@@ -139,142 +106,8 @@ public class PokemonService {
             pokemonToNormalize.setMoveSet(movesDTO);
         }
     }
-
-    private ProgressingProcessCode validatePokemonExchangeDTO(PokemonExchangeDTO pokemonExchangeDTO){
-        if(pokemonExchangeDTO.getId() != null
-                && pokemonExchangeDTO.getType() != null
-                && pokemonExchangeDTO.getMoves() != null
-                && !pokemonExchangeDTO.getMoves().isEmpty()
-                && !pokemonExchangeDTO.getMoves().stream().anyMatch(Objects::isNull)){
-            Optional<PokemonSpeciesDTO> pokemonSpeciesDTO = pokemonSpeciesRepository.findByPokedexIdOrGetUnknow(pokemonExchangeDTO.getId());
-            Set<MoveDTO> moves = new HashSet<>();
-            pokemonExchangeDTO.getMoves().forEach(move -> {
-                Optional<MoveDTO> moveDTO= moveRepository.findByPokedexIdOrGetUnknow(move);
-                moveDTO.ifPresent(moves::add);
-            });
-            return pokemonSpeciesDTO.isPresent() && !moves.isEmpty()? ProgressingProcessCode.POKEMON_REQUEST_SUCCESS : ProgressingProcessCode.POKEMON_BAD_REQUEST;
-
-        }
-        return ProgressingProcessCode.POKEMON_BAD_REQUEST;
-    }
-
-    private PokemonDTO validateAndGivePokemonToSave(PokemonExchangeDTO pokemonExchangeDTO) {
-        PokemonDTO pokemonToPersistDTO = null;
-        if (pokemonExchangeDTO != null && !ProgressingProcessCode.POKEMON_BAD_REQUEST.equals(validatePokemonExchangeDTO(pokemonExchangeDTO))) {
-            Pokemon pokemonBusiness = pokemonToExchangeMarshaller.fromDTO(pokemonExchangeDTO);
-            pokemonToPersistDTO = pokemonMarshaller.toDTO(pokemonBusiness);
-            normalizeDTO(pokemonToPersistDTO);
-        }
-        return pokemonToPersistDTO;
-    }
-
-    public PackageExchange inizializePokemonsSwap(PokemonExchangeDTO pokemon, HttpServletResponse response) {
-        PackageExchange exchangeSwapDTO = null;
-        if (pokemon != null) {
-            PokemonDTO pokemonToPersistDTO = validateAndGivePokemonToSave(pokemon);
-            int pokemonToGiveId = choosePokemonToSwap();
-            Optional<PokemonDTO> pokemonDTOToGive= pokemonRepository.findById(pokemonToGiveId);
-            if(pokemonDTOToGive.isPresent() && pokemonToPersistDTO != null){
-                String idSwap = UUID.randomUUID().toString();
-                swapBank.addDeposit(idSwap,pokemonToPersistDTO,pokemonDTOToGive.get());
-                exchangeSwapDTO = new PackageExchange(idSwap, mapPokemonToGiveForExchange(pokemonDTOToGive.get()));
-            }
-        }
-        return exchangeSwapDTO;
-    }
-
-    public ProgressingProcessCode nextStepSwap(String exchangeid, PackageExchangeStatus packageExchangeStatus) {
-        ProgressingProcessCode code;
-        if (packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode() && swapBank.doDepositExist(exchangeid)) {
-            PokemonSwapDeposit exchange = swapBank.getDeposit(exchangeid);
-            PokemonDTO pokemonToSave = exchange != null ? exchange.getPokemonToSave() : null;
-            PokemonDTO pokemonToDelete = exchange != null ? exchange.getPokemonToDelete() : null;
-
-            code = progressWithSwap(exchangeid,pokemonToSave, pokemonToDelete);
-        }else if((packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode()
-                || packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_BAD_REQUEST.getCode()
-                || packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_DOWN_SERVER_ERROR.getCode())
-                && !swapBank.doDepositExist(exchangeid)){
-            code = ProgressingProcessCode.POKEMON_EXCHANGE_NOT_FOUND;
-        }else{
-            swapBank.removeDeposit(exchangeid);
-            code = ProgressingProcessCode.POKEMON_REQUEST_SUCCESS;
-        }
-        return code;
-    }
-
-    private ProgressingProcessCode progressWithSwap(String exchangeId,PokemonDTO pokemonToSave, PokemonDTO pokemonToDelete){
-        ProgressingProcessCode code = ProgressingProcessCode.POKEMON_REQUEST_SUCCESS;
-        if (pokemonToSave != null && pokemonToDelete != null) {
-            try{
-                PokemonSwapDeposit deposit = swapBank.getDeposit(exchangeId);
-                if(deposit!= null && deposit.getPokemonToSave() != null && deposit.getPokemonToDelete() != null){
-                    swapBank.removeDeposit(exchangeId);
-                    log.info("EXCHANGE WITH ID: {} HAS BEEN COMPLETED",exchangeId);
-                }else{
-                    throw new PokemonServiceException("EXCHANGE TOOK TOO MUCH TIME TO COMPLETE",new Throwable("POKEMON TO PERSIST"));
-                }
-            } catch (PokemonServiceException ex) {
-                code = ProgressingProcessCode.POKEMON_BAD_REQUEST;
-                throw new PokemonServiceException("EXCHANGE TOOK TOO MUCH TIME TO COMPLETE", ex);
-            }
-            try {
-                pokemonToSave = pokemonRepository.save(pokemonToSave);
-                swapBank.addPokemonToStorage(pokemonToSave);
-            } catch (PokemonServiceException ex) {
-                code = ProgressingProcessCode.POKEMON_REQUEST_DOWN_SERVER_ERROR;
-                throw new PokemonServiceException("Pokemon cannot be persisted", ex);
-            }
-            try {
-                pokemonRepository.deleteById(pokemonToDelete.getDbId());
-            } catch (PokemonServiceException ex) {
-                pokemonRepository.deleteById(pokemonToSave.getDbId());
-                swapBank.removePokemonFromStorage(pokemonToSave);
-                swapBank.addPokemonToStorage(pokemonToDelete);
-                code = ProgressingProcessCode.POKEMON_REQUEST_DOWN_SERVER_ERROR;
-                throw new PokemonServiceException("POKEMON CANNOT BE PERSISTED", ex);
-            }
-        } else {
-            code = ProgressingProcessCode.POKEMON_BAD_REQUEST;
-        }
-        return code;
-    }
-    
-    private void checkPokemonsListSize(){
-        Consumer<SwapBank> checkIfPokemArePresent = (bank) -> {
-            if (bank.isPokemonStorageEmpty()) {
-                PokemonDTO pokemonDTO = loadPokemonFromProperty();
-                bank.addPokemonToStorage(pokemonDTO);
-            }
-        };
-        checkIfPokemArePresent.accept(swapBank);
-    }
-
-    private void loadPokemonsFromDatabase(){
-        Consumer<SwapBank> checkIfPokemArePresent = (bank) -> {
-            List<PokemonDTO> pokemonsDB = pokemonRepository.getSixRandomPokemon();
-            pokemonsDB.forEach(poke->{
-                bank.addPokemonToStorage(poke);
-            });
-            checkPokemonsListSize();
-        };
-        checkIfPokemArePresent.accept(swapBank);
-    }
-
-    private PokemonDTO loadPokemonFromProperty() {
-        PokemonDTO pokemonDTO = null;
-        try {
-            pokemonDTO = ObjectMapperFactory.buildStrictGenericObjectMapper().readValue(new File(pathPokemonFallBack), PokemonDTO.class);
-            normalizeDTO(pokemonDTO);
-            pokemonDTO = pokemonRepository.save(pokemonDTO);
-        } catch (PokemonServiceException | IOException e) {
-            throw new PokemonServiceException("pokemon not loaded properly from propert", e);
-        }
-        return pokemonDTO;
-    }
-
     public Map<SwapBankAction,PokemonFrontEndDTO> getPokemonsFromSwapCacheLog(String exchangeId){
-        PokemonSwapDeposit deposit = swapBank.getCacheOfDeposit(exchangeId);
+        PokemonSwapDeposit deposit = swapBankService.getCacheOfDeposit(exchangeId);
         PokemonFrontEndDTO toSave = null;
         PokemonFrontEndDTO toDelete = null;
         Map<SwapBankAction,PokemonFrontEndDTO> mapDeposit = new EnumMap<>(SwapBankAction.class);
@@ -294,7 +127,24 @@ public class PokemonService {
         }
         return mapDeposit;
     }
-
+    public void addInizalizeExchangeRequest(AsyncContext response, PokemonRequestExchangeDTO pokemonDTO){
+        Map<ValueEnum, WrapperValue> valuesMap = new HashMap<>();
+        valuesMap.put(ValueEnum.REQUEST_CODE,new WrapperValue(ProgressingProcessCode.POKEMON_EXCHANGE_REQUEST_OPEN));
+        valuesMap.put(ValueEnum.POKEMON_RECEIVED_TO_EXCHANGE,new WrapperValue<>(pokemonDTO));
+        swapBankService.addQueueRequest(new ExchangeRequestInteraction(SwapFunctionAction.INIZIALIZE_SWAP,response,valuesMap));
+    }
+    public void concludeExchangeRequest(AsyncContext response, String exchangeId, PackageExchangeStatus packageExchangeStatus){
+        Map<ValueEnum, WrapperValue> valuesMap = new HashMap<>();
+        ExchangeRequestInteraction waiter = new ExchangeRequestInteraction(SwapFunctionAction.CONCLUDE_SWAP,response);
+        if(swapBankService.doDepositExist(exchangeId) && packageExchangeStatus != null && packageExchangeStatus.getStatus() != null){
+            valuesMap.put(ValueEnum.EXCHANGE_ID,new WrapperValue(exchangeId));
+            valuesMap.put(ValueEnum.PACKAGE_EXCHANGE_STATUS,new WrapperValue<>(packageExchangeStatus));
+            waiter.setValuesMap(valuesMap);
+            swapBankService.addQueueRequest(waiter);
+        }else{
+            waiter.sendData(null, HttpStatus.NOT_FOUND.value());
+        }
+    }
     @Scheduled(fixedDelay = 2000)
     private void checkDatabaseConnection() {
         try (Connection connection = dataSource.getConnection()) {
