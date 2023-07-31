@@ -269,8 +269,8 @@ public class PokemonService {
         });
         spoiledExchange.forEach(key -> {
             PokemonSwapDeposit deposit = swapBank.get(key);
-            if(randomPokemonStorage.size() < 6){
-                randomPokemonStorage.add(deposit.getPokemonToDelete());
+            if(swapablePokemonStorage.size() < 6){
+                swapablePokemonStorage.add(deposit.getPokemonToDelete());
             }
             swapBank.remove(key);
         });
