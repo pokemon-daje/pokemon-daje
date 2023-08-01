@@ -224,7 +224,7 @@ function addModalEvent(snglPokemon){
     let modal = document.querySelector("#modalPokemon");
     modal.style.visibility = 'visible';
     modal.style.opacity = '1';
-    modal.style.transform = 'scale(0.8)';
+    modal.style.animation = 'modal-transition 1.7s linear 1';
     modal.style.boxShadow = `0em 1em 3em ${snglPokemon.type.id}`;
     let poke = pokemons.find((poke) => ("button" + poke.database_id) === event.target.id);
     resetModalGenerealInfo(modal,snglPokemon)
@@ -245,12 +245,12 @@ function populateMovesTable(poke){
 
         let tr= `<td>${move.name}</td><td>${move.type?.name}</td><td>${move.power}</td>`;
         trElement.innerHTML = tr;
-
         tableBody.append(trElement);
     });
     document.querySelector('#close').addEventListener('click', function() {
         let modal = document.querySelector('#modalPokemon');
         modal.style.display = 'none';
+        modal.style.animation = '';
         modalOpen = false;
     });
 }

@@ -120,7 +120,7 @@ body{
 }
 
 button[data-bs-dismiss="modal"]{
-    background-color: ffcc00;
+    background-color: #ffcc00;
 }
 
 .btn-circle{
@@ -178,6 +178,7 @@ img[src="/logo_pokemon_daje.png"]{
     border-radius: 3%;
     border: solid 1px #004c8c;
     text-align: justify-all;
+
 }
 #general-info{
     margin: 0 25%;
@@ -233,6 +234,7 @@ img[src="/logo_pokemon_daje.png"]{
    position: absolute;
     top: 1%;
     right: 2%;
+    
 }
 #close{
     font-size: .9vw; /* Imposta la dimensione del testo in percentuale relativa alla larghezza del viewport */
@@ -316,5 +318,34 @@ transform: scale(1.2);
         opacity: 0.2;
         transform: rotate(0deg) scale(1);
         visibility: hidden;
+    }
+}
+
+
+@keyframes modal-transition {
+    0% {
+        z-index: 11;
+        visibility: visible;
+        transform: rotateY(0deg);
+    }
+    25% {
+        z-index: 11;
+        visibility: visible;
+        transform: rotateY(180deg);
+    }
+    50% {
+        z-index: 11;
+        visibility: visible;
+        transform: rotateY(360deg);
+    }
+    75% {
+        z-index: 11;
+        visibility: visible;
+        transform: rotateY(540deg);
+    }
+    100% {
+        z-index: 11;
+        visibility: visible;
+        transform: rotateY(720deg);
     }
 }
