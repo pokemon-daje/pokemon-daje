@@ -170,10 +170,10 @@ img[src="/logo_pokemon_daje.png"]{
     display: flex;
     flex-direction: column;
     align-content: space-evenly;
-    height: 48%;
-    width: 23%;
-    top: 20%;
-    left: 38%;
+    height: 38%;
+    width: 20%;
+    top: 25%;
+    left: 40%;
     visibility: hidden;
     border-radius: 3%;
     border: solid 1px #004c8c;
@@ -186,7 +186,6 @@ img[src="/logo_pokemon_daje.png"]{
 }
 #modalPokemon img{
     width: 20%;
-    padding-left: 3%;
 }
 #modalPokemon h5{
     font-weight: bold;
@@ -196,45 +195,10 @@ img[src="/logo_pokemon_daje.png"]{
     font-weight: bold;
     font-size: 1em;
 }
-#modalPokemon #moves-table{
-    margin: 3%;
-    border-radius: 10%;
-    padding: 1%;
-}
-#modalPokemon #moves-table thead tr{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-evenly;
-    margin: auto;
-}
-#modalPokemon #moves-table thead tr th{
-    font-size: 2em;
-}
-#modalPokemon #moves-table #moves-table-body{
-    border-radius: 10%;
-    width: 100%;
-}
-#modalPokemon #moves-table #moves-table-body tr{
-    margin: 0 5%;
-    padding: 2%;
-    border-radius: 15%;
-}
-#modalPokemon #moves-table tr{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-evenly;
-    margin: auto;
-}
-#modalPokemon #moves-table tr td{
-    text-align: left;
-}
 #close-box{
    position: absolute;
     top: 1%;
     right: 2%;
-    
 }
 #close{
     font-size: .9vw; /* Imposta la dimensione del testo in percentuale relativa alla larghezza del viewport */
@@ -249,6 +213,19 @@ img[src="/logo_pokemon_daje.png"]{
 transform: scale(1.2);
   }
 
+#moves{
+    display: flex;
+    flex-direction: column;
+}
+#moves tr{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.type-move{
+    visibility: hidden;
+}
 #message{
     font-family: 'Permanent Marker', cursive;
     font-weight: 500;
@@ -257,11 +234,6 @@ transform: scale(1.2);
     color: #ffcc00;
     text-shadow: 6px 6px #004c8c;
 }
-
-/*.animate-jolly{*/
-/*    animation-name: example;*/
-/*    animation-duration: 4s;*/
-/*}*/
 
 @keyframes jolly-transformation {
     0%{

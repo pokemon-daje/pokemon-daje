@@ -63,7 +63,7 @@ let backgroundImage = {
     16: '/background_grass',
     17: '/background_normal',
     18: '/background_water',
-    30000: '/background_uknown'
+    30000: '/background_unknown'
 };
 setInterval(()=>{
     let swap = pokemonSwaps.shift();
@@ -232,20 +232,25 @@ function addModalEvent(snglPokemon){
   });
 }
 function populateMovesTable(poke){
-    let table = document.getElementById("moves-table")
-    table.style.boxShadow = `inset 0em 1em 3em ${colorPaletteDarken[poke.type.id]}`
 
-    let tableBody = document.getElementById("moves-table-body");
-    tableBody.innerHTML = "";
+    let movesBody = document.getElementById("moves");
+        movesBody.style.boxShadow = `inset 0em 1em 3em ${colorPaletteDarken[poke.type.id]}`
+    movesBody.innerHTML = "";
     poke.moves.forEach(move => {
         let trElement =document.createElement("tr")
         trElement.style.backgroundColor = `${colorPalette[move.type.id]}`
         trElement.style.border = `${colorPaletteDarken[move.type.id]} 5px solid`
         trElement.style.boxShadow = `inset 0em 1em 3em ${colorPaletteDarken[poke.type.id]}`
 
-        let tr= `<td>${move.name}</td><td>${move.type?.name}</td><td>${move.power}</td>`;
+        let tr= `<div><span>${move.name}</span></div><div><span id="move${move.type.id}" class="type-move">${move.type.name}</span><img id="img${move.type.id}" src="${move.type.imageUrl}"></div><div><span>${move.power}</span></div>`;
         trElement.innerHTML = tr;
-        tableBody.append(trElement);
+        movesBody.append(trElement);
+        document.getElementById(`img${move.type.id}`).addEventListener("mouseover",()=>{
+            document.getElementById(`move${move.type.id}`).style.visibility = 'visible'
+        })
+        document.getElementById(`img${move.type.id}`).addEventListener("mouseout",()=>{
+            document.getElementById(`move${move.type.id}`).style.visibility = 'hidden'
+        })
     });
     document.querySelector('#close').addEventListener('click', function() {
         let modal = document.querySelector('#modalPokemon');

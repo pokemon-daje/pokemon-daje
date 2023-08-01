@@ -17,4 +17,4 @@ INSERT INTO type(pokedex_type_id, image_url, name) VALUES
                                                        (16, '/type_grass', 'grass'),
                                                        (17, '/type_normal', 'normal'),
                                                        (18, '/type_water', 'water'),
-                                                       (30000,'/type_unkwon','unknown');
+                                                       (30000,'/type_unknown','unknown');
