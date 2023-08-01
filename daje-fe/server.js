@@ -397,7 +397,7 @@ function differntResponse(path,res){
             res.write(typePsychic);
             res.end();
             break;
-        case "/type_Bug":
+        case "/type_bug":
             res.writeHead(200, {'Content-Type': 'image/png'})
             res.write(typeBug);
             res.end();
