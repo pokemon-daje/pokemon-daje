@@ -179,7 +179,6 @@ img[src="/logo_pokemon_daje.png"]{
     border: solid 1px #004c8c;
     text-align: justify-all;
     z-index: 20;
-
 }
 #general-info{
     margin: 0 25%;
@@ -242,6 +241,27 @@ table thead tr{
     margin: 30px 0 5px;
     color: #ffcc00;
     text-shadow: 6px 6px #004c8c;
+}
+
+#notify-swap-modal{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-content: space-evenly;
+    height: 35%;
+    width: 60%;
+    top: 25%;
+    left: 20%;
+    visibility: hidden;
+    border-radius: 3%;
+    border: solid 1px #004c8c;
+    text-align: justify-all;
+    z-index: 20;
+    background-color: wheat;
+}
+#notify-body{
+    display: flex;
+    justify-content: space-between;
 }
 
 @keyframes jolly-transformation {
@@ -327,5 +347,99 @@ table thead tr{
         z-index: 11;
         visibility: visible;
         transform: rotateY(720deg);
+    }
+}
+
+@keyframes error-swap {
+    0% {
+        background-color: #a40202;
+        color: white;
+        transform: translateX(0%);
+        transform: translateY(0%);
+    }
+    25% {
+        background-color: #a40202;
+        color: white;
+        transform: translateX(-5%);
+        transform: translateY(5%);
+    }
+    50% {
+        background-color: #a40202;
+        color: white;
+        transform: translateX(0%);
+        transform: translateY(0%);
+    }
+    75% {
+        background-color: #a40202;
+        color: white;
+        transform: translateX(5%);
+        transform: translateY(-5%);
+    }
+    100% {
+        background-color: #a40202;
+        color: white;
+        transform: translateX(0%);
+        transform: translateY(0%);
+    }
+}
+
+@keyframes forfait-swap {
+    0% {
+        background-color: #b24604;
+        color: white;
+        transform: translateX(0%);
+        transform: translateY(0%);
+    }
+    25% {
+        background-color: #b24604;
+        color: white;
+        transform: translateX(-5%);
+        transform: translateY(5%);
+    }
+    50% {
+        background-color: #b24604;
+        color: white;
+        transform: translateX(0%);
+        transform: translateY(0%);
+    }
+    75% {
+        background-color: #b24604;
+        color: white;
+        transform: translateX(5%);
+        transform: translateY(-5%);
+    }
+    100% {
+        background-color: #b24604;
+        color: white;
+        transform: translateX(0%);
+        transform: translateY(0%);
+    }
+}
+
+@keyframes success-swap {
+    0% {
+        background-color: #049630;
+        color: white;
+        transform: scale(1)
+    }
+    25% {
+        background-color: #04bb3d;
+        color: white;
+        transform: scale(1.5);
+    }
+    50% {
+        background-color: #049630;
+        color: white;
+        transform: scale(1);
+    }
+    75% {
+        background-color: #04bb3d;
+        color: white;
+        transform: scale(0.8);
+    }
+    100% {
+        background-color: #049630;
+        color: white;
+        transform: scale(1);
     }
 }

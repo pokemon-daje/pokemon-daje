@@ -1,7 +1,10 @@
 let pokemons = [];
 let modifiedPokemons = [];
 let pokemonSwapsConclude = [];
+let pokemonInitializedSwaps = [];
+let droppedSwaps = [];
 let modalOpen = false;
+let notifyTradeBeingShown = false;
 let colorPalette = {
     1: "rgba(188,230,230)",
     2: 'rgba(134,98,143,0.8)',
@@ -66,9 +69,47 @@ let backgroundImage = {
     30000: '/background_unknown'
 };
 setInterval(()=>{
-    let swap = pokemonSwapsConclude.shift();
-    if(swap !== null && swap !== undefined){
-        startUIUpdateDoToSwap(swap);
+    if(pokemonInitializedSwaps.length >= 1 && !notifyTradeBeingShown){
+        notifyTradeBeingShown = true;
+        let initializedSwap = pokemonInitializedSwaps.shift()
+        startSwapsNotifyModal(initializedSwap)
+        setTimeout(()=>{
+            let indexConcludedSwap = pokemonSwapsConclude.findIndex(swap => swap.exchange_id === initializedSwap.exchange_id);
+            let concludedSwap = null;
+            if( indexConcludedSwap > -1){
+                concludedSwap = pokemonSwapsConclude[indexConcludedSwap]
+                pokemonSwapsConclude = pokemonSwapsConclude.filter(swaps => swaps.exchange_id !== concludedSwap.exchange_id)
+            }
+            if(concludedSwap!= null
+                && concludedSwap != undefined
+                && concludedSwap.status_request_code === 200
+                && concludedSwap.status_response_code === 200){
+                startSwapsNotifyModal(concludedSwap)
+                document.getElementById("notify-swap-modal").style.animation = 'success-swap 2s linear 1'
+                setTimeout(()=>{
+                    document.getElementById("notify-swap-modal").style.visibility = 'hidden';
+                    document.getElementById("notify-swap-modal").style.animation = ''
+                    startUIUpdateDoToSwap(concludedSwap);
+                    notifyTradeBeingShown = false;
+                },2300)
+            }else if(concludedSwap == null || concludedSwap == undefined){
+                startSwapsNotifyModal({...initializedSwap,status_response_code:408})
+                document.getElementById("notify-swap-modal").style.animation = 'forfait-swap 2s linear 1'
+                setTimeout(()=>{
+                    document.getElementById("notify-swap-modal").style.visibility = 'hidden';
+                    document.getElementById("notify-swap-modal").style.animation = ''
+                    notifyTradeBeingShown = false;
+                },2300)
+            }else{
+                startSwapsNotifyModal({...initializedSwap,status_response_code:400})
+                document.getElementById("notify-swap-modal").style.animation = 'error-swap 2s linear 1'
+                setTimeout(()=>{
+                    document.getElementById("notify-swap-modal").style.visibility = 'hidden';
+                    document.getElementById("notify-swap-modal").style.animation = ''
+                    notifyTradeBeingShown = false;
+                },2300)
+            }
+        },10000)
     }
 },4000)
 
@@ -89,12 +130,8 @@ function manageSwap(swap){
                 newSwap(swap)
                 break;
             }
-            case 200: { // scambio andato a buon fine
-                nextPhaseSwap(swap)
-                break;
-            }
             default:{
-
+                nextPhaseSwap(swap)
             }
         }
     }
@@ -103,18 +140,16 @@ function manageSwap(swap){
 function newSwap(swap){
     switch (swap.status_response_code){
         case 200: {
+            pokemonInitializedSwaps.push(swap)
             break;
+        }default: {
+            droppedSwaps.push(swap);
         }
     }
 }
 
 function nextPhaseSwap(swap){
-    switch (swap.status_request_code){
-        case 200: {
-            completeSwap(swap);
-            break;
-        }
-    }
+    pokemonSwapsConclude.push(swap);
 }
 
 function completeSwap(swap){
@@ -123,7 +158,7 @@ function completeSwap(swap){
             if (swap.pokemon_receive != null
                 && swap.pokemon_sent != null
             ) {
-                pokemonSwapsConclude.push({exchange_id:swap.exchange_id,time:Date.now(),pokemon_receive:swap.pokemon_receive,pokemon_sent:swap.pokemon_sent});
+                pokemonSwapsConclude.push({...swap,time:Date.now()});
             }
         }
     }
@@ -340,7 +375,73 @@ function addModalButtonOpen(card,snglPokemon){
     card.appendChild(cardButton)
 }
 
+function startSwapsNotifyModal(swap){
+    let notifyModal = document.getElementById("notify-swap-modal")
+    notifyModal.style.visibility = "visible"
+    let header = document.getElementById("notify-head")
+    let action = getActionSwap(swap.status_request_code, swap.status_response_code)
+    header.innerHTML = action;
+    addPokemonsToNotifyModal(swap.pokemon_sent,swap.pokemon_receive)
+}
 
+function addPokemonsToNotifyModal(pokemonOnExit,pokemonOnReceive){
+    if(pokemonOnExit != null){
+        let divPokemonOnExit = document.getElementById("pokemon-on-exit")
+        divPokemonOnExit.innerHTML = "";
+        divPokemonOnExit.innerHTML = `<img src="${pokemonOnExit.sprite_url}">`
+        divPokemonOnExit.style.border = 'red 2px solid'
+        divPokemonOnExit.style.backgroundColor = `${colorPalette[pokemonOnExit.type.id]}`
+        divPokemonOnExit.style.borderRadius = '50%'
+        divPokemonOnExit.style.backgroundRepeat = 'no-repeat'
+    }
+    if(pokemonOnReceive != null){
+        let divPokemonOnReceive = document.getElementById("pokemon-on-receive")
+        divPokemonOnReceive.innerHTML = "";
+        divPokemonOnReceive.innerHTML = `<img src="${pokemonOnReceive.sprite_url}">`
+        divPokemonOnReceive.style.border = 'green 2px solid'
+        divPokemonOnReceive.style.backgroundColor = `${colorPalette[pokemonOnReceive.type.id]}`
+        divPokemonOnReceive.style.borderRadius = '50%'
+        divPokemonOnReceive.style.backgroundRepeat = 'no-repeat'
+    }
+}
+
+function getActionSwap(swapAction,swapresponse){
+    switch (swapAction){
+        case 0:{
+            return getResponseActionInizialized(swapresponse);
+        }
+        case 200:{
+            return getResponseActionConclude(swapresponse);
+        }
+        default:{
+            return getResponseActionConclude(swapresponse)
+        }
+    }
+}
+
+function getResponseActionInizialized(swapResponse){
+    switch (swapResponse){
+        case 200:{
+            return "SWAP HAS BEEN INITIALIZED"
+        }
+        case 408:{
+            return "SWAP FORFAIT"
+        }
+        default:{
+            return "SWAP FAILED"
+        }
+    }
+}
+function getResponseActionConclude(swapResponse){
+    switch (swapResponse){
+        case 200:{
+            return "SWAP HAS BEEN SUCCESSFULLY COMPLETED"
+        }
+        default:{
+            return "SWAP FAILED"
+        }
+    }
+}
 
 
 

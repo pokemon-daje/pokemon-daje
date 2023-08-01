@@ -272,15 +272,15 @@ public class PokemonService {
         spoiledExchangeCache.forEach(swapCacheLog::remove);
     }
 
-    @Scheduled(fixedDelay = 2000)
-    private void checkDatabaseConnection() {
-        try (Connection connection = dataSource.getConnection()) {
-            log.info("DATABASE CONNECTION WORKING");
-        } catch (Exception e) {
-            log.error("DATABASE CONNECTION NOT WORKING");
-            System.exit(1);
-        }
-    }
+//    @Scheduled(fixedDelay = 2000)
+//    private void checkDatabaseConnection() {
+//        try (Connection connection = dataSource.getConnection()) {
+//            log.info("DATABASE CONNECTION WORKING");
+//        } catch (Exception e) {
+//            log.error("DATABASE CONNECTION NOT WORKING");
+//            System.exit(1);
+//        }
+//    }
 
     public Map<SwapBankAction,PokemonFrontEndDTO> getPokemonsFromSwapCacheLog(String exchangeId){
         PokemonSwapDeposit deposit = swapCacheLog.get(exchangeId);
