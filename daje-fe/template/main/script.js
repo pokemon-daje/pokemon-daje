@@ -28,8 +28,6 @@ function gatherDataLoading(){
     }
 }
 function nextImg(integer){
-    console.log("prova")
-    console.log("vaffanculo cazzo!")
     if(wrapper == null){
         gatherData()
     }
@@ -47,6 +45,9 @@ function nextImg(integer){
     }else if(counter <= -1){
         counter = carouselChildrens.filter(child => child.id !== "JOLLY").length-1;
     }
+    let cardOfPokemon = carouselChildrens[counter];
+    let pokemonOfCard = modifiedPokemons.find(poke => poke.database_id == cardOfPokemon.id);
+    updateModalWhenMove(pokemonOfCard);
     for(cardPoke of carouselChildrens.filter(child => child.id !== "JOLLY")){
         animation(cardPoke);
     }
@@ -78,12 +79,20 @@ function openCurtains(){
 function moveCardWhenSwapHappens(cardPos){
     gatherData()
     counter = cardPos;
+    let cardOfPokemon = [...document.querySelectorAll(".carousel-container li:not(#JOLLY)")][cardPos];
+    let pokemonOfCard = modifiedPokemons.find(poke => poke.database_id == cardOfPokemon.id);
+    updateModalWhenMove(pokemonOfCard);
     for(cardPoke of carouselChildrens.filter(child => child.id !== "JOLLY")){
         animation(cardPoke);
     }
     animateJolly()
 }
-
+function updateModalWhenMove(pokemonToDisplay){
+    if(modalOpen){
+        resetModalGenerealInfo(document.getElementById("modalPokemon"),pokemonToDisplay)
+        populateMovesTable(pokemonToDisplay)
+    }
+}
 function animateJolly(){
     setTimeout(()=>{
         let jollyCard = document.getElementById("JOLLY")
