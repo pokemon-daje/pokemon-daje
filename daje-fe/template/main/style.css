@@ -331,22 +331,22 @@ table thead tr{
     25% {
         z-index: 11;
         visibility: visible;
-        transform: rotateY(180deg);
+        transform: rotateY(-90deg);
     }
     50% {
         z-index: 11;
         visibility: visible;
-        transform: rotateY(360deg);
+        transform: rotateY(-180deg);
     }
     75% {
         z-index: 11;
         visibility: visible;
-        transform: rotateY(540deg);
+        transform: rotateY(-90deg);
     }
     100% {
         z-index: 11;
         visibility: visible;
-        transform: rotateY(720deg);
+        transform: rotateY(0deg);
     }
 }
 

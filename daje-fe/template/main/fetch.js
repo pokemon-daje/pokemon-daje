@@ -110,7 +110,7 @@ setInterval(()=>{
                     notifyTradeBeingShown = false;
                 },2300)
             }
-        },10000)
+        },5000)
     }
 },4000)
 
@@ -264,7 +264,7 @@ function addModalEvent(snglPokemon){
     let modal = document.querySelector("#modalPokemon");
     modal.style.visibility = 'visible';
     modal.style.opacity = '1';
-    modal.style.animation = 'modal-transition 1.7s linear 1';
+    modal.style.animation = 'modal-transition 1s linear 1';
     modal.style.boxShadow = `0em 1em 3em ${snglPokemon.type.id}`;
     modalOpen = true;
     resetModalGenerealInfo(modal,snglPokemon)
@@ -406,13 +406,13 @@ function addPokemonsToNotifyModal(pokemonOnExit,pokemonOnReceive){
         let divPokemonOnExit = document.getElementById("pokemon-on-exit")
         divPokemonOnExit.innerHTML = "";
         divPokemonOnExit.innerHTML = `<img src="${pokemonOnExit.sprite_url}">`
-        divPokemonOnExit.style.animation = 'send-pokemon-swap 6.8s linear 2'
+        divPokemonOnExit.style.animation = 'send-pokemon-swap 3.4s linear 2'
     }
     if(pokemonOnReceive != null){
         let divPokemonOnReceive = document.getElementById("pokemon-on-receive")
         divPokemonOnReceive.innerHTML = "";
         divPokemonOnReceive.innerHTML = `<img src="${pokemonOnReceive.sprite_url}">`
-        divPokemonOnReceive.style.animation = 'receive-pokemon-swap 6.8s linear 2'
+        divPokemonOnReceive.style.animation = 'receive-pokemon-swap 3.4s linear 2'
     }
 }
 function resetNotifyModalAnimations(){
