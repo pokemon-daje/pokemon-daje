@@ -1,6 +1,6 @@
 let pokemons = [];
 let modifiedPokemons = [];
-let pokemonSwaps = [];
+let pokemonSwapsConclude = [];
 let modalOpen = false;
 let colorPalette = {
     1: "rgba(188,230,230)",
@@ -66,7 +66,7 @@ let backgroundImage = {
     30000: '/background_unknown'
 };
 setInterval(()=>{
-    let swap = pokemonSwaps.shift();
+    let swap = pokemonSwapsConclude.shift();
     if(swap !== null && swap !== undefined){
         startUIUpdateDoToSwap(swap);
     }
@@ -76,6 +76,7 @@ let uuid = crypto.randomUUID();
 var source = new EventSource("http://localhost:8080/api/pokemon/exchange/events/"+uuid);
 source.addEventListener("pokemon", (event) => {
     let swapEvent = JSON.parse(event.data);
+    console.log(swapEvent)
     manageSwap(swapEvent);
 });
 
@@ -91,6 +92,9 @@ function manageSwap(swap){
             case 200: { // scambio andato a buon fine
                 nextPhaseSwap(swap)
                 break;
+            }
+            default:{
+
             }
         }
     }
@@ -119,7 +123,7 @@ function completeSwap(swap){
             if (swap.pokemon_receive != null
                 && swap.pokemon_sent != null
             ) {
-                pokemonSwaps.push({exchange_id:swap.exchange_id,time:Date.now(),pokemon_receive:swap.pokemon_receive,pokemon_sent:swap.pokemon_sent});
+                pokemonSwapsConclude.push({exchange_id:swap.exchange_id,time:Date.now(),pokemon_receive:swap.pokemon_receive,pokemon_sent:swap.pokemon_sent});
             }
         }
     }
@@ -226,7 +230,7 @@ function addModalEvent(snglPokemon){
     modal.style.opacity = '1';
     modal.style.animation = 'modal-transition 1.7s linear 1';
     modal.style.boxShadow = `0em 1em 3em ${snglPokemon.type.id}`;
-    let poke = pokemons.find((poke) => ("button" + poke.database_id) === event.target.id);
+    modalOpen = true;
     resetModalGenerealInfo(modal,snglPokemon)
     populateMovesTable(snglPokemon)
   });
@@ -235,14 +239,14 @@ function populateMovesTable(poke){
 
     let movesBody = document.getElementById("moves");
         movesBody.style.boxShadow = `inset 0em 1em 3em ${colorPaletteDarken[poke.type.id]}`
-    movesBody.innerHTML = "";
+        movesBody.innerHTML = "";
     poke.moves.forEach(move => {
         let trElement =document.createElement("tr")
         trElement.style.backgroundColor = `${colorPalette[move.type.id]}`
-        trElement.style.border = `${colorPaletteDarken[move.type.id]} 5px solid`
+        trElement.style.margin = '2%'
         trElement.style.boxShadow = `inset 0em 1em 3em ${colorPaletteDarken[poke.type.id]}`
 
-        let tr= `<div><span>${move.name}</span></div><div><span id="move${move.type.id}" class="type-move">${move.type.name}</span><img id="img${move.type.id}" src="${move.type.imageUrl}"></div><div><span>${move.power}</span></div>`;
+        let tr= `<div><span>${move.name}</span><img id="img${move.type.id}" src="${move.type.imageUrl}"><span id="move${move.type.id}" class="type-move">${move.type.name}</span></div><div><span>${move.power}</span></div>`;
         trElement.innerHTML = tr;
         movesBody.append(trElement);
         document.getElementById(`img${move.type.id}`).addEventListener("mouseover",()=>{
@@ -254,7 +258,7 @@ function populateMovesTable(poke){
     });
     document.querySelector('#close').addEventListener('click', function() {
         let modal = document.querySelector('#modalPokemon');
-        modal.style.display = 'none';
+        modal.style.visibility = 'hidden';
         modal.style.animation = '';
         modalOpen = false;
     });
@@ -264,6 +268,11 @@ function resetModalGenerealInfo(modal,poke){
         +"<h5 id=\"max-hp\"></h5>\n"
         +"<p id=\"type\"></p>";
     setPaletteColorModal(modal,poke)
+    modal.style.backgroundImage = `url(${poke.sprite_url})`
+    modal.style.backgroundSize = '30%'
+    modal.style.backgroundRepeat = 'no-repeat'
+    modal.style.backgroundPositionY = '5%'
+    modal.style.backgroundPositionX = '90%'
 
     document.getElementById("current-hp").innerHTML = `<h5>CURRENT HP: ${poke.current_hp} </h5>`;
     document.getElementById("max-hp").innerHTML = `<h5>MAX HP: ${poke.max_hp}</h5>`;
@@ -294,7 +303,7 @@ function setPaletteColorModal(modal,poke){
     else{
         modal.style.color = 'black';
     }
-    modal.style.display = modalOpen ? 'none' : 'block';
+    modal.style.visible = modalOpen ? 'visible' : 'hidden';
 }
 function addImageToCard(card,snglPokemon){
     let imgContainer = document.createElement("div");
