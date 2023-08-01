@@ -16,7 +16,7 @@ ByTeam-Daje.
     - Css
     - Bootstrap
     - Js
-    - Node Js
+    - Node Js (used for educational purposes)
 - [Encountered issues](#Encountered-issues)
 - [Online References](#Online-references)
 
@@ -35,8 +35,6 @@ Pokemon Daje is a web application that:
 - After the exchange, it will show the received Pokemon along with its information.
 
 `--- immagini di funzionamento (screen)`
-
-
 
 ***
 
@@ -94,12 +92,13 @@ styling of Pokémon data along with their information and the layout of the whol
 ### _Bootstrap_:
 Bootstrap is a framework based on CSS and has been used to handle the layout of the web 
 page and make it responsive (adaptable to various devices).
+It was used only in the initial phase of the project and was then replaced by the css.
 
 ### _Js_:
 "_JavaScript_" is a programming language used to add dynamic content to web pages and for 
 making asynchronous AJAX calls to the backend.
 
-### _Node Js_:
+### _Node Js (used for educational purposes)_:
 A JavaScript framework that executes server-side code.
 It has been used to connect the frontend with the server, making it accessible to third 
 parties (external clients).
