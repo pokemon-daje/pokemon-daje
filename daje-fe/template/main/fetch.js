@@ -89,6 +89,9 @@ setInterval(()=>{
                 swapPokemonsNotifyPosition(concludedSwap.pokemon_sent,concludedSwap.pokemon_receive);
 
                 setTimeout(()=>{
+                    if(modalOpen){
+                        closeModalInfo();
+                    }
                     resetNotifyModalAnimations()
                     startUIUpdateDoToSwap(concludedSwap);
                     notifyTradeBeingShown = false;
@@ -293,11 +296,14 @@ function populateMovesTable(poke){
         })
     });
     document.querySelector('#close').addEventListener('click', function() {
-        let modal = document.querySelector('#modalPokemon');
-        modal.style.visibility = 'hidden';
-        modal.style.animation = '';
-        modalOpen = false;
+        closeModalInfo()
     });
+}
+function closeModalInfo(){
+    let modal = document.querySelector('#modalPokemon');
+    modal.style.visibility = 'hidden';
+    modal.style.animation = '';
+    modalOpen = false;
 }
 function resetModalGenerealInfo(modal,poke){
     document.getElementById("general-info").innerHTML ="<h5 id=\"current-hp\"></h5>\n"
