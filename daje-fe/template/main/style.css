@@ -170,7 +170,7 @@ img[src="/logo_pokemon_daje.png"]{
     display: flex;
     flex-direction: column;
     align-content: space-evenly;
-    height: 38%;
+    height: 35%;
     width: 20%;
     top: 25%;
     left: 40%;
@@ -178,14 +178,18 @@ img[src="/logo_pokemon_daje.png"]{
     border-radius: 3%;
     border: solid 1px #004c8c;
     text-align: justify-all;
+    z-index: 20;
 
 }
 #general-info{
     margin: 0 25%;
     text-align: left;
 }
-#modalPokemon img{
+#modalPokemon .body-modal #general-info #type p img{
     width: 20%;
+}
+#modalPokemon div img{
+    width: 15%;
 }
 #modalPokemon h5{
     font-weight: bold;
@@ -201,7 +205,7 @@ img[src="/logo_pokemon_daje.png"]{
     right: 2%;
 }
 #close{
-    font-size: .9vw; /* Imposta la dimensione del testo in percentuale relativa alla larghezza del viewport */
+    font-size: .9vw;
     border: #66ff66 solid  2px;
     text-align: center;
     cursor: pointer;
@@ -213,16 +217,21 @@ img[src="/logo_pokemon_daje.png"]{
 transform: scale(1.2);
   }
 
-#moves{
-    display: flex;
-    flex-direction: column;
-}
 #moves tr{
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+    text-align: left;
 }
 
+#moves tr div:nth-of-type(1){
+    display: flex;
+    justify-content: space-evenly;
+}
+table thead tr{
+    display: flex;
+    justify-content: space-between;
+}
 .type-move{
     visibility: hidden;
 }
@@ -289,7 +298,6 @@ transform: scale(1.2);
         visibility: visible;
         opacity: 0.2;
         transform: rotate(0deg) scale(1);
-        visibility: hidden;
     }
 }
 
