@@ -1,16 +1,20 @@
 package com.pokemon.daje.service;
 
-import com.pokemon.daje.controller.json.dto.*;
-import com.pokemon.daje.controller.json.marshaller.PokemonToExchangeMarshaller;
-import com.pokemon.daje.controller.json.marshaller.PokemonToFrontEndMarshaller;
+import com.pokemon.daje.model.functional.CheckValidityFunction;
+import com.pokemon.daje.util.marshaller.api_marshaller.PokemonToExchangeMarshaller;
+import com.pokemon.daje.util.marshaller.api_marshaller.PokemonToFrontEndMarshaller;
 import com.pokemon.daje.model.*;
+import com.pokemon.daje.model.api_dto.PackageExchange;
+import com.pokemon.daje.model.api_dto.PackageExchangeStatus;
+import com.pokemon.daje.model.api_dto.PokemonExchangeDTO;
+import com.pokemon.daje.model.api_dto.PokemonFrontEndDTO;
 import com.pokemon.daje.persistance.dao.MoveRepository;
 import com.pokemon.daje.persistance.dao.PokemonRepository;
 import com.pokemon.daje.persistance.dao.PokemonSpeciesRepository;
 import com.pokemon.daje.persistance.dto.MoveDTO;
 import com.pokemon.daje.persistance.dto.PokemonDTO;
 import com.pokemon.daje.persistance.dto.PokemonSpeciesDTO;
-import com.pokemon.daje.persistance.marshaller.PokemonMarshaller;
+import com.pokemon.daje.util.marshaller.persistance.PokemonMarshaller;
 import com.pokemon.daje.util.exception.PokemonServiceException;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +45,7 @@ public class PokemonService {
     private final DataSource dataSource;
     @Value("${pokemon.fallback.path}")
     private String pathPokemonFallBack;
+    private CheckValidityFunction validatePokemon;
 
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository,
@@ -91,7 +96,7 @@ public class PokemonService {
         return pokemonFrontEnd;
     }
 
-    public List<PokemonFrontEndDTO> getSixRandomPokemon(){
+    public List<PokemonFrontEndDTO> getPokemonInStorage(){
         checkPokemonsListSize();
         return swapablePokemonStorage.stream().map(pokemonDTO -> {
             int databaseId = pokemonDTO.getDbId();
@@ -108,8 +113,7 @@ public class PokemonService {
 
     public PackageExchange inizializeSwap(PokemonExchangeDTO pokemon) {
         PackageExchange exchangeSwapDTO = null;
-        if (pokemon != null) {
-            PokemonDTO pokemonToPersistDTO = validateAndGivePokemonToSave(pokemon);
+            PokemonDTO pokemonToPersistDTO = normalizeAndGivePokemonToSave(pokemon);
             PokemonDTO pokemonToGive = choosePokemonToSwap();
             Set<MoveDTO> pokemonToGiveMoves = moveRepository.findAllByPokemonId(pokemonToGive.getDbId());
             pokemonToGive.setMoveSet(pokemonToGiveMoves);
@@ -132,7 +136,6 @@ public class PokemonService {
                                 )
                         )
                 );
-            }
         }
         return exchangeSwapDTO;
     }
@@ -167,7 +170,8 @@ public class PokemonService {
     private void normalizeDTO(PokemonDTO pokemonToNormalize) {
         if(pokemonToNormalize != null){
             Set<MoveDTO> movesDTO = new HashSet<>();
-            Optional<PokemonSpeciesDTO> speciesDTO = pokemonSpeciesRepository.findByPokedexIdOrGetUnknow(pokemonToNormalize.getPokemonSpeciesDTO().getPokedexId());
+            Optional<PokemonSpeciesDTO> speciesDTO =
+                    pokemonSpeciesRepository.findByPokedexIdOrGetUnknow(pokemonToNormalize.getPokemonSpeciesDTO().getPokedexId());
             pokemonToNormalize.getMoveSet().forEach(move -> {
                 Optional<MoveDTO> moveDTO = moveRepository.findByPokedexIdOrGetUnknow(move.getPokedexId());
                 moveDTO.ifPresent(movesDTO::add);
@@ -177,31 +181,11 @@ public class PokemonService {
         }
     }
 
-    private ProgressingProcessCode validatePokemonSwapDTO(PokemonExchangeDTO pokemonExchangeDTO){
-        if(pokemonExchangeDTO.getId() != null
-                && pokemonExchangeDTO.getType() != null
-                && pokemonExchangeDTO.getMoves() != null
-                && !pokemonExchangeDTO.getMoves().isEmpty()
-                && pokemonExchangeDTO.getMoves().stream().noneMatch(Objects::isNull)){
-            Optional<PokemonSpeciesDTO> pokemonSpeciesDTO = pokemonSpeciesRepository.findByPokedexIdOrGetUnknow(pokemonExchangeDTO.getId());
-            Set<MoveDTO> moves = new HashSet<>();
-            pokemonExchangeDTO.getMoves().forEach(move -> {
-                Optional<MoveDTO> moveDTO= moveRepository.findByPokedexIdOrGetUnknow(move);
-                moveDTO.ifPresent(moves::add);
-            });
-            return pokemonSpeciesDTO.isPresent() && !moves.isEmpty()? ProgressingProcessCode.POKEMON_REQUEST_SUCCESS : ProgressingProcessCode.POKEMON_BAD_REQUEST;
-
-        }
-        return ProgressingProcessCode.POKEMON_BAD_REQUEST;
-    }
-
-    private PokemonDTO validateAndGivePokemonToSave(PokemonExchangeDTO pokemonExchangeDTO) {
+    private PokemonDTO normalizeAndGivePokemonToSave(PokemonExchangeDTO pokemonExchangeDTO) {
         PokemonDTO pokemonToPersistDTO = null;
-        if (pokemonExchangeDTO != null && !ProgressingProcessCode.POKEMON_BAD_REQUEST.equals(validatePokemonSwapDTO(pokemonExchangeDTO))) {
             Pokemon pokemonBusiness = pokemonToExchangeMarshaller.fromDTO(pokemonExchangeDTO);
             pokemonToPersistDTO = pokemonMarshaller.toDTO(pokemonBusiness);
             normalizeDTO(pokemonToPersistDTO);
-        }
         return pokemonToPersistDTO;
     }
 
