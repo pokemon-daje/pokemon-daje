@@ -148,7 +148,9 @@ public class PokemonService {
             PokemonDTO pokemonToDelete = exchange != null ? exchange.getPokemonToDelete() : null;
             try{
                 code = progressWithSwap(pokemonToSave, pokemonToDelete);
+                swapBank.remove(exchangeid);
             }catch (PokemonServiceException exception){
+                swapBank.remove(exchangeid);
                 log.info("ERROR TRYING TO ASSOCIATE VARIABLE CODE TO RETURN VALUE OF PROGRESSWITHSWAP METHOD");
             }
         }else if((!swapBank.containsKey(exchangeid))){
