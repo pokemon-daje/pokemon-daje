@@ -1,4 +1,4 @@
-package com.pokemon.daje.controller.json.dto;
+package com.pokemon.daje.model.api_dto;
 
 import lombok.Getter;
 import lombok.Setter;

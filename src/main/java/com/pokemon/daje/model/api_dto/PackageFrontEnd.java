@@ -1,7 +1,6 @@
-package com.pokemon.daje.controller.json.dto;
+package com.pokemon.daje.model.api_dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pokemon.daje.persistance.dto.PokemonDTO;
 import lombok.Getter;
 import lombok.Setter;
 
