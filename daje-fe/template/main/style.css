@@ -425,7 +425,7 @@ table thead tr{
     25% {
         background-color: #04bb3d;
         color: white;
-        transform: scale(1.5);
+        transform: scale(1);
     }
     50% {
         background-color: #049630;
@@ -435,7 +435,7 @@ table thead tr{
     75% {
         background-color: #04bb3d;
         color: white;
-        transform: scale(0.8);
+        transform: scale(1);
     }
     100% {
         background-color: #049630;
@@ -443,3 +443,178 @@ table thead tr{
         transform: scale(1);
     }
 }
+
+@keyframes receive-pokemon-swap {
+    0% {
+        opacity: 1;
+        background-color: #04bb3d;
+        border: gold 2px solid;
+        border-radius: 50%;
+        transform: translateX(0%);
+    }
+    25% {
+        opacity: 0.8;
+        background-color: #07fc51;
+        border: #ffd929 4px dashed;
+        border-radius: 35%;
+        transform: translateX(-75%);
+    }
+    50% {
+        opacity: 1;
+        background-color: #04bb3d;
+        border: gold 2px solid;
+        border-radius: 50%;
+        transform: translateX(-150%);
+    }
+    75% {
+        opacity: 0.8;
+        background-color: #07fc51;
+        border: #ffd929 4px dashed;
+        border-radius: 35%;
+        transform: translateX(-75%);
+    }
+    100% {
+        opacity: 1;
+        background-color: #04bb3d;
+        border: gold 2px solid;
+        border-radius: 50%;
+        transform: translateX(0%);
+    }
+}
+@keyframes receive-pokemon-swap-complete {
+    0% {
+        opacity: 1;
+        background-color: #04bb3d;
+        border: gold 2px solid;
+        border-radius: 50%;
+        transform: translateX(-150%);
+    }
+    25% {
+        opacity: 0.8;
+        background-color: #07fc51;
+        border: #ffd929 4px dashed;
+        border-radius: 35%;
+        transform: translateX(-180%);
+    }
+    50% {
+        opacity: 1;
+        background-color: #04bb3d;
+        border: gold 2px solid;
+        border-radius: 50%;
+        transform: translateX(-210%);
+    }
+    75% {
+        opacity: 0.8;
+        background-color: #07fc51;
+        border: #ffd929 4px dashed;
+        border-radius: 35%;
+        transform: translateX(-240%);
+    }
+    100% {
+        opacity: 1;
+        background-color: #04bb3d;
+        border: gold 2px solid;
+        border-radius: 50%;
+        transform: translateX(-270%);
+    }
+}
+
+@keyframes send-pokemon-swap {
+    0% {
+        opacity: 1;
+        background-color: #a10101;
+        border: darkblue 2px solid;
+        border-radius: 50%;
+        transform: translateX(0%);
+    }
+    25% {
+        opacity: 0.8;
+        background-color: #e50505;
+        border: #0a0ae8 4px dashed;
+        border-radius: 35%;
+        transform: translateX(75%);
+    }
+    50% {
+        opacity: 1;
+        background-color: #a10101;
+        border: darkblue 2px solid;
+        border-radius: 50%;
+        transform: translateX(150%);
+    }
+    75% {
+        opacity: 0.8;
+        background-color: #e50505;
+        border: #0a0ae8 4px dashed;
+        border-radius: 35%;
+        transform: translateX(75%);
+    }
+    100% {
+        opacity: 1;
+        background-color: #a10101;
+        border: darkblue 2px solid;
+        border-radius: 50%;
+        transform: translateX(0%);
+    }
+}
+
+@keyframes send-pokemon-swap-complete {
+    0% {
+        opacity: 1;
+        background-color: #a10101;
+        border: darkblue 2px solid;
+        border-radius: 50%;
+        transform: translateX(150%);
+    }
+    25% {
+        opacity: 0.8;
+        background-color: #e50505;
+        border: #0a0ae8 4px dashed;
+        border-radius: 35%;
+        transform: translateX(180%);
+    }
+    50% {
+        opacity: 1;
+        background-color: #a10101;
+        border: darkblue 2px solid;
+        border-radius: 50%;
+        transform: translateX(210%);
+    }
+    75% {
+        opacity: 0.8;
+        background-color: #e50505;
+        border: #0a0ae8 4px dashed;
+        border-radius: 35%;
+        transform: translateX(240%);
+    }
+    100% {
+        opacity: 1;
+        background-color: #a10101;
+        border: darkblue 2px solid;
+        border-radius: 50%;
+        transform: translateX(270%);
+    }
+}
+
+@keyframes send-in-progess {
+    0% {
+        background-color: #7c7a7a;
+        border: darkgray 2px solid;
+    }
+    25% {
+        background-color: darkgray;
+        border: #7c7a7a 4px dashed;
+    }
+    50% {
+        background-color: #7c7a7a;
+        border: darkgray 2px solid;
+    }
+    75% {
+        background-color: darkgray;
+        border: #7c7a7a 4px dashed;
+    }
+    100% {
+        background-color: #7c7a7a;
+        border: darkgray 2px solid;
+    }
+}
+

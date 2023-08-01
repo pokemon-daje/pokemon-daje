@@ -150,8 +150,10 @@ public class PokemonController {
                         .name("pokemon");
                 emitter.send(event);
                 serverEmitters.put(eventId, emitter);
-                emitter.onTimeout(() -> serverEmitters.remove(eventId));
-
+                emitter.onTimeout(() -> {
+                    emitter.complete();
+                    serverEmitters.remove(eventId);
+                });
             } catch (Exception ex) {
                 emitter.completeWithError(ex);
             }

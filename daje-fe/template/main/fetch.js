@@ -86,26 +86,27 @@ setInterval(()=>{
                 && concludedSwap.status_response_code === 200){
                 startSwapsNotifyModal(concludedSwap)
                 document.getElementById("notify-swap-modal").style.animation = 'success-swap 2s linear 1'
+                swapPokemonsNotifyPosition(concludedSwap.pokemon_sent,concludedSwap.pokemon_receive);
+
                 setTimeout(()=>{
-                    document.getElementById("notify-swap-modal").style.visibility = 'hidden';
-                    document.getElementById("notify-swap-modal").style.animation = ''
+                    resetNotifyModalAnimations()
                     startUIUpdateDoToSwap(concludedSwap);
                     notifyTradeBeingShown = false;
                 },2300)
             }else if(concludedSwap == null || concludedSwap == undefined){
                 startSwapsNotifyModal({...initializedSwap,status_response_code:408})
                 document.getElementById("notify-swap-modal").style.animation = 'forfait-swap 2s linear 1'
+
                 setTimeout(()=>{
-                    document.getElementById("notify-swap-modal").style.visibility = 'hidden';
-                    document.getElementById("notify-swap-modal").style.animation = ''
+                    resetNotifyModalAnimations()
                     notifyTradeBeingShown = false;
                 },2300)
             }else{
                 startSwapsNotifyModal({...initializedSwap,status_response_code:400})
                 document.getElementById("notify-swap-modal").style.animation = 'error-swap 2s linear 1'
+
                 setTimeout(()=>{
-                    document.getElementById("notify-swap-modal").style.visibility = 'hidden';
-                    document.getElementById("notify-swap-modal").style.animation = ''
+                    resetNotifyModalAnimations()
                     notifyTradeBeingShown = false;
                 },2300)
             }
@@ -378,10 +379,26 @@ function addModalButtonOpen(card,snglPokemon){
 function startSwapsNotifyModal(swap){
     let notifyModal = document.getElementById("notify-swap-modal")
     notifyModal.style.visibility = "visible"
+    notifyModal.style.animation = "send-in-progess 2s linear 5"
     let header = document.getElementById("notify-head")
     let action = getActionSwap(swap.status_request_code, swap.status_response_code)
     header.innerHTML = action;
     addPokemonsToNotifyModal(swap.pokemon_sent,swap.pokemon_receive)
+}
+
+function swapPokemonsNotifyPosition(pokemonOnExit,pokemonOnReceive){
+    if(pokemonOnExit != null){
+        let divPokemonOnExit = document.getElementById("pokemon-on-exit")
+        divPokemonOnExit.innerHTML = "";
+        divPokemonOnExit.innerHTML = `<img src="${pokemonOnExit.sprite_url}">`
+        divPokemonOnExit.style.animation = 'send-pokemon-swap-complete 2s linear 1'
+    }
+    if(pokemonOnReceive != null){
+        let divPokemonOnReceive = document.getElementById("pokemon-on-receive")
+        divPokemonOnReceive.innerHTML = "";
+        divPokemonOnReceive.innerHTML = `<img src="${pokemonOnReceive.sprite_url}">`
+        divPokemonOnReceive.style.animation = 'receive-pokemon-swap-complete 2s linear 1'
+    }
 }
 
 function addPokemonsToNotifyModal(pokemonOnExit,pokemonOnReceive){
@@ -389,20 +406,25 @@ function addPokemonsToNotifyModal(pokemonOnExit,pokemonOnReceive){
         let divPokemonOnExit = document.getElementById("pokemon-on-exit")
         divPokemonOnExit.innerHTML = "";
         divPokemonOnExit.innerHTML = `<img src="${pokemonOnExit.sprite_url}">`
-        divPokemonOnExit.style.border = 'red 2px solid'
-        divPokemonOnExit.style.backgroundColor = `${colorPalette[pokemonOnExit.type.id]}`
-        divPokemonOnExit.style.borderRadius = '50%'
-        divPokemonOnExit.style.backgroundRepeat = 'no-repeat'
+        divPokemonOnExit.style.animation = 'send-pokemon-swap 6.8s linear 2'
     }
     if(pokemonOnReceive != null){
         let divPokemonOnReceive = document.getElementById("pokemon-on-receive")
         divPokemonOnReceive.innerHTML = "";
         divPokemonOnReceive.innerHTML = `<img src="${pokemonOnReceive.sprite_url}">`
-        divPokemonOnReceive.style.border = 'green 2px solid'
-        divPokemonOnReceive.style.backgroundColor = `${colorPalette[pokemonOnReceive.type.id]}`
-        divPokemonOnReceive.style.borderRadius = '50%'
-        divPokemonOnReceive.style.backgroundRepeat = 'no-repeat'
+        divPokemonOnReceive.style.animation = 'receive-pokemon-swap 6.8s linear 2'
     }
+}
+function resetNotifyModalAnimations(){
+    document.getElementById("notify-swap-modal").style.visibility = 'hidden';
+    document.getElementById("notify-swap-modal").style.animation = ''
+    resetPokemonsNotifyDivAnimation()
+}
+function resetPokemonsNotifyDivAnimation(){
+    let divPokemonOnExit = document.getElementById("pokemon-on-exit")
+    let divPokemonOnReceive = document.getElementById("pokemon-on-receive")
+    divPokemonOnExit.style.animation = '';
+    divPokemonOnReceive.style.animation = '';
 }
 
 function getActionSwap(swapAction,swapresponse){
