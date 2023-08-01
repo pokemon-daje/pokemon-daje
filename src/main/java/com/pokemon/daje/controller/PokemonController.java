@@ -1,9 +1,10 @@
 package com.pokemon.daje.controller;
 
-import com.pokemon.daje.controller.json.dto.*;
 import com.pokemon.daje.model.Pokemon;
 import com.pokemon.daje.model.ProgressingProcessCode;
 import com.pokemon.daje.model.SwapBankAction;
+import com.pokemon.daje.model.api_dto.*;
+import com.pokemon.daje.model.functional.CheckValidityFunction;
 import com.pokemon.daje.service.PokemonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,17 +25,33 @@ public class PokemonController {
     final PokemonService pokemonService;
     private Map<String, SseEmitter> serverEmitters;
     ExecutorService sseMvcExecutor;
+    CheckValidityFunction isSwapPokemonValid;
 
     @Autowired
     public PokemonController(PokemonService pokemonService) {
         this.pokemonService = pokemonService;
         serverEmitters = new HashMap<>();
         sseMvcExecutor = Executors.newSingleThreadExecutor();
+        isSwapPokemonValid = pokemon -> (
+                pokemon != null
+                        && pokemon.getId() != null
+                        && pokemon.getType() != null
+                        && pokemon.getMoves() != null
+                        && !pokemon.getMoves().isEmpty()
+                        && pokemon.getMoves().stream().noneMatch(Objects::isNull)
+                        && pokemon.getMaxHP() > 0
+                        && pokemon.getCurrentHP() >= 0
+                        && pokemon.getCurrentHP() <= pokemon.getMaxHP()
+                        && !ObjectUtils.isEmpty(pokemon.getName())
+                        && !ObjectUtils.isEmpty(pokemon.getOriginalTrainer())
+        )
+                ? ProgressingProcessCode.POKEMON_REQUEST_SUCCESS
+                : ProgressingProcessCode.POKEMON_BAD_REQUEST;
     }
 
     @GetMapping("/pokemon")
     public ResponseEntity<List<PokemonFrontEndDTO>> getSixRandom() {
-        List<PokemonFrontEndDTO> pokemonDTOList = pokemonService.getSixRandomPokemon();
+        List<PokemonFrontEndDTO> pokemonDTOList = pokemonService.getPokemonInStorage();
         if(!pokemonDTOList.isEmpty()){
             return new ResponseEntity<>(pokemonDTOList,HttpStatus.OK);
         }
@@ -58,17 +75,26 @@ public class PokemonController {
     }
 
     @PostMapping("/pokemon/exchange")
-    public ResponseEntity<PackageExchange> swap(@RequestBody PokemonExchangeDTO pokemon) {
-        PackageExchange pack = pokemonService.inizializeSwap(pokemon);
-        ResponseEntity<PackageExchange> toSend = new ResponseEntity<>(pack,HttpStatus.OK);
-        if(pack == null){
-            sentDataToFrontEnd("exchange error",ProgressingProcessCode.POKEMON_BAD_REQUEST.getCode()
-                    ,ProgressingProcessCode.POKEMON_EXCHANGE_REQUEST_OPEN.getCode());
-            toSend = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<PackageExchange> initializeSwap(@RequestBody PokemonExchangeDTO pokemon) {
+        ProgressingProcessCode checkCode = isSwapPokemonValid.checkValidity(pokemon);
+        PackageExchange pack = null;
+        ResponseEntity<PackageExchange> toSend = new ResponseEntity<>(pack,HttpStatus.BAD_REQUEST);
+        String msgId = "exchange error";
+        int responseCode = 0;
+        if(!ProgressingProcessCode.POKEMON_BAD_REQUEST.equals(checkCode)){
+            pack = pokemonService.inizializeSwap(pokemon);
+            msgId = pack.getId();
+            if(pack != null){
+                sentDataToFrontEnd(pack.getId(),ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode()
+                        ,ProgressingProcessCode.POKEMON_EXCHANGE_REQUEST_OPEN.getCode());
+                toSend = new ResponseEntity<>(pack,HttpStatus.OK);
+            }else{
+                responseCode = HttpStatus.INTERNAL_SERVER_ERROR.value();
+            }
         }else{
-            sentDataToFrontEnd(pack.getId(),ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode()
-                    ,ProgressingProcessCode.POKEMON_EXCHANGE_REQUEST_OPEN.getCode());
+            responseCode = HttpStatus.BAD_REQUEST.value();
         }
+        sentDataToFrontEnd(msgId,responseCode,ProgressingProcessCode.POKEMON_EXCHANGE_REQUEST_OPEN.getCode());
         return toSend;
     }
     @GetMapping("/pokemon/exchange")
@@ -85,7 +111,7 @@ public class PokemonController {
     }
 
     @PostMapping("/pokemon/exchange/{exchangeId}/status")
-    public ResponseEntity<HttpStatus> statusSwap(@PathVariable("exchangeId") String exchangeId, @RequestBody PackageExchangeStatus packageExchangeStatus){
+    public ResponseEntity<HttpStatus> concludeSwap(@PathVariable("exchangeId") String exchangeId, @RequestBody PackageExchangeStatus packageExchangeStatus){
         ProgressingProcessCode code;
         if(!ObjectUtils.isEmpty(exchangeId) && packageExchangeStatus != null
                 && !ProgressingProcessCode.POKEMON_REQUEST_UNKWON.equals(ProgressingProcessCode.fromNumber(packageExchangeStatus.getStatus()))
@@ -94,6 +120,7 @@ public class PokemonController {
             sentDataToFrontEnd(exchangeId,code.getCode(), packageExchangeStatus.getStatus());
         } else {
             code = ProgressingProcessCode.POKEMON_BAD_REQUEST;
+            sentDataToFrontEnd(exchangeId,code.getCode(), packageExchangeStatus.getStatus());
         }
 
         switch (code){
@@ -123,8 +150,10 @@ public class PokemonController {
                         .name("pokemon");
                 emitter.send(event);
                 serverEmitters.put(eventId, emitter);
-                emitter.onTimeout(() -> serverEmitters.remove(eventId));
-
+                emitter.onTimeout(() -> {
+                    emitter.complete();
+                    serverEmitters.remove(eventId);
+                });
             } catch (Exception ex) {
                 emitter.completeWithError(ex);
             }

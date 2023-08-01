@@ -1,26 +1,29 @@
 let pokemons = [];
 let modifiedPokemons = [];
-let pokemonSwaps = [];
+let pokemonSwapsConclude = [];
+let pokemonInitializedSwaps = [];
+let droppedSwaps = [];
 let modalOpen = false;
+let notifyTradeBeingShown = false;
 let colorPalette = {
     1: "rgba(188,230,230)",
     2: 'rgba(134,98,143,0.8)',
     3: 'rgb(255, 228, 225)',
-    4: 'rgb(255, 100, 0)',
+    4: 'rgb(166, 16, 34)',
     5: 'rgb(255, 203, 5)',
     6: 'rgb(176,119,68)',
     7: 'rgb(192, 192, 192)',
-    8: 'rgb(255, 0, 0)',
+    8: 'rgb(203, 50, 52)',
     9: 'rgb(139, 115, 85)',
-    10: 'rgb(138, 43, 226)',
+    10: 'rgb(134, 115, 161)',
     11: 'rgb(75,73,73)',
-    12: 'rgb(255, 100, 0)',
+    12: 'rgb(236, 124, 38)',
     13: 'rgb(165,185,67)',
     14: 'rgb(232,125,204)',
     15: 'rgb(255, 192, 203)',
     16: 'rgb(100, 180, 100)',
     17: 'rgb(239, 235, 222)',
-    18: 'rgb(0, 191, 255)',
+    18: 'rgb(109, 177, 216)',
     30000: 'rgb(96,70,70)'
 };
 let colorPaletteDarken = {
@@ -45,30 +48,72 @@ let colorPaletteDarken = {
     30000: 'rgb(65,47,47)'
 };
 let backgroundImage = {
-    1: "https://vignette3.wikia.nocookie.net/legendarymob/images/c/ca/Ice_cave.jpg/revision/latest?cb=20160924215941",
-    2: 'https://media.pokemoncentral.it/wiki/c/c0/Lavandonia_PO.png',
-    3: 'https://img.freepik.com/free-vector/pastel-sky-background_23-2148900230.jpg?w=740&t=st=1690533400~exp=1690534000~hmac=ffcf5dfed6b1518be146d3a5ad2ea6da45074834dc1071416c0223998dfa4aa8',
-    4: 'https://i.pinimg.com/564x/ec/c4/09/ecc4094b6774d8ec8614b9d328d2e3da.jpg',
-    5: 'https://img.freepik.com/free-vector/flat-design-yellow-comics-wallpaper_23-2148801759.jpg?w=740&t=st=1690533524~exp=1690534124~hmac=19f81ad5796273f73304e17f7dc94e235f386d5941365f8b78770e20f79c6c34',
-    6: 'https://i.pinimg.com/564x/b6/57/e9/b657e987391a50599b0ebb90d8dd63a9.jpg',
-    7: 'https://i.pinimg.com/564x/ef/c7/45/efc745a9ddb6d81e77652d9667668c3e.jpg',
-    8: 'https://cutewallpaper.org/21/anime-gym-background/Anime-Gymnasium-Background-Related-Keywords-Suggestions-.png',
-    9: 'https://pbs.twimg.com/tweet_video_thumb/FSqD_jZXsAANef0.jpg',
-    10: 'https://www.gameovercancer.ca/backgrounds/Poison.png',
-    11: 'https://cdn.discordapp.com/attachments/1130423419368915076/1134411282821414972/bb4819ec39296e0b75b01ab6d2a1f110.png',
-    12: 'https://cutewallpaper.org/21x/pe8g5cl1q/Best-29-Fire-Background-1080P-on-HipWallpaper-Terrifying-.jpg',
-    13: 'https://cdn.openart.ai/stable_diffusion/c9947e97e2cb45211d19295a058c73b6136d33ce_2000x2000.webp',
-    14: 'https://media.pokemoncentral.it/wiki/thumb/1/19/Laboratorio_Cadente_MDDX.png/1200px-Laboratorio_Cadente_MDDX.png',
-    15: 'https://img.freepik.com/free-photo/sunset-sky-mountain-orange-yellow-blue-generative-ai_188544-9180.jpg?w=740&t=st=1690534228~exp=1690534828~hmac=070458ba391e1e619dfb1988a0a66e60a746b5b8e5620ced69f3ab623c160d2f',
-    16: 'https://wallpapercave.com/wp/wp10311654.png',
-    17: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5bbf58a6-1e85-4cfe-83fd-02df6f482b45/de8nlib-6bed7b3d-3d7e-4763-bb60-18f5ee0127fd.png/v1/fill/w_1024,h_652,q_80,strp/background_prairie_pokemon_screencapture_by_nemotrex_de8nlib-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NjUyIiwicGF0aCI6IlwvZlwvNWJiZjU4YTYtMWU4NS00Y2ZlLTgzZmQtMDJkZjZmNDgyYjQ1XC9kZThubGliLTZiZWQ3YjNkLTNkN2UtNDc2My1iYjYwLTE4ZjVlZTAxMjdmZC5wbmciLCJ3aWR0aCI6Ijw9MTAyNCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.ZVgNGi61AOkC068E-wphWmAUW8amj0MiJySqDcMCVh8',
-    18: 'https://wallpapercave.com/wp/wp2690555.jpg',
-    30000: 'https://wallpapers.com/images/featured/void-background-5sm9tokk2youui90.jpg'
+    1: "/background_ice",
+    2: '/background_ghost',
+    3: '/background_fairy',
+    4: '/background_dragon',
+    5: '/background_electric',
+    6: '/background_rock',
+    7: '/background_steel',
+    8: '/background_fighting',
+    9: '/background_ground',
+    10: '/background_poison',
+    11: '/background_dark',
+    12: '/background_fire',
+    13: '/background_bug',
+    14: '/background_psychic',
+    15: '/background_flying',
+    16: '/background_grass',
+    17: '/background_normal',
+    18: '/background_water',
+    30000: '/background_unknown'
 };
 setInterval(()=>{
-    let swap = pokemonSwaps.shift();
-    if(swap !== null && swap !== undefined){
-        startUIUpdateDoToSwap(swap);
+    if(pokemonInitializedSwaps.length >= 1 && !notifyTradeBeingShown){
+        notifyTradeBeingShown = true;
+        let initializedSwap = pokemonInitializedSwaps.shift()
+        startSwapsNotifyModal(initializedSwap)
+        setTimeout(()=>{
+            let indexConcludedSwap = pokemonSwapsConclude.findIndex(swap => swap.exchange_id === initializedSwap.exchange_id);
+            let concludedSwap = null;
+            if( indexConcludedSwap > -1){
+                concludedSwap = pokemonSwapsConclude[indexConcludedSwap]
+                pokemonSwapsConclude = pokemonSwapsConclude.filter(swaps => swaps.exchange_id !== concludedSwap.exchange_id)
+            }
+            if(concludedSwap!= null
+                && concludedSwap != undefined
+                && concludedSwap.status_request_code === 200
+                && concludedSwap.status_response_code === 200){
+                startSwapsNotifyModal(concludedSwap)
+                document.getElementById("notify-swap-modal").style.animation = 'success-swap 2s linear 1'
+                swapPokemonsNotifyPosition(concludedSwap.pokemon_sent,concludedSwap.pokemon_receive);
+
+                setTimeout(()=>{
+                    if(modalOpen){
+                        closeModalInfo();
+                    }
+                    resetNotifyModalAnimations()
+                    startUIUpdateDoToSwap(concludedSwap);
+                    notifyTradeBeingShown = false;
+                },2300)
+            }else if(concludedSwap == null || concludedSwap == undefined){
+                startSwapsNotifyModal({...initializedSwap,status_response_code:408})
+                document.getElementById("notify-swap-modal").style.animation = 'forfait-swap 2s linear 1'
+
+                setTimeout(()=>{
+                    resetNotifyModalAnimations()
+                    notifyTradeBeingShown = false;
+                },2300)
+            }else{
+                startSwapsNotifyModal({...initializedSwap,status_response_code:400})
+                document.getElementById("notify-swap-modal").style.animation = 'error-swap 2s linear 1'
+
+                setTimeout(()=>{
+                    resetNotifyModalAnimations()
+                    notifyTradeBeingShown = false;
+                },2300)
+            }
+        },5000)
     }
 },4000)
 
@@ -76,6 +121,7 @@ let uuid = crypto.randomUUID();
 var source = new EventSource("http://localhost:8080/api/pokemon/exchange/events/"+uuid);
 source.addEventListener("pokemon", (event) => {
     let swapEvent = JSON.parse(event.data);
+    console.log(swapEvent)
     manageSwap(swapEvent);
 });
 
@@ -84,13 +130,12 @@ function manageSwap(swap){
         && pokemons.length > 0
         && modifiedPokemons.length > 0){
         switch (swap.status_request_code){
-            case 0: {
+            case 0: { // inizio scambio
                 newSwap(swap)
                 break;
             }
-            case 200: {
+            default:{
                 nextPhaseSwap(swap)
-                break;
             }
         }
     }
@@ -99,18 +144,16 @@ function manageSwap(swap){
 function newSwap(swap){
     switch (swap.status_response_code){
         case 200: {
+            pokemonInitializedSwaps.push(swap)
             break;
+        }default: {
+            droppedSwaps.push(swap);
         }
     }
 }
 
 function nextPhaseSwap(swap){
-    switch (swap.status_request_code){
-        case 200: {
-            completeSwap(swap);
-            break;
-        }
-    }
+    pokemonSwapsConclude.push(swap);
 }
 
 function completeSwap(swap){
@@ -119,7 +162,7 @@ function completeSwap(swap){
             if (swap.pokemon_receive != null
                 && swap.pokemon_sent != null
             ) {
-                pokemonSwaps.push({exchange_id:swap.exchange_id,time:Date.now(),pokemon_receive:swap.pokemon_receive,pokemon_sent:swap.pokemon_sent});
+                pokemonSwapsConclude.push({...swap,time:Date.now()});
             }
         }
     }
@@ -224,41 +267,54 @@ function addModalEvent(snglPokemon){
     let modal = document.querySelector("#modalPokemon");
     modal.style.visibility = 'visible';
     modal.style.opacity = '1';
-    modal.style.transform = 'scale(0.8)';
+    modal.style.animation = 'modal-transition 1s linear 1';
     modal.style.boxShadow = `0em 1em 3em ${snglPokemon.type.id}`;
-    let poke = pokemons.find((poke) => ("button" + poke.database_id) === event.target.id);
+    modalOpen = true;
     resetModalGenerealInfo(modal,snglPokemon)
     populateMovesTable(snglPokemon)
   });
 }
 function populateMovesTable(poke){
-    let table = document.getElementById("moves-table")
-    table.style.boxShadow = `inset 0em 1em 3em ${colorPaletteDarken[poke.type.id]}`
 
-    let tableBody = document.getElementById("moves-table-body");
-    tableBody.innerHTML = "";
+    let movesBody = document.getElementById("moves");
+        movesBody.style.boxShadow = `inset 0em 1em 3em ${colorPaletteDarken[poke.type.id]}`
+        movesBody.innerHTML = "";
     poke.moves.forEach(move => {
         let trElement =document.createElement("tr")
         trElement.style.backgroundColor = `${colorPalette[move.type.id]}`
-        trElement.style.border = `${colorPaletteDarken[move.type.id]} 5px solid`
+        trElement.style.margin = '2%'
         trElement.style.boxShadow = `inset 0em 1em 3em ${colorPaletteDarken[poke.type.id]}`
 
-        let tr= `<td>${move.name}</td><td>${move.type?.name}</td><td>${move.power}</td>`;
+        let tr= `<div><span>${move.name}</span><img id="img${move.type.id}" src="${move.type.imageUrl}"><span id="move${move.type.id}" class="type-move">${move.type.name}</span></div><div><span>${move.power}</span></div>`;
         trElement.innerHTML = tr;
-
-        tableBody.append(trElement);
+        movesBody.append(trElement);
+        document.getElementById(`img${move.type.id}`).addEventListener("mouseover",()=>{
+            document.getElementById(`move${move.type.id}`).style.visibility = 'visible'
+        })
+        document.getElementById(`img${move.type.id}`).addEventListener("mouseout",()=>{
+            document.getElementById(`move${move.type.id}`).style.visibility = 'hidden'
+        })
     });
     document.querySelector('#close').addEventListener('click', function() {
-        let modal = document.querySelector('#modalPokemon');
-        modal.style.display = 'none';
-        modalOpen = false;
+        closeModalInfo()
     });
+}
+function closeModalInfo(){
+    let modal = document.querySelector('#modalPokemon');
+    modal.style.visibility = 'hidden';
+    modal.style.animation = '';
+    modalOpen = false;
 }
 function resetModalGenerealInfo(modal,poke){
     document.getElementById("general-info").innerHTML ="<h5 id=\"current-hp\"></h5>\n"
         +"<h5 id=\"max-hp\"></h5>\n"
         +"<p id=\"type\"></p>";
     setPaletteColorModal(modal,poke)
+    modal.style.backgroundImage = `url(${poke.sprite_url})`
+    modal.style.backgroundSize = '30%'
+    modal.style.backgroundRepeat = 'no-repeat'
+    modal.style.backgroundPositionY = '5%'
+    modal.style.backgroundPositionX = '90%'
 
     document.getElementById("current-hp").innerHTML = `<h5>CURRENT HP: ${poke.current_hp} </h5>`;
     document.getElementById("max-hp").innerHTML = `<h5>MAX HP: ${poke.max_hp}</h5>`;
@@ -289,7 +345,7 @@ function setPaletteColorModal(modal,poke){
     else{
         modal.style.color = 'black';
     }
-    modal.style.display = modalOpen ? 'none' : 'block';
+    modal.style.visible = modalOpen ? 'visible' : 'hidden';
 }
 function addImageToCard(card,snglPokemon){
     let imgContainer = document.createElement("div");
@@ -326,7 +382,94 @@ function addModalButtonOpen(card,snglPokemon){
     card.appendChild(cardButton)
 }
 
+function startSwapsNotifyModal(swap){
+    let notifyModal = document.getElementById("notify-swap-modal")
+    notifyModal.style.visibility = "visible"
+    notifyModal.style.animation = "send-in-progess 2s linear 5"
+    let header = document.getElementById("notify-head")
+    let action = getActionSwap(swap.status_request_code, swap.status_response_code)
+    header.innerHTML = action;
+    addPokemonsToNotifyModal(swap.pokemon_sent,swap.pokemon_receive)
+}
 
+function swapPokemonsNotifyPosition(pokemonOnExit,pokemonOnReceive){
+    if(pokemonOnExit != null){
+        let divPokemonOnExit = document.getElementById("pokemon-on-exit")
+        divPokemonOnExit.innerHTML = "";
+        divPokemonOnExit.innerHTML = `<img src="${pokemonOnExit.sprite_url}">`
+        divPokemonOnExit.style.animation = 'send-pokemon-swap-complete 2s linear 1'
+    }
+    if(pokemonOnReceive != null){
+        let divPokemonOnReceive = document.getElementById("pokemon-on-receive")
+        divPokemonOnReceive.innerHTML = "";
+        divPokemonOnReceive.innerHTML = `<img src="${pokemonOnReceive.sprite_url}">`
+        divPokemonOnReceive.style.animation = 'receive-pokemon-swap-complete 2s linear 1'
+    }
+}
+
+function addPokemonsToNotifyModal(pokemonOnExit,pokemonOnReceive){
+    if(pokemonOnExit != null){
+        let divPokemonOnExit = document.getElementById("pokemon-on-exit")
+        divPokemonOnExit.innerHTML = "";
+        divPokemonOnExit.innerHTML = `<img src="${pokemonOnExit.sprite_url}">`
+        divPokemonOnExit.style.animation = 'send-pokemon-swap 3.4s linear 2'
+    }
+    if(pokemonOnReceive != null){
+        let divPokemonOnReceive = document.getElementById("pokemon-on-receive")
+        divPokemonOnReceive.innerHTML = "";
+        divPokemonOnReceive.innerHTML = `<img src="${pokemonOnReceive.sprite_url}">`
+        divPokemonOnReceive.style.animation = 'receive-pokemon-swap 3.4s linear 2'
+    }
+}
+function resetNotifyModalAnimations(){
+    document.getElementById("notify-swap-modal").style.visibility = 'hidden';
+    document.getElementById("notify-swap-modal").style.animation = ''
+    resetPokemonsNotifyDivAnimation()
+}
+function resetPokemonsNotifyDivAnimation(){
+    let divPokemonOnExit = document.getElementById("pokemon-on-exit")
+    let divPokemonOnReceive = document.getElementById("pokemon-on-receive")
+    divPokemonOnExit.style.animation = '';
+    divPokemonOnReceive.style.animation = '';
+}
+
+function getActionSwap(swapAction,swapresponse){
+    switch (swapAction){
+        case 0:{
+            return getResponseActionInizialized(swapresponse);
+        }
+        case 200:{
+            return getResponseActionConclude(swapresponse);
+        }
+        default:{
+            return getResponseActionConclude(swapresponse)
+        }
+    }
+}
+
+function getResponseActionInizialized(swapResponse){
+    switch (swapResponse){
+        case 200:{
+            return "SWAP HAS BEEN INITIALIZED"
+        }
+        case 408:{
+            return "SWAP FORFAIT"
+        }
+        default:{
+            return "SWAP FAILED"
+        }
+    }
+}
+function getResponseActionConclude(swapResponse){
+    switch (swapResponse){
+        case 200:{
+            return "SWAP HAS BEEN SUCCESSFULLY COMPLETED"
+        }
+        default:{
+            return "SWAP FAILED"
+        }
+    }
+}
 
 
 

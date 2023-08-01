@@ -23,30 +23,40 @@
     <div class="content-to-change">Page</div>
         <div id="modalPokemon">
             <div class="body-modal">
-                <div id="close-box"><div id ="close"> X </div></div>
+                <div id="close-box"><div id ="close"> ESC </div></div>
                 <div id="general-info">
                     <h5 id="current-hp"></h5>
                     <h5 id="max-hp"></h5>
                     <p id="type"></p>
                 </div>
-                <table id="moves-table">
-                    <thead id="moves-table-head">
-                    <tr>
-                        <th></th>
-                        <th>MOVES</th>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <th>name</th>
-                        <th>type</th>
-                        <th>power</th>
-                    <tr></tr>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+
+                            </th>
+                            <th>
+                                Power
+                            </th>
+                        </tr>
                     </thead>
-                    <tbody id="moves-table-body">
-                    </tbody>
                 </table>
-                <h5 id="moves-name"></h5>
-                <h5 id="moves-power"></h5>
+                <div id="moves">
+                </div>
+            </div>
+        </div>
+        <div id="notify-swap-modal">
+            <div id="notify-head"></div>
+            <div id="notify-body">
+                <div id="pokemon-on-exit">
+
+                </div>
+                <div id="pokemon-on-receive">
+
+                </div>
             </div>
         </div>
     <script src="/routes.js"></script>
