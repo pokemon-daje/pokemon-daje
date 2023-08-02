@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const urlRoutes = {
         "/": {
-            template: "../template/main/pokemonscarillion.html"
+            template: "/pokemons_carillion"
         }
     }
     const urlRoute = (event) => {
