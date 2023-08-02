@@ -80,7 +80,6 @@ After carefully reading the requirements and having reasoned together, this type
 below, the diagram of its structure:
 
 ![](image/E-R_Scheme.png)
-    
  
 - ## <a name="FrontEnd">Frontend</a>
 ### _Html_:
