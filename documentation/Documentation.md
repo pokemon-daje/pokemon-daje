@@ -34,8 +34,12 @@ Pokemon Daje is a web application that:
 - Initially displays six random Pokémon from the stored collection, each with their respective characteristics.
 - After the exchange, it will show the received Pokemon along with its information.
 
-`--- immagini di funzionamento (screen)`
-
+![pokedex.png](image%2Fpokedex.png)
+Pokedex demonstration
+![card.png](image%2Fcard.png)
+Pokémon's card 
+![modale.png](image%2Fmodale.png)
+Modal demonstration that having Pokémon information
 ***
 
 ## <a name="Software-Technologies">Software technologies</a>
