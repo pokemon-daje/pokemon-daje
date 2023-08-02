@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.pokemon</groupId>
 	<artifactId>daje</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>snapshot</version>
 	<name>daje</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
