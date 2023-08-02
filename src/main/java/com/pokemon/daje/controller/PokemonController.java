@@ -39,6 +39,7 @@ public class PokemonController {
                         && pokemon.getMoves() != null
                         && !pokemon.getMoves().isEmpty()
                         && pokemon.getMoves().stream().noneMatch(Objects::isNull)
+                        && pokemon.getMoves().size() <= 4
                         && pokemon.getMaxHP() > 0
                         && pokemon.getCurrentHP() >= 0
                         && pokemon.getCurrentHP() <= pokemon.getMaxHP()
