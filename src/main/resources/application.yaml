@@ -20,5 +20,6 @@ spring:
       continue-on-error: false
 
 pokemon:
-  fallback:
-    path: src/main/resources/fallbackpokemon.json
+  daje:
+    external-base-path: ../src/main/resources/
+    external-properties: properties-back-end.json
