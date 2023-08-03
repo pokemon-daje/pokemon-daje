@@ -60,7 +60,7 @@ public class PokemonService {
         this.swapBank = new HashMap<>();
         this.swapCacheLog = new HashMap<>();
         this.properties = properties;
-        loadProperties();
+        properties.loadPaths();
     }
 
     public PokemonFrontEndDTO getById(int pokemonId) {
@@ -286,14 +286,4 @@ public class PokemonService {
         }
         return mapDeposit;
     }
-
-    private void loadProperties(){
-        try{
-            this.properties.loadPaths();
-        }catch (IOException ex){
-            log.error("ERROR WHILE LOADING PROPERTIES");
-        }
-    }
-
-
 }
