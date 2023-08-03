@@ -1,0 +1,6 @@
+FROM openjdk:17-oracle
+WORKDIR ./src
+
+COPY /daje-snapshot.jar .
+
+CMD java -jar daje-snapshot.jar

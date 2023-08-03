@@ -10,10 +10,46 @@ services:
       MYSQL_PASSWORD: daje
     ports:
       - 3306:3306
+    networks:
+      - db_back_end
     volumes:
       - ./scripts/schema.sql:/docker-entrypoint-initdb.d/1.sql
       - ./scripts/insertTypes.sql:/docker-entrypoint-initdb.d/2.sql
       - ./scripts/insertPokemonSpecies.sql:/docker-entrypoint-initdb.d/3.sql
       - ./scripts/insertPokemonMoves.sql:/docker-entrypoint-initdb.d/4.sql
     command: mysqld --sql_mode="" --character-set-server=utf8 --collation-server=utf8_slovenian_ci --init-connect='SET NAMES UTF8;' --innodb-flush-log-at-trx-commit=0
+  fron_tend:
+    container_name: daje_front_end
+    build:
+      context: ./daje-fe
+      dockerfile: Dockerfile-front-end
+    ports:
+      - 8081:8081
+    networks:
+      - front_back
+  back_end:
+    container_name: daje_back_end
+    build:
+      context: ./target
+      dockerfile: Dockerfile-back-end
+    ports:
+      - 8080:8080
+    volumes:
+      - ./target/properties-back-end:/src/main/resources
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - db_back_end
+      - front_back
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/daje
+      SPRING_DATASOURCE_USERNAME: daje
+      SPRING_DATASOURCE_PASSWORD: daje
+    restart: on-failure
 
+networks:
+  db_back_end:
+    name: db_back_end
+  front_back:
+    name: front_back
