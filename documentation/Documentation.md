@@ -17,11 +17,11 @@ ByTeam-Daje.
     - Bootstrap
     - Js
     - Node Js (used for educational purposes)
+- [How to setup our application]([How-setup-our-application])
 - [Encountered issues](#Encountered-issues)
 - [Online References](#Online-references)
 
 ***
-
 ## <a name="Introduction">Introduction</a>
 
 ### Requirements:
@@ -106,7 +106,12 @@ A JavaScript framework that executes server-side code.
 It has been used to connect the frontend with the server, making it accessible to third 
 parties (external clients).
 ***
+## <a name="How-setup-our-application">How to setup our application</a>
+Through a zipped pack containing a docker-compose setup it is only needed to unzip pack and 
+run the command: 
 
+**`"docker-compose up"`**
+***
 - ## <a name="encountered-issues">Encountered issues</a>
 
 ### _Initial clone from git_:  
