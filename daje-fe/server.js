@@ -145,7 +145,15 @@ let documentsInfoData ={
         "format":"image/png"
     },
     "/type_grass":{
-        "path":"./template/main/images/type/type_flying.png",
+        "path":"./template/main/images/type/type_grass.png",
+        "format":"image/png"
+    },
+    "/type_water":{
+        "path":"./template/main/images/type/type_water.png",
+        "format":"image/png"
+    },
+    "/type_normal":{
+        "path":"./template/main/images/type/type_normal.png",
         "format":"image/png"
     },
     "/background_image":{
