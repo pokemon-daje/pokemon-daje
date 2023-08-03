@@ -5,6 +5,8 @@ let pokemonInitializedSwaps = [];
 let droppedSwaps = [];
 let modalOpen = false;
 let notifyTradeBeingShown = false;
+let properties = "";
+var source = ""
 let colorPalette = {
     1: "rgba(188,230,230)",
     2: 'rgba(134,98,143,0.8)',
@@ -68,6 +70,19 @@ let backgroundImage = {
     18: '/background_water',
     30000: '/background_unknown'
 };
+fetch("/property-front-end").then(data => {
+    data.json().then(res=>{
+        properties = res
+        source = new EventSource(`${properties.base_url_back_end}/api/pokemon/exchange/events/${uuid}`);
+        source.addEventListener("pokemon", (event) => {
+            let swapEvent = JSON.parse(event.data);
+            console.log(swapEvent)
+            manageSwap(swapEvent);
+        });
+    },rej=>{
+        console.log("error fetch")
+    })
+})
 setInterval(()=>{
     if(pokemonInitializedSwaps.length >= 1 && !notifyTradeBeingShown){
         notifyTradeBeingShown = true;
@@ -118,12 +133,7 @@ setInterval(()=>{
 },4000)
 
 let uuid = crypto.randomUUID();
-var source = new EventSource("http://localhost:8080/api/pokemon/exchange/events/"+uuid);
-source.addEventListener("pokemon", (event) => {
-    let swapEvent = JSON.parse(event.data);
-    console.log(swapEvent)
-    manageSwap(swapEvent);
-});
+
 
 function manageSwap(swap){
     if(swap != null
@@ -208,35 +218,35 @@ function animateOnSwap(swap,cardPokemon,pokePos){
     moveCardWhenSwapHappens(modifiedPokemons[pokePos].pos)
 }
 
-var getPokemons = () => fetch("http://localhost:8080/api/pokemon").then((data) => {
-  if (data.ok) {
-    data.json().then((response) => {
-      let carouselContainer = document.querySelector(".carousel-container");
-      [...carouselContainer.children].forEach(child => {
-          let classValue= child.getAttribute("class");
-          if(classValue != "curtain-carousel-right"
-          && classValue != "curtain-carousel-left"
-          && child.id !== 'JOLLY'){
-              carouselContainer.removeChild(child);
-          }
-      })
-        modifiedPokemon = [];
-        pokemons = response;
-        let psIndex = 0;
-        for (let snglPokemon of response) {
-            if(snglPokemon != null){
-                modifiedPokemons.push({...snglPokemon,pos:psIndex,originalPos:0});
-                psIndex++;
+var getPokemons = () => fetch(`${properties.base_url_back_end}/api/pokemon`).then((data) => {
+    if (data.ok) {
+        data.json().then((response) => {
+            let carouselContainer = document.querySelector(".carousel-container");
+            [...carouselContainer.children].forEach(child => {
+                let classValue= child.getAttribute("class");
+                if(classValue != "curtain-carousel-right"
+                    && classValue != "curtain-carousel-left"
+                    && child.id !== 'JOLLY'){
+                    carouselContainer.removeChild(child);
+                }
+            })
+            modifiedPokemon = [];
+            pokemons = response;
+            let psIndex = 0;
+            for (let snglPokemon of response) {
+                if(snglPokemon != null){
+                    modifiedPokemons.push({...snglPokemon,pos:psIndex,originalPos:0});
+                    psIndex++;
 
-                let card = document.createElement("li");
-                createCardStructure(carouselContainer,card,snglPokemon);
+                    let card = document.createElement("li");
+                    createCardStructure(carouselContainer,card,snglPokemon);
+                }
             }
-        }
-        setTimeout(()=>{
-             gatherDataLoading();
-        },100)
-      });
-  }
+            setTimeout(()=>{
+                gatherDataLoading();
+            },100)
+        });
+    }
 });
 
 function createCardStructure(carouselContainer,card,snglPokemon){
@@ -262,23 +272,23 @@ function updateCardStructure(card,snglPokemon){
     addModalEvent(snglPokemon);
 }
 function addModalEvent(snglPokemon){
-  let idButton = `#button${snglPokemon.database_id}`;
-  document.querySelector(idButton).addEventListener('click', function (event) {
-    let modal = document.querySelector("#modalPokemon");
-    modal.style.visibility = 'visible';
-    modal.style.opacity = '1';
-    modal.style.animation = 'modal-transition 1s linear 1';
-    modal.style.boxShadow = `0em 1em 3em ${snglPokemon.type.id}`;
-    modalOpen = true;
-    resetModalGenerealInfo(modal,snglPokemon)
-    populateMovesTable(snglPokemon)
-  });
+    let idButton = `#button${snglPokemon.database_id}`;
+    document.querySelector(idButton).addEventListener('click', function (event) {
+        let modal = document.querySelector("#modalPokemon");
+        modal.style.visibility = 'visible';
+        modal.style.opacity = '1';
+        modal.style.animation = 'modal-transition 1s linear 1';
+        modal.style.boxShadow = `0em 1em 3em ${snglPokemon.type.id}`;
+        modalOpen = true;
+        resetModalGenerealInfo(modal,snglPokemon)
+        populateMovesTable(snglPokemon)
+    });
 }
 function populateMovesTable(poke){
 
     let movesBody = document.getElementById("moves");
-        movesBody.style.boxShadow = `inset 0em 1em 3em ${colorPaletteDarken[poke.type.id]}`
-        movesBody.innerHTML = "";
+    movesBody.style.boxShadow = `inset 0em 1em 3em ${colorPaletteDarken[poke.type.id]}`
+    movesBody.innerHTML = "";
     poke.moves.forEach(move => {
         let trElement =document.createElement("tr")
         trElement.style.backgroundColor = `${colorPalette[move.type.id]}`
