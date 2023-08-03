@@ -1,6 +1,6 @@
 package com.pokemon.daje.service;
 
-import com.pokemon.daje.model.functional.CheckValidityFunction;
+import com.pokemon.daje.util.Properties;
 import com.pokemon.daje.util.marshaller.api_marshaller.PokemonToExchangeMarshaller;
 import com.pokemon.daje.util.marshaller.api_marshaller.PokemonToFrontEndMarshaller;
 import com.pokemon.daje.model.*;
@@ -19,14 +19,11 @@ import com.pokemon.daje.util.exception.PokemonServiceException;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
 import java.io.File;
-import java.sql.Connection;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -42,10 +39,7 @@ public class PokemonService {
     private final List<PokemonDTO> swapablePokemonStorage;
     private final Map<String, PokemonSwapDeposit> swapBank;
     private final Map<String, PokemonSwapDeposit> swapCacheLog;
-    private final DataSource dataSource;
-    @Value("${pokemon.fallback.path}")
-    private String pathPokemonFallBack;
-    private CheckValidityFunction validatePokemon;
+    private Properties properties;
 
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository,
@@ -53,7 +47,8 @@ public class PokemonService {
                           PokemonToFrontEndMarshaller pokemonToFrontEndMarshaller,
                           PokemonToExchangeMarshaller pokemonToExchangeMarshaller,
                           MoveRepository moveRepository,
-                          PokemonSpeciesRepository pokemonSpeciesRepository) {
+                          PokemonSpeciesRepository pokemonSpeciesRepository,
+                          Properties properties) {
 
         this.pokemonRepository = pokemonRepository;
         this.pokemonMarshaller = pokemonMarshaller;
@@ -63,13 +58,9 @@ public class PokemonService {
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
         this.swapablePokemonStorage = new ArrayList<>(pokemonRepository.getSixRandomPokemon());
         this.swapBank = new HashMap<>();
-        this.dataSource = DataSourceBuilder.create()
-                .driverClassName("com.mysql.cj.jdbc.Driver")
-                .url("jdbc:mysql://localhost:3306/daje")
-                .username("daje")
-                .password("daje")
-                .build();
         this.swapCacheLog = new HashMap<>();
+        this.properties = properties;
+        loadProperties();
     }
 
     public PokemonFrontEndDTO getById(int pokemonId) {
@@ -237,7 +228,7 @@ public class PokemonService {
     private PokemonDTO loadPokemonFromProperty() throws PokemonServiceException {
         PokemonDTO pokemonDTO;
         try {
-            pokemonDTO = ObjectMapperFactory.buildStrictGenericObjectMapper().readValue(new File(pathPokemonFallBack), PokemonDTO.class);
+            pokemonDTO = ObjectMapperFactory.buildStrictGenericObjectMapper().readValue(new File(properties.PATH_TO_FALLBACK_POKEMON), PokemonDTO.class);
             normalizeDTO(pokemonDTO);
             pokemonDTO = pokemonRepository.save(pokemonDTO);
         } catch (Exception e) {
@@ -274,16 +265,6 @@ public class PokemonService {
         spoiledExchangeCache.forEach(swapCacheLog::remove);
     }
 
-//    @Scheduled(fixedDelay = 2000)
-//    private void checkDatabaseConnection() {
-//        try (Connection connection = dataSource.getConnection()) {
-//            log.info("DATABASE CONNECTION WORKING");
-//        } catch (Exception e) {
-//            log.error("DATABASE CONNECTION NOT WORKING");
-//            System.exit(1);
-//        }
-//    }
-
     public Map<SwapBankAction,PokemonFrontEndDTO> getPokemonsFromSwapCacheLog(String exchangeId){
         PokemonSwapDeposit deposit = swapCacheLog.get(exchangeId);
         PokemonFrontEndDTO toSave;
@@ -304,6 +285,14 @@ public class PokemonService {
             mapDeposit.put(SwapBankAction.TODELETE,toDelete);
         }
         return mapDeposit;
+    }
+
+    private void loadProperties(){
+        try{
+            this.properties.loadPaths();
+        }catch (IOException ex){
+            log.error("ERROR WHILE LOADING PROPERTIES");
+        }
     }
 
 
