@@ -18,8 +18,3 @@ spring:
   sql:
     init:
       continue-on-error: false
-
-pokemon:
-  daje:
-    external-base-path: ../src/main/resources/
-    external-properties: properties-back-end.json

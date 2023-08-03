@@ -1,13 +1,12 @@
 package com.pokemon.daje.util;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,16 +17,15 @@ import java.util.List;
 @Setter
 @Slf4j
 public class Properties {
-    @JsonIgnore
-    @Value("${pokemon.daje.external-properties}")
-    private static String PATH_TO_PROPERTIES;
-    @JsonIgnore
-    @Value("${pokemon.daje.external-base-path}")
-    private static String EXTERNAL_BASE_PATH;
+    private static final String PATH_TO_PROPERTIES = "properties-back-end.json";
+    private static final String EXTERNAL_BASE_PATH = "../src/main/resources/";
 
     public String PATH_TO_FALLBACK_POKEMON;
+    @Autowired
+    public Properties(){
+    }
 
-    public void loadPaths() throws IOException {
+    public void loadPaths(){
         InputStream stream = null;
         Properties properties;
         try{
@@ -52,10 +50,13 @@ public class Properties {
             }
         }catch (Exception e){
             log.error("FAILED TO SET FIELDS");
-        }finally {
+        }
+        try {
             if(stream != null){
                 stream.close();
             }
+        }catch (IOException e){
+            log.error("FAILED TO CLOSE INPUTSTREAM");
         }
         log.info("THE PROPERTY RESULT FALLBACK POKEMON FOR LOADING PROPERTIES CHECK IS {}",PATH_TO_FALLBACK_POKEMON);
     }
