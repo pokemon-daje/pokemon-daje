@@ -1,1 +1,2 @@
 # Pokemon-Daje-Team-Daje
+[Documentation]([](https://github.com/pokemon-daje/pokemon-daje/blob/main/documentation/Documentation.md)https://github.com/pokemon-daje/pokemon-daje/blob/main/documentation/Documentation.md)
