@@ -37,8 +37,7 @@ services:
     volumes:
       - ./target/properties-back-end:/src/main/resources
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql
     networks:
       - db_back_end
       - front_back
