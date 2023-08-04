@@ -23,7 +23,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -37,8 +36,8 @@ public class PokemonService {
     private final MoveRepository moveRepository;
     private final PokemonSpeciesRepository pokemonSpeciesRepository;
     private final List<PokemonDTO> swapablePokemonStorage;
-    private final Map<String, PokemonSwapDeposit> swapBank;
-    private final Map<String, PokemonSwapDeposit> swapCacheLog;
+    private final Map<String, PokemonSwap> swapLog;
+    private final Map<String, PokemonSwap> swapCacheLog;
     private Properties properties;
 
     @Autowired
@@ -57,7 +56,7 @@ public class PokemonService {
         this.moveRepository = moveRepository;
         this.pokemonSpeciesRepository = pokemonSpeciesRepository;
         this.swapablePokemonStorage = new ArrayList<>(pokemonRepository.getSixRandomPokemon());
-        this.swapBank = new HashMap<>();
+        this.swapLog = new HashMap<>();
         this.swapCacheLog = new HashMap<>();
         this.properties = properties;
         properties.loadPaths();
@@ -112,15 +111,15 @@ public class PokemonService {
                 String idSwap = UUID.randomUUID().toString();
                 exchangeSwapDTO = new PackageExchange(idSwap, mapPokemonToGiveForSwap(pokemonToGive));
                 swapCacheLog.put(idSwap,
-                        new PokemonSwapDeposit(
+                        new PokemonSwap(
                                 Map.of(
                                         SwapBankAction.TOSAVE, pokemonToPersistDTO,
                                         SwapBankAction.TODELETE, pokemonToGive
                                 )
                         )
                 );
-                swapBank.put(idSwap,
-                        new PokemonSwapDeposit(
+                swapLog.put(idSwap,
+                        new PokemonSwap(
                                 Map.of(
                                         SwapBankAction.TOSAVE, pokemonToPersistDTO,
                                         SwapBankAction.TODELETE, pokemonToGive
@@ -133,21 +132,21 @@ public class PokemonService {
 
     public ProgressingProcessCode concludeSwap(String exchangeid, PackageExchangeStatus packageExchangeStatus) {
         ProgressingProcessCode code = ProgressingProcessCode.POKEMON_REQUEST_DOWN_SERVER_ERROR;
-        if (packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode() && swapBank.containsKey(exchangeid)) {
-            PokemonSwapDeposit exchange = swapBank.get(exchangeid);
+        if (packageExchangeStatus.getStatus() == ProgressingProcessCode.POKEMON_REQUEST_SUCCESS.getCode() && swapLog.containsKey(exchangeid)) {
+            PokemonSwap exchange = swapLog.get(exchangeid);
             PokemonDTO pokemonToSave = exchange != null ? exchange.getPokemonToSave() : null;
             PokemonDTO pokemonToDelete = exchange != null ? exchange.getPokemonToDelete() : null;
             try{
                 code = progressWithSwap(pokemonToSave, pokemonToDelete);
-                swapBank.remove(exchangeid);
+                swapLog.remove(exchangeid);
             }catch (PokemonServiceException exception){
-                swapBank.remove(exchangeid);
+                swapLog.remove(exchangeid);
                 log.info("ERROR TRYING TO ASSOCIATE VARIABLE CODE TO RETURN VALUE OF PROGRESSWITHSWAP METHOD");
             }
-        }else if((!swapBank.containsKey(exchangeid))){
+        }else if((!swapLog.containsKey(exchangeid))){
             code = ProgressingProcessCode.POKEMON_EXCHANGE_NOT_FOUND;
         }else {
-            swapBank.remove(exchangeid);
+            swapLog.remove(exchangeid);
             code = ProgressingProcessCode.POKEMON_REQUEST_SUCCESS;
         }
         return code;
@@ -240,17 +239,17 @@ public class PokemonService {
     @Scheduled(fixedDelay = 60000)
     private void checkTimeBank() {
         List<String> spoiledExchange = new ArrayList<>();
-        swapBank.forEach((key, exchange) -> {
+        swapLog.forEach((key, exchange) -> {
             if (System.currentTimeMillis() - exchange.getDepositTime() >= 5000) {
                 spoiledExchange.add(key);
             }
         });
         spoiledExchange.forEach(key -> {
-            PokemonSwapDeposit deposit = swapBank.get(key);
+            PokemonSwap deposit = swapLog.get(key);
             if(swapablePokemonStorage.size() < 6){
                 swapablePokemonStorage.add(deposit.getPokemonToDelete());
             }
-            swapBank.remove(key);
+            swapLog.remove(key);
         });
     }
 
@@ -266,15 +265,15 @@ public class PokemonService {
     }
 
     public Map<SwapBankAction,PokemonFrontEndDTO> getPokemonsFromSwapCacheLog(String exchangeId){
-        PokemonSwapDeposit deposit = swapCacheLog.get(exchangeId);
+        PokemonSwap swap = swapCacheLog.get(exchangeId);
         PokemonFrontEndDTO toSave;
         PokemonFrontEndDTO toDelete;
         Map<SwapBankAction,PokemonFrontEndDTO> mapDeposit = new EnumMap<>(SwapBankAction.class);
-        if(deposit!=null && deposit.getPokemonToDelete()!=null && deposit.getPokemonToSave()!=null){
-            int databaseIdPokemonToDelete = deposit.getPokemonToDelete().getDbId();
-            int databaseIdPokemonToSave = deposit.getPokemonToSave().getDbId();
-            Pokemon pokemonToDelete = pokemonMarshaller.fromDTO(deposit.getPokemonToDelete());
-            Pokemon pokemonToSave = pokemonMarshaller.fromDTO(deposit.getPokemonToSave());
+        if(swap!=null && swap.getPokemonToDelete()!=null && swap.getPokemonToSave()!=null){
+            int databaseIdPokemonToDelete = swap.getPokemonToDelete().getDbId();
+            int databaseIdPokemonToSave = swap.getPokemonToSave().getDbId();
+            Pokemon pokemonToDelete = pokemonMarshaller.fromDTO(swap.getPokemonToDelete());
+            Pokemon pokemonToSave = pokemonMarshaller.fromDTO(swap.getPokemonToSave());
 
             toSave = pokemonToFrontEndMarshaller.toDTO(pokemonToSave);
             toSave.setDatabaseId(databaseIdPokemonToSave);

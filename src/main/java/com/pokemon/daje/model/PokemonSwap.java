@@ -4,15 +4,14 @@ import com.pokemon.daje.persistance.dto.PokemonDTO;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 @Getter
 @Setter
-public class PokemonSwapDeposit {
+public class PokemonSwap {
     private Map<SwapBankAction,PokemonDTO> depositExchange;
     private long depositTime;
 
-    public PokemonSwapDeposit(Map<SwapBankAction, PokemonDTO> depositExchange) {
+    public PokemonSwap(Map<SwapBankAction, PokemonDTO> depositExchange) {
         this.depositExchange = depositExchange;
         depositTime = System.currentTimeMillis();
     }
