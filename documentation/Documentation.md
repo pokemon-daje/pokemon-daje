@@ -154,6 +154,7 @@ which pokemon to exchange.
 
 **Solution schema:**
 ![](image/pokemonExchangeSequence.png)
+
 ***
 
 ## <a name="Online-references">Online references</a>
